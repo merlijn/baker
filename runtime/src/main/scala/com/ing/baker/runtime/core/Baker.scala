@@ -118,7 +118,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
       throw new IllegalStateException(implementationErrors.mkString(", "))
 
     if (compiledRecipe.validationErrors.nonEmpty)
-      throw new RecipeValidationException(compiledRecipe.validationErrors.mkString(", "))
+      throw new IllegalArgumentException(compiledRecipe.validationErrors.mkString(", "))
 
     val futureResult = recipeManager.ask(AddRecipe(compiledRecipe))(timeout)
     Await.result(futureResult, timeout) match {

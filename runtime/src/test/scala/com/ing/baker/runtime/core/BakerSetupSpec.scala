@@ -122,7 +122,7 @@ class BakerSetupSpec extends BakerRuntimeTestBase {
 
         baker.addImplementations(mockImplementations)
 
-        intercept[RecipeValidationException] {
+        intercept[IllegalArgumentException] {
           baker.addRecipe(RecipeCompiler.compileRecipe(recipe))
         } should have('message ("Ingredient 'initialIngredient' for interaction 'InteractionOne' is not provided by any event or interaction"))
       }
