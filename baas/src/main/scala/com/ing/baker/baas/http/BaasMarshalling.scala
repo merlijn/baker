@@ -4,7 +4,7 @@ import akka.http.scaladsl.marshalling.PredefinedToEntityMarshallers
 import akka.http.scaladsl.unmarshalling.PredefinedFromEntityUnmarshallers
 import com.ing.baker.baas.KryoUtil
 import com.ing.baker.recipe.common.Recipe
-import com.ing.baker.runtime.core.{RuntimeEvent, SensoryEventStatus}
+import com.ing.baker.runtime.core.{ProcessEvent, SensoryEventStatus}
 import com.twitter.chill.KryoPool
 
 import scala.reflect.ClassTag
@@ -23,12 +23,12 @@ trait BaasMarshalling {
   }
 
   implicit val addInteractionUnmarshaller = kryoUnmarshaller[AddInteractionHTTPRequest]
-  implicit val eventUnmarshaller = kryoUnmarshaller[RuntimeEvent]
+  implicit val eventUnmarshaller = kryoUnmarshaller[ProcessEvent]
   implicit val recipeUnmarshaller = kryoUnmarshaller[Recipe]
 
   implicit val sensoryEventStatusMarhaller = kryoMarhaller[SensoryEventStatus]
   implicit val ingredientsMarhaller = kryoMarhaller[Map[String, Any]]
-  implicit val eventMarshaller = kryoMarhaller[RuntimeEvent]
-  implicit val eventListMarshaller = kryoMarhaller[List[RuntimeEvent]]
+  implicit val eventMarshaller = kryoMarhaller[ProcessEvent]
+  implicit val eventListMarshaller = kryoMarhaller[List[ProcessEvent]]
   implicit val stringMarshaller = kryoMarhaller[String]
 }

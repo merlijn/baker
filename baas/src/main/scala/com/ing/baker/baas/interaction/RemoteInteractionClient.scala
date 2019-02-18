@@ -8,7 +8,7 @@ import com.ing.baker.baas.KryoUtil.defaultKryoPool
 import com.ing.baker.baas.ClientUtils._
 import com.ing.baker.baas.interaction.http.ExecuteInteractionHTTPRequest
 import com.ing.baker.il.petrinet.InteractionTransition
-import com.ing.baker.runtime.core.{InteractionImplementation, RuntimeEvent}
+import com.ing.baker.runtime.core.{InteractionImplementation, ProcessEvent}
 import com.ing.baker.types.{Type, Value}
 import org.slf4j.LoggerFactory
 
@@ -33,7 +33,7 @@ case class RemoteInteractionClient(override val name: String,
     * @param input
     * @return
     */
-  override def execute(input: Seq[Value]): Option[RuntimeEvent] = {
+  override def execute(input: Seq[Value]): Option[ProcessEvent] = {
 
     log.info(s"Calling remote execution of interaction: $name on $uri")
 
@@ -44,6 +44,6 @@ case class RemoteInteractionClient(override val name: String,
         method = akka.http.scaladsl.model.HttpMethods.POST,
         entity = ByteString.fromArray(defaultKryoPool.toBytesWithClass(request)))
 
-    Option(doRequestAndParseResponse[RuntimeEvent](httpRequest))
+    Option(doRequestAndParseResponse[ProcessEvent](httpRequest))
   }
 }

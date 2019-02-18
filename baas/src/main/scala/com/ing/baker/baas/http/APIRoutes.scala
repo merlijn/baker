@@ -5,7 +5,7 @@ import akka.http.scaladsl.server.{Directives, Route}
 import com.ing.baker.baas.interaction.RemoteInteractionClient
 import com.ing.baker.compiler.RecipeCompiler
 import com.ing.baker.recipe.commonserialize
-import com.ing.baker.runtime.core.{Baker, RuntimeEvent}
+import com.ing.baker.runtime.core.{Baker, ProcessEvent}
 
 import scala.concurrent.duration._
 
@@ -21,7 +21,7 @@ object APIRoutes extends Directives with BaasMarshalling {
 
       path("event") {
         post {
-          (entity(as[RuntimeEvent]) & parameter('confirm.as[String] ?)) { (event, confirm) =>
+          (entity(as[ProcessEvent]) & parameter('confirm.as[String] ?)) { (event, confirm) =>
 
             val sensoryEventStatus = confirm.getOrElse(defaultEventConfirm) match {
               case "received"  => baker.processEventAsync(requestId, event).confirmReceived()

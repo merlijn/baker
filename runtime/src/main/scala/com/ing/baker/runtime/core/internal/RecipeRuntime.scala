@@ -13,15 +13,15 @@ import com.ing.baker.runtime.actor.process_instance.internal.ExceptionStrategy.{
 import com.ing.baker.runtime.actor.process_instance.internal._
 import com.ing.baker.runtime.core.events.{InteractionCompleted, InteractionFailed, InteractionStarted}
 import com.ing.baker.runtime.core.internal.RecipeRuntime._
-import com.ing.baker.runtime.core.{ProcessState, RuntimeEvent}
+import com.ing.baker.runtime.core.{ProcessState, ProcessEvent}
 import com.ing.baker.types.{PrimitiveValue, Value}
 import org.slf4j.MDC
 
 object RecipeRuntime {
-  def recipeEventSourceFn: Transition => (ProcessState => RuntimeEvent => ProcessState) =
+  def recipeEventSourceFn: Transition => (ProcessState => ProcessEvent => ProcessState) =
     _ => state => {
       case null => state
-      case RuntimeEvent(name, providedIngredients) =>
+      case ProcessEvent(name, providedIngredients) =>
         state.copy(
           ingredients = state.ingredients ++ providedIngredients,
           eventNames = state.eventNames :+ name)
@@ -32,7 +32,7 @@ object RecipeRuntime {
     *
     * It fills a token in the out adjacent place of the transition with the interaction name
     */
-  def createProducedMarking(outAdjacent: MultiSet[Place], event: Option[RuntimeEvent]): Marking[Place] = {
+  def createProducedMarking(outAdjacent: MultiSet[Place], event: Option[ProcessEvent]): Marking[Place] = {
     outAdjacent.keys.map { place =>
 
       // use the event name as a token value, otherwise null
@@ -47,7 +47,7 @@ object RecipeRuntime {
     *
     * Returns an optional error message.
     */
-  def validateInteractionOutput(interaction: InteractionTransition, optionalEvent: Option[RuntimeEvent]): Option[String] = {
+  def validateInteractionOutput(interaction: InteractionTransition, optionalEvent: Option[ProcessEvent]): Option[String] = {
 
     optionalEvent match {
 
@@ -103,11 +103,11 @@ object RecipeRuntime {
   }
 
   // function that (optionally) transforms the output event using the event output transformers
-  def transformInteractionEvent(interaction: InteractionTransition, runtimeEvent: RuntimeEvent): RuntimeEvent = {
+  def transformInteractionEvent(interaction: InteractionTransition, runtimeEvent: ProcessEvent): ProcessEvent = {
     interaction.eventOutputTransformers
       .find { case (eventName, _) => runtimeEvent.name.equals(eventName) } match {
       case Some((_, eventOutputTransformer)) =>
-        RuntimeEvent(
+        ProcessEvent(
           eventOutputTransformer.newEventName,
           runtimeEvent.providedIngredients.map { case (name, value) => eventOutputTransformer.ingredientRenames.getOrElse(name, name) -> value })
       case None => runtimeEvent
@@ -115,7 +115,7 @@ object RecipeRuntime {
   }
 }
 
-class RecipeRuntime(recipe: CompiledRecipe, interactionManager: InteractionManager, eventStream: EventStream) extends ProcessInstanceRuntime[Place, Transition, ProcessState, RuntimeEvent] {
+class RecipeRuntime(recipe: CompiledRecipe, interactionManager: InteractionManager, eventStream: EventStream) extends ProcessInstanceRuntime[Place, Transition, ProcessState, ProcessEvent] {
 
   /**
     * All transitions except sensory event interactions are auto-fireable by the runtime
@@ -162,7 +162,7 @@ class RecipeRuntime(recipe: CompiledRecipe, interactionManager: InteractionManag
             case ExceptionStrategyOutcome.BlockTransition => BlockTransition
             case ExceptionStrategyOutcome.RetryWithDelay(delay) => RetryWithDelay(delay)
             case ExceptionStrategyOutcome.Continue(eventName) => {
-              val runtimeEvent = RuntimeEvent(eventName, Seq.empty)
+              val runtimeEvent = ProcessEvent(eventName, Seq.empty)
               Continue(createProducedMarking(outMarking, Some(runtimeEvent)), runtimeEvent)
             }
           }
@@ -171,16 +171,16 @@ class RecipeRuntime(recipe: CompiledRecipe, interactionManager: InteractionManag
       }
   }
 
-  override def transitionTask(petriNet: PetriNet[Place, Transition], t: Transition)(marking: Marking[Place], state: ProcessState, input: Any): IO[(Marking[Place], RuntimeEvent)] =
+  override def transitionTask(petriNet: PetriNet[Place, Transition], t: Transition)(marking: Marking[Place], state: ProcessState, input: Any): IO[(Marking[Place], ProcessEvent)] =
     t match {
       case interaction: InteractionTransition => interactionTask(interaction, petriNet.outMarking(t), state)
-      case t: EventTransition                 => IO.pure(petriNet.outMarking(t).toMarking, input.asInstanceOf[RuntimeEvent])
-      case t                                  => IO.pure(petriNet.outMarking(t).toMarking, null.asInstanceOf[RuntimeEvent])
+      case t: EventTransition                 => IO.pure(petriNet.outMarking(t).toMarking, input.asInstanceOf[ProcessEvent])
+      case t                                  => IO.pure(petriNet.outMarking(t).toMarking, null.asInstanceOf[ProcessEvent])
     }
 
   def interactionTask(interaction: InteractionTransition,
                       outAdjacent: MultiSet[Place],
-                      processState: ProcessState): IO[(Marking[Place], RuntimeEvent)] = {
+                      processState: ProcessState): IO[(Marking[Place], ProcessEvent)] = {
 
     // returns a delayed task that will get executed by the process instance
     IO {
@@ -205,7 +205,7 @@ class RecipeRuntime(recipe: CompiledRecipe, interactionManager: InteractionManag
         eventStream.publish(InteractionStarted(timeStarted, recipe.name, recipe.recipeId, processState.processId, interaction.interactionName))
 
         // executes the interaction and obtain the (optional) output event
-        val interactionOutput: Option[RuntimeEvent] = implementation.execute(input)
+        val interactionOutput: Option[ProcessEvent] = implementation.execute(input)
 
         // validates the event, throws a FatalInteraction exception if invalid
         RecipeRuntime.validateInteractionOutput(interaction, interactionOutput).foreach { validationError =>
@@ -213,7 +213,7 @@ class RecipeRuntime(recipe: CompiledRecipe, interactionManager: InteractionManag
         }
 
         // transform the event if there is one
-        val outputEvent: Option[RuntimeEvent] = interactionOutput
+        val outputEvent: Option[ProcessEvent] = interactionOutput
           .map(e => transformInteractionEvent(interaction, e))
 
         val timeCompleted = System.currentTimeMillis()

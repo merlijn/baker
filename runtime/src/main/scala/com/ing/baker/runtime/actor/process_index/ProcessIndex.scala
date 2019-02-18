@@ -19,7 +19,7 @@ import com.ing.baker.runtime.actor.recipe_manager.RecipeManagerProtocol._
 import com.ing.baker.runtime.actor.serialization.{BakerProtoMessage, Encryption}
 import com.ing.baker.runtime.core.events.{ProcessCreated, RejectReason}
 import com.ing.baker.runtime.core.internal.{InteractionManager, RecipeRuntime}
-import com.ing.baker.runtime.core.{ProcessState, RuntimeEvent, events, namedCachedThreadPool, _}
+import com.ing.baker.runtime.core.{ProcessEvent, ProcessState, events, namedCachedThreadPool, _}
 
 import scala.collection.mutable
 import scala.concurrent.duration._
@@ -28,6 +28,7 @@ import scala.util.{Failure, Success}
 import cats.data.OptionT
 import cats.instances.future._
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol.ExceptionStrategy.{BlockTransition, Continue, RetryWithDelay}
+import com.ing.baker.runtime.core
 
 object ProcessIndex {
 
@@ -122,11 +123,11 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
 
   // creates a ProcessInstanceActor, does not do any validation
   def createProcessActor(processId: String, compiledRecipe: CompiledRecipe): ActorRef = {
-    val runtime: ProcessInstanceRuntime[Place, Transition, ProcessState, RuntimeEvent] =
+    val runtime: ProcessInstanceRuntime[Place, Transition, ProcessState, ProcessEvent] =
       new RecipeRuntime(compiledRecipe, interactionManager, context.system.eventStream)
 
     val processActorProps =
-      ProcessInstance.props[Place, Transition, ProcessState, RuntimeEvent](
+      ProcessInstance.props[Place, Transition, ProcessState, ProcessEvent](
         compiledRecipe.name, compiledRecipe.petriNet, runtime,
         ProcessInstance.Settings(
           executionContext = bakerExecutionContext,
@@ -232,7 +233,7 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
         case _ => sender() ! ProcessAlreadyExists(processId)
       }
 
-    case cmd @ ProcessEvent(processId: String, event: RuntimeEvent, _, waitForRetries, processEventTimout) =>
+    case cmd @ ProcessIndexProtocol.ProcessEvent(processId: String, event, _, waitForRetries, processEventTimout) =>
 
       def rejectWith(msg: Any, rejectReason: RejectReason): Unit = {
         context.system.eventStream.publish(events.EventRejected(System.currentTimeMillis(), cmd.processId, cmd.correlationId, cmd.event, rejectReason))

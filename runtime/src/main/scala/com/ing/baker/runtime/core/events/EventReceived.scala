@@ -1,6 +1,6 @@
 package com.ing.baker.runtime.core.events
 
-import com.ing.baker.runtime.core.RuntimeEvent
+import com.ing.baker.runtime.core.ProcessEvent
 
 /**
   * Event describing the fact that an event was received for a process.
@@ -17,4 +17,4 @@ case class EventReceived(timeStamp: Long,
                          recipeId: String,
                          processId: String,
                          correlationId: Option[String],
-                         event: RuntimeEvent) extends BakerEvent
+                         event: ProcessEvent) extends BakerEvent

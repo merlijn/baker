@@ -6,7 +6,7 @@ import com.ing.baker.BakerRuntimeTestBase
 import akka.testkit.{TestDuration, TestKit}
 import com.ing.baker.compiler.RecipeCompiler
 import com.ing.baker.recipe.scaladsl._
-import com.ing.baker.runtime.core.{Baker, RuntimeEvent}
+import com.ing.baker.runtime.core.{Baker, ProcessEvent}
 import ScalaDSLRuntime._
 
 import scala.concurrent.duration._

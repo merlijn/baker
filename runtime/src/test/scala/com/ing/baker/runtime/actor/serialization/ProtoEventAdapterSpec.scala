@@ -62,7 +62,7 @@ object ProtoEventAdapterSpec {
     val runtimeEventGen = for {
       eventName <- eventNameGen
       ingredients <- Gen.listOf(ingredientsGen)
-    } yield RuntimeEvent(eventName, ingredients)
+    } yield ProcessEvent(eventName, ingredients)
 
     val processStateGen = for {
       processId <- processIdGen

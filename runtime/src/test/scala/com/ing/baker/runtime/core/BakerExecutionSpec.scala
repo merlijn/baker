@@ -423,11 +423,11 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       response.confirmCompleted() shouldBe SensoryEventStatus.Completed
 
       response.confirmAllEvents(timeout) should contain only (
-         RuntimeEvent("InitialEvent", Seq(initialIngredient("initialIngredient"))),
-         RuntimeEvent("SieveInteractionSuccessful", Seq(sievedIngredient("sievedIngredient"))),
-         RuntimeEvent("InteractionOneSuccessful", Seq(interactionOneIngredient("interactionOneIngredient"))),
-         RuntimeEvent("EventFromInteractionTwo", Seq(interactionTwoIngredient("interactionTwoIngredient"))),
-         RuntimeEvent("InteractionThreeSuccessful", Seq(interactionThreeIngredient("interactionThreeIngredient")))
+         ProcessEvent("InitialEvent", Seq(initialIngredient("initialIngredient"))),
+         ProcessEvent("SieveInteractionSuccessful", Seq(sievedIngredient("sievedIngredient"))),
+         ProcessEvent("InteractionOneSuccessful", Seq(interactionOneIngredient("interactionOneIngredient"))),
+         ProcessEvent("EventFromInteractionTwo", Seq(interactionTwoIngredient("interactionTwoIngredient"))),
+         ProcessEvent("InteractionThreeSuccessful", Seq(interactionThreeIngredient("interactionThreeIngredient")))
       )
     }
 
@@ -914,7 +914,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
         Baker.extractEvent(InitialEvent(initialIngredientValue)),
         Baker.extractEvent(SieveInteractionSuccessful(sievedIngredientValue)),
         Baker.extractEvent(EventFromInteractionTwo(interactionTwoIngredientValue)),
-        RuntimeEvent("InteractionOneSuccessful", Seq("interactionOneIngredient" -> Converters.toValue(interactionOneIngredientValue))),
+        ProcessEvent("InteractionOneSuccessful", Seq("interactionOneIngredient" -> Converters.toValue(interactionOneIngredientValue))),
         Baker.extractEvent(InteractionThreeSuccessful(interactionThreeIngredientValue))
       )
 
@@ -925,8 +925,8 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       baker.events(processId) should contain only(
         Baker.extractEvent(InitialEvent(initialIngredientValue)),
         Baker.extractEvent(EventFromInteractionTwo(interactionTwoIngredientValue)),
-        RuntimeEvent("SecondEvent", Seq.empty),
-        RuntimeEvent("InteractionOneSuccessful", Seq("interactionOneIngredient" -> Converters.toValue(interactionOneIngredientValue))),
+        ProcessEvent("SecondEvent", Seq.empty),
+        ProcessEvent("InteractionOneSuccessful", Seq("interactionOneIngredient" -> Converters.toValue(interactionOneIngredientValue))),
         Baker.extractEvent(SieveInteractionSuccessful(sievedIngredientValue)),
         Baker.extractEvent(InteractionThreeSuccessful(interactionThreeIngredientValue)),
         Baker.extractEvent(InteractionFourSuccessful(interactionFourIngredientValue))

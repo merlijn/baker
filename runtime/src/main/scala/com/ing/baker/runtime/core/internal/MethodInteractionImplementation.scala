@@ -2,7 +2,7 @@ package com.ing.baker.runtime.core.internal
 
 import java.util.UUID
 
-import com.ing.baker.runtime.core.{RuntimeEvent, _}
+import com.ing.baker.runtime.core.{ProcessEvent, _}
 import com.ing.baker.types.{Converters, Type, Value}
 import org.slf4j.LoggerFactory
 
@@ -53,7 +53,7 @@ case class MethodInteractionImplementation(implementation: AnyRef) extends Inter
     }
   }.toSeq
 
-  override def execute(input: Seq[Value]): Option[RuntimeEvent] =  {
+  override def execute(input: Seq[Value]): Option[ProcessEvent] =  {
 
     val invocationId = UUID.randomUUID().toString
 

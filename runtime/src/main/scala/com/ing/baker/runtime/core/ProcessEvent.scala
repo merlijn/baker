@@ -5,7 +5,7 @@ import com.ing.baker.types.{NullValue, Value}
 
 import scala.collection.JavaConverters._
 
-case class RuntimeEvent(name: String,
+case class ProcessEvent(name: String,
                         providedIngredients: Seq[(String, Value)]) {
 
   /**

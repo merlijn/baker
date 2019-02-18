@@ -8,10 +8,9 @@ import akka.stream.testkit.TestSubscriber
 import akka.stream.testkit.scaladsl.TestSink
 import akka.testkit.{TestDuration, TestKit, TestProbe}
 import com.ing.baker.compiler.RecipeCompiler
-import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol.ProcessEvent
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol._
-import com.ing.baker.runtime.core.RuntimeEvent
+import com.ing.baker.runtime.core.ProcessEvent
 import com.typesafe.config.{Config, ConfigFactory}
 import org.scalatest.Matchers._
 import org.scalatest.WordSpecLike
@@ -47,7 +46,7 @@ class ProcessEventActorSpec extends TestKit(ActorSystem("ProcessApiSpec", Proces
 
       val processProbe = TestProbe()
 
-      val processEventCmd = ProcessEvent("", RuntimeEvent(webshop.orderPlaced.name, Seq.empty), None, true, 1 second)
+      val processEventCmd = ProcessIndexProtocol.ProcessEvent("", ProcessEvent(webshop.orderPlaced.name, Seq.empty), None, true, 1 second)
 
       val source: Source[Any, NotUsed] = ProcessEventActor.processEvent(processProbe.ref, webShopRecipe, processEventCmd)
 
@@ -67,7 +66,7 @@ class ProcessEventActorSpec extends TestKit(ActorSystem("ProcessApiSpec", Proces
 
       val processProbe = TestProbe()
 
-      val processEventCmd = ProcessEvent("", RuntimeEvent(webshop.orderPlaced.name, Seq.empty), None, true, 1 second)
+      val processEventCmd = ProcessIndexProtocol.ProcessEvent("", ProcessEvent(webshop.orderPlaced.name, Seq.empty), None, true, 1 second)
 
       val source: Source[Any, NotUsed] = ProcessEventActor.processEvent(processProbe.ref, webShopRecipe, processEventCmd)
 
@@ -90,7 +89,7 @@ class ProcessEventActorSpec extends TestKit(ActorSystem("ProcessApiSpec", Proces
 
       def check(msg: Any) = {
         val processProbe = TestProbe()
-        val processEventCmd = ProcessEvent("", RuntimeEvent(webshop.orderPlaced.name, Seq.empty), None, true, 1 second)
+        val processEventCmd = ProcessIndexProtocol.ProcessEvent("", ProcessEvent(webshop.orderPlaced.name, Seq.empty), None, true, 1 second)
 
         val source: Source[Any, NotUsed] = ProcessEventActor.processEvent(processProbe.ref, webShopRecipe, processEventCmd)
         val runSource: TestSubscriber.Probe[Any] = source.runWith(TestSink.probe)

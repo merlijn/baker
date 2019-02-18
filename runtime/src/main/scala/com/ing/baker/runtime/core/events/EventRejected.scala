@@ -1,6 +1,6 @@
 package com.ing.baker.runtime.core.events
 
-import com.ing.baker.runtime.core.RuntimeEvent
+import com.ing.baker.runtime.core.ProcessEvent
 
 /**
   * Event describing the fact that an event was received but rejected for a process
@@ -14,5 +14,5 @@ import com.ing.baker.runtime.core.RuntimeEvent
 case class EventRejected(timeStamp: Long,
                          processId: String,
                          correlationId: Option[String],
-                         event: RuntimeEvent,
+                         event: ProcessEvent,
                          reason: RejectReason) extends BakerEvent

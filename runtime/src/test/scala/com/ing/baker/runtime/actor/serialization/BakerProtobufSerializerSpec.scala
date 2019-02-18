@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.serialization.SerializationExtension
 import akka.testkit.TestKit
 import com.ing.baker.types.{PrimitiveValue, Value}
-import com.ing.baker.runtime.core.{ProcessState, RuntimeEvent}
+import com.ing.baker.runtime.core.{ProcessState, ProcessEvent}
 import org.scalacheck.Prop.forAll
 import org.scalacheck.{Gen, Test}
 import org.scalatest.FunSuiteLike
@@ -19,10 +19,10 @@ class BakerProtobufSerializerSpec extends TestKit(ActorSystem("BakerProtobufSeri
     data <- Gen.alphaNumStr // this uses akka.remote.serialization.StringSerializer
   } yield (name, PrimitiveValue(data))
 
-  val runtimeEventGen: Gen[RuntimeEvent] = for {
+  val runtimeEventGen: Gen[ProcessEvent] = for {
     name <- Gen.alphaNumStr
     ingredient <- Gen.mapOf(ingredientTupleGen)
-  } yield RuntimeEvent(name, ingredient.toSeq)
+  } yield ProcessEvent(name, ingredient.toSeq)
 
   val processStateGen: Gen[ProcessState] = for {
     name <- Gen.alphaNumStr

@@ -2,7 +2,7 @@ package com.ing.baker.runtime.core.events
 
 import java.util.Optional
 
-import com.ing.baker.runtime.core.RuntimeEvent
+import com.ing.baker.runtime.core.ProcessEvent
 
 /**
   * Event describing the fact that an interaction was executed successfully
@@ -21,12 +21,12 @@ case class InteractionCompleted(timeStamp: Long,
                                 recipeId: String,
                                 processId: String,
                                 interactionName: String,
-                                event: Option[RuntimeEvent]) extends BakerEvent {
+                                event: Option[ProcessEvent]) extends BakerEvent {
   /**
     * Java Optional version of the event.
     *
     * @return The (optional) event output of the interaction.
     */
-  def getEvent: Optional[RuntimeEvent] =
+  def getEvent: Optional[ProcessEvent] =
     event.map(e => Optional.of(e)).getOrElse(Optional.empty())
 }

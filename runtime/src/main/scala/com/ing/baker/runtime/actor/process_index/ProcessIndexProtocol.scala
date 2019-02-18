@@ -3,7 +3,7 @@ package com.ing.baker.runtime.actor.process_index
 import akka.stream.SourceRef
 import com.ing.baker.runtime.actor.process_index.ProcessIndex.ActorMetadata
 import com.ing.baker.runtime.actor.serialization.BakerProtoMessage
-import com.ing.baker.runtime.core.RuntimeEvent
+import com.ing.baker.runtime.core
 
 import scala.concurrent.duration.FiniteDuration
 
@@ -20,7 +20,7 @@ object ProcessIndexProtocol {
 
   case class CreateProcess(recipeId: String, override val processId: String) extends ProcessIndexMessage
 
-  case class ProcessEvent(override val processId: String, event: RuntimeEvent, correlationId: Option[String], waitForRetries: Boolean, timeout: FiniteDuration) extends ProcessIndexMessage
+  case class ProcessEvent(override val processId: String, event: core.ProcessEvent, correlationId: Option[String], waitForRetries: Boolean, timeout: FiniteDuration) extends ProcessIndexMessage
 
   case class ProcessEventResponse(override val processId: String, sourceRef: SourceRef[Any]) extends ProcessIndexMessage
 
@@ -30,7 +30,7 @@ object ProcessIndexProtocol {
 
   case class RetryBlockedInteraction(override val processId: String, interactionName: String) extends ProcessIndexMessage
 
-  case class ResolveBlockedInteraction(override val processId: String, interactionName: String, output: RuntimeEvent) extends ProcessIndexMessage
+  case class ResolveBlockedInteraction(override val processId: String, interactionName: String, output: core.ProcessEvent) extends ProcessIndexMessage
 
   case class StopRetryingInteraction(override val processId: String, interactionName: String) extends ProcessIndexMessage
 

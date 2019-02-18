@@ -9,7 +9,7 @@ import com.ing.baker.types.Value
 class RuntimeModule extends ProtoEventAdapterModule {
 
   override def toProto(ctx: ProtoEventAdapter): PartialFunction[AnyRef, scalapb.GeneratedMessage] = {
-    case e: core.RuntimeEvent =>
+    case e: core.ProcessEvent =>
       val ingredients = writeIngredients(e.providedIngredients, ctx)
       protobuf.RuntimeEvent(Some(e.name), ingredients)
 
@@ -21,7 +21,7 @@ class RuntimeModule extends ProtoEventAdapterModule {
   override def toDomain(ctx: ProtoEventAdapter): PartialFunction[scalapb.GeneratedMessage, AnyRef] = {
 
     case protobuf.RuntimeEvent(Some(name), ingredients) =>
-      core.RuntimeEvent(name, readIngredients(ingredients, ctx))
+      core.ProcessEvent(name, readIngredients(ingredients, ctx))
 
     case protobuf.ProcessState(Some(id), ingredients, events) =>
       core.ProcessState(id, readIngredients(ingredients, ctx).toMap, events.toList)

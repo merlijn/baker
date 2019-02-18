@@ -16,7 +16,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 
 object BakerResponse {
 
-  case class CompletedResponse(sensoryEventStatus: SensoryEventStatus, events: Seq[RuntimeEvent])
+  case class CompletedResponse(sensoryEventStatus: SensoryEventStatus, events: Seq[ProcessEvent])
 
   private def firstMessage(processId: String, response: Future[Any])(implicit ec: ExecutionContext): Future[SensoryEventStatus] =
     response.map(translateFirstMessage)
@@ -41,13 +41,13 @@ object BakerResponse {
       }
         .getOrElse(throw new NoSuchProcessException(s"No such process: $processId"))
 
-      val events: Seq[RuntimeEvent] = msgs.flatMap(translateOtherMessage)
+      val events: Seq[ProcessEvent] = msgs.flatMap(translateOtherMessage)
 
       CompletedResponse(sensoryEventStatus, events)
     }
 
-  private def translateOtherMessage(msg: Any): Option[RuntimeEvent] = msg match {
-    case fired: ProcessInstanceProtocol.TransitionFired => Option(fired.output.asInstanceOf[RuntimeEvent])
+  private def translateOtherMessage(msg: Any): Option[ProcessEvent] = msg match {
+    case fired: ProcessInstanceProtocol.TransitionFired => Option(fired.output.asInstanceOf[ProcessEvent])
     case _ => None
   }
 
@@ -147,7 +147,7 @@ class BakerResponse(processId: String, source: Source[Any, NotUsed])(implicit ma
     * @return
     */
   @throws[TimeoutException]("When the request does not receive a reply within the given deadline")
-  def confirmAllEvents(implicit timeout: FiniteDuration): Seq[RuntimeEvent] = {
+  def confirmAllEvents(implicit timeout: FiniteDuration): Seq[ProcessEvent] = {
     Await.result(completedFuture, timeout).events
   }
 }

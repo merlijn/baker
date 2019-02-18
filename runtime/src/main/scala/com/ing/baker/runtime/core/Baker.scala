@@ -33,6 +33,7 @@ import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 import scala.util.Try
 import Baker._
+import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceEventSourcing
 
 object Baker {
@@ -40,13 +41,13 @@ object Baker {
   /**
     * Transforms an object into a RuntimeEvent if possible.
     */
-  def extractEvent(event: Any): RuntimeEvent = {
+  def extractEvent(event: Any): ProcessEvent = {
     // transforms the given object into a RuntimeEvent instance
     event match {
-      case runtimeEvent: RuntimeEvent => runtimeEvent
+      case runtimeEvent: ProcessEvent => runtimeEvent
       case obj                        =>
         Converters.toValue(obj) match {
-          case RecordValue(entries) => RuntimeEvent(obj.getClass.getSimpleName, entries.toSeq)
+          case RecordValue(entries) => ProcessEvent(obj.getClass.getSimpleName, entries.toSeq)
           case other                => throw new IllegalArgumentException(s"Unexpected value: $other")
         }
     }
@@ -235,11 +236,11 @@ class Baker()(implicit val actorSystem: ActorSystem) {
   def processEventAsync(processId: String, event: Any, correlationId: Option[String] = None, timeout: FiniteDuration = defaultProcessEventTimeout): BakerResponse = {
 
     // transforms the given object into a RuntimeEvent instance
-    val runtimeEvent: RuntimeEvent = extractEvent(event)
+    val runtimeEvent: ProcessEvent = extractEvent(event)
 
     // sends the ProcessEvent command to the actor and retrieves a Source (stream) of responses.
     val response: Future[SourceRef[Any]] = processIndexActor
-      .ask(ProcessEvent(processId, runtimeEvent, correlationId, true, timeout))(timeout)
+      .ask(ProcessIndexProtocol.ProcessEvent(processId, runtimeEvent, correlationId, true, timeout))(timeout)
       .mapTo[ProcessEventResponse]
       .map(_.sourceRef)
 
@@ -292,11 +293,11 @@ class Baker()(implicit val actorSystem: ActorSystem) {
   def eventNames(processId: String, timeout: FiniteDuration = defaultInquireTimeout): List[String] =
     getProcessState(processId, timeout).eventNames
 
-  private def getEventsForRecipe(processId: String, compiledRecipe: CompiledRecipe): Source[(RuntimeEvent, Long), NotUsed] = {
+  private def getEventsForRecipe(processId: String, compiledRecipe: CompiledRecipe): Source[(ProcessEvent, Long), NotUsed] = {
     ProcessInstanceEventSourcing
-      .eventsForInstance[Place, Transition, ProcessState, RuntimeEvent](compiledRecipe.name, processId, compiledRecipe.petriNet, configuredEncryption, readJournal, RecipeRuntime.recipeEventSourceFn)
+      .eventsForInstance[Place, Transition, ProcessState, ProcessEvent](compiledRecipe.name, processId, compiledRecipe.petriNet, configuredEncryption, readJournal, RecipeRuntime.recipeEventSourceFn)
       .collect {
-        case (_, TransitionFiredEvent(_, _, _, _, time, _, _, runtimeEvent: RuntimeEvent))
+        case (_, TransitionFiredEvent(_, _, _, _, time, _, _, runtimeEvent: ProcessEvent))
           if runtimeEvent != null && compiledRecipe.allEvents.exists(e => e.name equals runtimeEvent.name) => (runtimeEvent, time)
       }
   }
@@ -307,7 +308,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     * @param processId The process identifier.
     * @return The source of events.
     */
-  def eventsWithTimestampAsync(processId: String): Source[(RuntimeEvent, Long), NotUsed] = {
+  def eventsWithTimestampAsync(processId: String): Source[(ProcessEvent, Long), NotUsed] = {
 
     val futureResult = processIndexActor.ask(GetCompiledRecipe(processId))(defaultInquireTimeout)
 
@@ -325,7 +326,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     * @param processId The process identifier.
     * @return A sequence of events with their timestamps.
     */
-  def eventsAsync(processId: String): Source[RuntimeEvent, NotUsed] =
+  def eventsAsync(processId: String): Source[ProcessEvent, NotUsed] =
     eventsWithTimestampAsync(processId).map { case (event, _) => event }
 
   /**
@@ -334,7 +335,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     * @param processId The process identifier.
     * @param timeout How long to wait to retrieve the events.
     */
-  def events(processId: String, timeout: FiniteDuration = defaultInquireTimeout): Seq[RuntimeEvent] =
+  def events(processId: String, timeout: FiniteDuration = defaultInquireTimeout): Seq[ProcessEvent] =
     eventsWithTimestamp(processId, timeout).map { case (event, _) => event }
 
   /**
@@ -344,7 +345,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     * @param timeout How long to wait to retrieve the events.
     * @return A sequence of events with their timestamps.
     */
-  def eventsWithTimestamp(processId: String, timeout: FiniteDuration = defaultInquireTimeout): Seq[(RuntimeEvent, Long)] = {
+  def eventsWithTimestamp(processId: String, timeout: FiniteDuration = defaultInquireTimeout): Seq[(ProcessEvent, Long)] = {
     val futureEventSeq = eventsWithTimestampAsync(processId).runWith(Sink.seq)
     Await.result(futureEventSeq, timeout)
   }

@@ -31,7 +31,7 @@ class BakerProtobufSerializer(system: ExtendedActorSystem) extends SerializerWit
   private lazy val protoEventAdapter = new ProtoEventAdapterImpl(getSerializationExtension(), NoEncryption)
 
   val manifestInfo = Seq(
-    Entry("core.RuntimeEvent", classOf[core.RuntimeEvent], protobuf.RuntimeEvent),
+    Entry("core.RuntimeEvent", classOf[core.ProcessEvent], protobuf.RuntimeEvent),
     Entry("core.ProcessState", classOf[core.ProcessState], protobuf.ProcessState),
 
     Entry("il.CompiledRecipe", classOf[il.CompiledRecipe], protobuf.CompiledRecipe),

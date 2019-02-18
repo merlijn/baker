@@ -25,5 +25,5 @@ trait InteractionImplementation {
     * @param input
     * @return
     */
-  def execute(input: Seq[Value]): Option[RuntimeEvent]
+  def execute(input: Seq[Value]): Option[ProcessEvent]
 }
