@@ -9,7 +9,6 @@ import akka.stream.scaladsl.{Broadcast, GraphDSL, Sink, Source}
 import akka.stream.{ClosedShape, Materializer}
 import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol
-import com.ing.baker.runtime.java_api.EventList
 
 import scala.compat.java8.FutureConverters
 import scala.concurrent.duration.{FiniteDuration, SECONDS}
@@ -117,39 +116,6 @@ class BakerResponse(processId: String, source: Source[Any, NotUsed])(implicit ma
   @throws[TimeoutException]("When the request does not receive a reply within the given deadline")
   def confirmCompleted(implicit timeout: FiniteDuration): SensoryEventStatus = {
     Await.result(completedFuture, timeout).sensoryEventStatus
-  }
-
-  /**
-    * Waits for all events that where caused by the sensory event input.
-    *
-    * !!! Note that this will return an empty list if the sensory event was rejected
-    *
-    * Therefor you are encouraged to first confirm that the event was properly received before checking this list.
-    * {{{
-    * BakerResponse response = baker.processEvent(someEvent);
-    *
-    * switch (response.confirmReceived()) {
-    *   case Received:
-    *
-    *     EventList events = response.confirmAllEvents()
-    *     // ...
-    *     break;
-    *
-    *   case ReceivePeriodExpired:
-    *   case AlreadyReceived:
-    *   case ProcessDeleted:
-    *   case FiringLimitMet:
-    *   case AlreadyReceived:
-    *     // ...
-    *     break;
-    * }
-    * }}}
-    * @param timeout The duration to wait for completion
-    * @return
-    */
-  @throws[TimeoutException]("When the request does not receive a reply within the given deadline")
-  def confirmAllEvents(timeout: Duration): EventList = {
-    EventList.ScalaWithNoTimestamps(confirmAllEvents(timeout.toScala))
   }
 
   /**

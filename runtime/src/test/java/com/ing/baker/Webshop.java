@@ -10,7 +10,7 @@ import com.ing.baker.recipe.annotations.RequiresIngredient;
 import com.ing.baker.recipe.javadsl.Interaction;
 import com.ing.baker.recipe.javadsl.InteractionFailureStrategy;
 import com.ing.baker.recipe.javadsl.Recipe;
-import com.ing.baker.runtime.java_api.JBaker;
+//import com.ing.baker.runtime.java_api.JBaker;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 import org.junit.Test;
@@ -145,16 +145,16 @@ public class Webshop {
         when(manufactureGoodsMock.apply(any())).thenReturn(new ManufactureGoods.GoodsManufactured("goods"));
         when(validateOrderMock.apply(any(), any())).thenReturn(new ValidateOrder.Valid());
 
-        JBaker baker = new JBaker(ActorSystem.apply("webshop", config));
-
-        baker.addImplementations(ImmutableList.of(shipGoodsMock, sendInvoiceMock, manufactureGoodsMock, validateOrderMock));
-
-        String recipeId = baker.addRecipe(recipe);
+//        JBaker baker = new JBaker(ActorSystem.apply("webshop", config));
+//
+//        baker.addImplementations(ImmutableList.of(shipGoodsMock, sendInvoiceMock, manufactureGoodsMock, validateOrderMock));
+//
+//        String recipeId = baker.addRecipe(recipe);
 
         String processId = "56a70f82-a24d-497f-b3ac-57366adbb39c"; //UUID.randomUUID().toString();
 
-        System.out.println("recipeId: " + recipeId);
-        System.out.println("processId: " + processId);
+//        System.out.println("recipeId: " + recipeId);
+//        System.out.println("processId: " + processId);
 
 
 //        baker.bake(recipeId, processId);
@@ -163,7 +163,7 @@ public class Webshop {
 //        baker.processEvent(processId, new OrderPlaced(order));
 //        baker.processEvent(processId, new PaymentMade());
 
-        System.out.println("ingredients: " + baker.getIngredients(processId).toString());
-        System.out.println("events: " + baker.getEvents(processId).toString());
+//        System.out.println("ingredients: " + baker.getIngredients(processId).toString());
+//        System.out.println("events: " + baker.getEvents(processId).toString());
     }
 }
