@@ -49,16 +49,16 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val id = UUID.randomUUID().toString
 
-      baker.bake(recipeId, id)
+      baker.createProcess(recipeId, id)
     }
 
     "throw an IllegalArgumentException if a baking a process with the same identifier twice" in {
       val (baker, recipeId) = setupBakerWithRecipe("DuplicateIdentifierRecipe")
 
       val id = UUID.randomUUID().toString
-      baker.bake(recipeId, id)
+      baker.createProcess(recipeId, id)
       a[IllegalArgumentException] should be thrownBy {
-        baker.bake(recipeId, id)
+        baker.createProcess(recipeId, id)
       }
     }
 
@@ -95,7 +95,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val (baker, recipeId) = setupBakerWithRecipe("NonExistingProcessEventTest")
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
       val intercepted: IllegalArgumentException = intercept[IllegalArgumentException] {
         baker.fireEvent(processId, SomeNotDefinedEvent("bla"))
       }
@@ -114,7 +114,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val processId = UUID.randomUUID().toString
 
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       verify(testInteractionOneMock).apply(processId.toString, "initialIngredient")
@@ -151,7 +151,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val processId = UUID.randomUUID().toString
 
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       verify(testInteractionTwoMock).apply(initialIngredientValue)
@@ -173,7 +173,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       when(testInteractionOneMock.apply(anyString(), anyString())).thenReturn(InteractionOneSuccessful(interactionOneIngredientValue))
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       val executedFirst = baker.fireEvent(processId, InitialEvent(initialIngredientValue))
       executedFirst shouldBe SensoryEventStatus.Completed
@@ -196,7 +196,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       when(testInteractionOneMock.apply(anyString(), anyString())).thenReturn(InteractionOneSuccessful(interactionOneIngredientValue))
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       val executedFirst = baker.fireEvent(processId, InitialEvent(initialIngredientValue), Some("abc"))
       executedFirst shouldBe SensoryEventStatus.Completed
@@ -219,7 +219,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       when(testInteractionOneMock.apply(anyString(), anyString())).thenReturn(InteractionOneSuccessful(interactionOneIngredientValue))
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       val executedFirst = baker.fireEvent(processId, InitialEvent(initialIngredientValue))
       executedFirst shouldBe SensoryEventStatus.Completed
@@ -297,7 +297,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
         def createProcess(): Unit = {
 
-          baker.bake(recipeId, processId)
+          baker.createProcess(recipeId, processId)
 
           // prepare mocks
           when(shipGoodsMock.apply(anyString(), any[CustomerInfo]())).thenReturn(new ShipGoods.GoodsShipped(trackingId))
@@ -358,7 +358,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val recipeId = baker.addRecipe(compiledRecipe)
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId).toString
+      baker.createProcess(recipeId, processId).toString
 
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
@@ -378,7 +378,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val processId = UUID.randomUUID().toString
 
-      baker.bake(recipeId, processId).toString
+      baker.createProcess(recipeId, processId).toString
       baker.fireEvent(processId, UnboxedProviderEvent(initialIngredientValue, initialIngredientValue, initialIngredientValue))
 
       verify(testOptionalIngredientInteractionMock).apply(java.util.Optional.of(initialIngredientValue), Optional.empty(), Some(initialIngredientValue), Option.empty, initialIngredientValue)
@@ -402,7 +402,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 //      baker.registerEventListener(listenerMock)
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
 //      verify(listenerMock).apply(processId.toString, Baker.extractEvent(InitialEvent(initialIngredientValue)))
@@ -415,7 +415,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val processId = UUID.randomUUID().toString
 
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       val response = baker.fireEventAsync(processId, InitialEvent(initialIngredientValue))
 
@@ -442,7 +442,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       when(testInteractionOneMock.apply(anyString(), anyString())).thenReturn(InteractionOneSuccessful(interactionOneIngredientValue))
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
@@ -454,7 +454,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val (baker, recipeId) = setupBakerWithRecipe("JoinRecipeForIngredients")
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
@@ -468,7 +468,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val (baker, recipeId) = setupBakerWithRecipe("JoinRecipeForEvents")
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       baker.fireEvent(processId, InitialEvent("initialIngredient"))
       baker.fireEvent(processId, SecondEvent())
@@ -490,7 +490,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val (baker, recipeId) = setupBakerWithRecipe(recipe, mockImplementations)
 
       val firstProcessId = UUID.randomUUID().toString
-      baker.bake(recipeId, firstProcessId)
+      baker.createProcess(recipeId, firstProcessId)
 
       // Fire one of the events for the first process
       baker.fireEvent(firstProcessId, InitialEvent("initialIngredient"))
@@ -500,7 +500,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       resetMocks
 
       val secondProcessId = UUID.randomUUID().toString
-      baker.bake(recipeId, secondProcessId)
+      baker.createProcess(recipeId, secondProcessId)
 
       baker.fireEvent(secondProcessId, SecondEvent())
       verify(testInteractionFourMock).apply()
@@ -516,7 +516,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val (baker, recipeId) = setupBakerWithRecipe(recipe, mockImplementations)
 
       val firstProcessId = UUID.randomUUID().toString
-      baker.bake(recipeId, firstProcessId)
+      baker.createProcess(recipeId, firstProcessId)
 
       // Fire one of the events for the first process
       baker.fireEvent(firstProcessId, InitialEvent("initialIngredient"))
@@ -531,7 +531,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val (baker, recipeId) = setupBakerWithRecipe("MultipleInteractionsFromOneIngredient")
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       baker.fireEvent(processId, InitialEvent("initialIngredient"))
 
@@ -544,7 +544,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val (baker, recipeId) = setupBakerWithRecipe("MultipleInteractionsFromOneIngredient")
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       baker.fireEvent(processId, InitialEvent("initialIngredient"))
 
@@ -579,7 +579,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val processId = UUID.randomUUID().toString
 
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       Thread.sleep(2000)
 
@@ -610,7 +610,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       when(testInteractionOneMock.apply(processId.toString, firstData)).thenReturn(InteractionOneSuccessful(firstResponse))
       when(testInteractionOneMock.apply(processId.toString, secondData)).thenReturn(InteractionOneSuccessful(secondResponse))
 
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       //Fire the first event
       baker.fireEvent(processId, InitialEvent(firstData))
@@ -653,7 +653,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val processId = UUID.randomUUID().toString
 
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       verify(testInteractionOneMock).apply(processId.toString, initialIngredientValue)
@@ -674,7 +674,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
         .thenThrow(new RuntimeException(errorMessage))
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
     }
 
@@ -688,8 +688,8 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
         .thenReturn(InteractionOneSuccessful(interactionOneIngredientValue))
       when(testInteractionOneMock.apply(secondProcessId.toString, initialIngredientValue))
         .thenThrow(new RuntimeException(errorMessage))
-      baker.bake(recipeId, firstProcessId)
-      baker.bake(recipeId, secondProcessId)
+      baker.createProcess(recipeId, firstProcessId)
+      baker.createProcess(recipeId, secondProcessId)
 
       // start the first process with firing an event
       baker.fireEvent(firstProcessId, InitialEvent(initialIngredientValue))
@@ -710,7 +710,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val processId = UUID.randomUUID().toString
       when(testInteractionOneMock.apply(processId.toString, initialIngredientValue))
         .thenThrow(new RuntimeException(errorMessage))
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       // Send failing event and after that send succeeding event
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
@@ -729,7 +729,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
         .thenThrow(new RuntimeException(errorMessage))
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
@@ -749,7 +749,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val processId = UUID.randomUUID().toString
 
       when(testInteractionTwoMock.apply(anyString())).thenThrow(new RuntimeException(errorMessage))
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       // first fired event causes a failure in the action
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
@@ -782,7 +782,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val (baker, recipeId) = setupBakerWithRecipe(recipe, mockImplementations)
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       //Handle first event
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
@@ -803,7 +803,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val (baker, recipeId) = setupBakerWithRecipe(recipe, mockImplementations)
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       //Handle first event
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
@@ -829,7 +829,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       baker.registerEventListener(PartialFunction(listenerMock))
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       //Handle first event
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
@@ -854,7 +854,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val processId = UUID.randomUUID().toString
 
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
       val status = baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       baker.getIngredients(processId) shouldBe
@@ -883,7 +883,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val processId = UUID.randomUUID().toString
 
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
       val status = baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       baker.getIngredients(processId) shouldBe
@@ -904,7 +904,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val (baker, recipeId) = setupBakerWithRecipe("CheckEventRecipe")
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       //Handle first event
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
@@ -938,7 +938,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val (baker, recipeId) = setupBakerWithRecipe("CheckEventNamesRecipe")
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       //Handle two event
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
@@ -973,7 +973,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
         val processIds = (0 to nrOfProcesses).map(_ => java.util.UUID.randomUUID().toString).toSet
 
-        processIds.foreach(id => baker.bake(recipeId, id))
+        processIds.foreach(id => baker.createProcess(recipeId, id))
 
         baker.getIndex().map(_.processId) shouldBe processIds
       }
@@ -990,7 +990,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val processIds = (0 to nrOfProcesses).map(_ => java.util.UUID.randomUUID().toString).toSet
 
-      processIds.foreach(id => baker.bake(recipeId, id))
+      processIds.foreach(id => baker.createProcess(recipeId, id))
 
       baker.getIndex().map(_.processId) shouldBe processIds
     }
@@ -1007,7 +1007,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       try {
         val baker1 = setupBakerWithNoRecipe()(system1)
         recipeId = baker1.addRecipe(compiledRecipe)
-        baker1.bake(recipeId, processId)
+        baker1.createProcess(recipeId, processId)
         baker1.fireEvent(processId, InitialEvent(initialIngredientValue))
         baker1.fireEvent(processId, SecondEvent())
         baker1.getIngredients(processId) shouldBe finalState
@@ -1043,7 +1043,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       }
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
       val response: BakerResponse = baker.fireEventAsync(processId, InitialEvent(initialIngredientValue))
 
       response.confirmCompleted(3000 millis) shouldBe SensoryEventStatus.Completed
@@ -1056,7 +1056,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
         .thenThrow(new RuntimeException("Unknown Exception.")) // This interaction is not retried and blocks the process
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
       val response = baker.fireEventAsync(processId, InitialEvent(initialIngredientValue))
 
       response.confirmReceived() shouldBe SensoryEventStatus.Received
@@ -1075,7 +1075,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       //      println(baker.compiledRecipe.getRecipeVisualization)
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       verify(testInteractionOneMock, times(1)).apply(processId.toString, initialIngredientValue)
@@ -1096,7 +1096,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val (baker, recipeId) = setupBakerWithRecipe(recipe, mockImplementations)
       val processId = UUID.randomUUID().toString
 
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       verify(testInteractionOneMock, times(1)).apply(processId.toString, initialIngredientValue)
@@ -1117,7 +1117,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val processId = UUID.randomUUID().toString
 
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       Thread.sleep(receivePeriod.toMillis + 100)
 
@@ -1137,7 +1137,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val (baker, recipeId) = setupBakerWithRecipe(recipe, mockImplementations)
       val processId = UUID.randomUUID().toString
 
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       baker.fireEvent(processId, InitialEvent("")) shouldBe SensoryEventStatus.Completed
     }
@@ -1147,7 +1147,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val (baker, recipeId) = setupBakerWithRecipe("CheckEventRecipe")
 
       val processId = UUID.randomUUID().toString
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       val noEventsGraph = baker.getVisualState(processId)
       //      System.out.println(noEventsGraph)
@@ -1181,7 +1181,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val processId = UUID.randomUUID().toString
 
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       //Should not fail
       baker.getIngredients(processId)
@@ -1212,7 +1212,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val processId = UUID.randomUUID().toString
 
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
@@ -1233,7 +1233,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val processId = UUID.randomUUID().toString
 
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 

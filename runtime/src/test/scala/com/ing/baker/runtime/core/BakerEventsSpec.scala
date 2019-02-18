@@ -100,7 +100,7 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
 
       baker.registerEventListener(listenerFunction(listenerProbe.ref))
 
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
       baker.fireEvent(processId, InitialEvent(initialIngredientValue), Some("someId"))
 
       // TODO check the order of the timestamps later
@@ -131,7 +131,7 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
 
       baker.registerEventListener(listenerFunction(listenerProbe.ref))
 
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       // We used async function here because ThirdEvent is not part of the recipe and throws exception
       baker.fireEventAsync(processId, ThirdEvent(), Some("someId"))
@@ -152,7 +152,7 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
 
       baker.registerEventListener(listenerFunction(listenerProbe.ref))
 
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
       baker.fireEvent(processId, InitialEvent(initialIngredientValue), Some("someId"))
       baker.fireEvent(processId, InitialEvent(initialIngredientValue), Some("someId")) // Same correlationId cannot be used twice
 
@@ -172,7 +172,7 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
 
       baker.registerEventListener(listenerFunction(listenerProbe.ref))
 
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
       baker.fireEvent(processId, InitialEvent(initialIngredientValue)) // Firing limit is set to 1 in the recipe
 
@@ -192,7 +192,7 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
 
       baker.registerEventListener(listenerFunction(listenerProbe.ref))
 
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       Thread.sleep(eventReceiveTimeout.toMillis)
 

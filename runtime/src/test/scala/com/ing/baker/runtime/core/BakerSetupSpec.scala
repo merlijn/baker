@@ -40,7 +40,7 @@ class BakerSetupSpec extends BakerRuntimeTestBase {
         val recipeId = baker.addRecipe(simpleRecipe)
         val processId = java.util.UUID.randomUUID().toString
 
-        baker.bake(recipeId, processId)
+        baker.createProcess(recipeId, processId)
         baker.fireEvent(processId, initialEvent.instance("initialIngredient"))
 
       }

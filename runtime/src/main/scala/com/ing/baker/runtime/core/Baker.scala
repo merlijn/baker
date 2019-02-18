@@ -11,17 +11,19 @@ import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, SourceRef}
 import akka.util.Timeout
 import com.ing.baker.il._
-import com.ing.baker.il.failurestrategy.ExceptionStrategyOutcome
 import com.ing.baker.il.petrinet._
-import com.ing.baker.runtime.actor.process_instance.ProcessInstanceEventSourcing.TransitionFiredEvent
 import com.ing.baker.runtime.actor._
+import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol
 import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol._
+import com.ing.baker.runtime.actor.process_instance.ProcessInstanceEventSourcing
+import com.ing.baker.runtime.actor.process_instance.ProcessInstanceEventSourcing.TransitionFiredEvent
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol.{Initialized, InstanceState, Uninitialized}
 import com.ing.baker.runtime.actor.recipe_manager.RecipeManagerProtocol._
 import com.ing.baker.runtime.actor.serialization.Encryption
 import com.ing.baker.runtime.actor.serialization.Encryption.NoEncryption
 import com.ing.baker.runtime.core
-import com.ing.baker.runtime.core.events.{BakerEvent, EventReceived, InteractionCompleted, InteractionFailed}
+import com.ing.baker.runtime.core.Baker._
+import com.ing.baker.runtime.core.events.BakerEvent
 import com.ing.baker.runtime.core.internal.{InteractionManager, MethodInteractionImplementation, RecipeRuntime}
 import com.ing.baker.types.{Converters, RecordValue, Value}
 import net.ceedubs.ficus.Ficus._
@@ -32,9 +34,6 @@ import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 import scala.util.Try
-import Baker._
-import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol
-import com.ing.baker.runtime.actor.process_instance.ProcessInstanceEventSourcing
 
 object Baker {
 
@@ -190,8 +189,8 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     * @return
     */
   @throws[TimeoutException]("When the request does not receive a reply within the given deadline")
-  def bake(recipeId: String, processId: String, timeout: FiniteDuration = defaultBakeTimeout): ProcessState =
-    Await.result(bakeAsync(recipeId, processId), timeout)
+  def createProcess(recipeId: String, processId: String, timeout: FiniteDuration = defaultBakeTimeout): ProcessState =
+    Await.result(createProcessAsync(recipeId, processId), timeout)
 
   /**
     * Asynchronously creates a process instance for the given recipeId with the given processId as identifier
@@ -201,7 +200,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     * @param timeout
     * @return
     */
-  def bakeAsync(recipeId: String, processId: String, timeout: FiniteDuration = defaultBakeTimeout): Future[ProcessState] = {
+  def createProcessAsync(recipeId: String, processId: String, timeout: FiniteDuration = defaultBakeTimeout): Future[ProcessState] = {
 
     val initializeFuture = processIndexActor.ask(CreateProcess(recipeId, processId))(timeout)
 
@@ -297,8 +296,8 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     ProcessInstanceEventSourcing
       .eventsForInstance[Place, Transition, ProcessState, ProcessEvent](compiledRecipe.name, processId, compiledRecipe.petriNet, configuredEncryption, readJournal, RecipeRuntime.recipeEventSourceFn)
       .collect {
-        case (_, TransitionFiredEvent(_, _, _, _, time, _, _, runtimeEvent: ProcessEvent))
-          if runtimeEvent != null && compiledRecipe.allEvents.exists(e => e.name equals runtimeEvent.name) => (runtimeEvent, time)
+        case (_, TransitionFiredEvent(_, _, _, _, time, _, _, event: ProcessEvent))
+          if event != null && compiledRecipe.allEvents.exists(e => e.name equals event.name) => (event, time)
       }
   }
 

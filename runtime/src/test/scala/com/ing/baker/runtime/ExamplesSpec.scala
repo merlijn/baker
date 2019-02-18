@@ -74,7 +74,7 @@ class ExamplesSpec extends BakerRuntimeTestBase  {
 
       val processId = UUID.randomUUID().toString
 
-      baker.bake(recipeId, processId)
+      baker.createProcess(recipeId, processId)
 
       implicit val timeout: FiniteDuration = 2.seconds.dilated
 
