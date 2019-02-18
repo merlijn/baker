@@ -98,7 +98,7 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
 
       val listenerProbe = TestProbe()
 
-      baker.registerEventListenerPF(listenerFunction(listenerProbe.ref))
+      baker.registerEventListener(listenerFunction(listenerProbe.ref))
 
       baker.bake(recipeId, processId)
       baker.processEvent(processId, InitialEvent(initialIngredientValue), Some("someId"))
@@ -129,7 +129,7 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
 
       val listenerProbe = TestProbe()
 
-      baker.registerEventListenerPF(listenerFunction(listenerProbe.ref))
+      baker.registerEventListener(listenerFunction(listenerProbe.ref))
 
       baker.bake(recipeId, processId)
 
@@ -150,7 +150,7 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
 
       val listenerProbe = TestProbe()
 
-      baker.registerEventListenerPF(listenerFunction(listenerProbe.ref))
+      baker.registerEventListener(listenerFunction(listenerProbe.ref))
 
       baker.bake(recipeId, processId)
       baker.processEvent(processId, InitialEvent(initialIngredientValue), Some("someId"))
@@ -170,7 +170,7 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
 
       val listenerProbe = TestProbe()
 
-      baker.registerEventListenerPF(listenerFunction(listenerProbe.ref))
+      baker.registerEventListener(listenerFunction(listenerProbe.ref))
 
       baker.bake(recipeId, processId)
       baker.processEvent(processId, InitialEvent(initialIngredientValue))
@@ -190,7 +190,7 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
 
       val listenerProbe = TestProbe()
 
-      baker.registerEventListenerPF(listenerFunction(listenerProbe.ref))
+      baker.registerEventListener(listenerFunction(listenerProbe.ref))
 
       baker.bake(recipeId, processId)
 
@@ -212,7 +212,7 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
 
       val listenerProbe = TestProbe()
 
-      baker.registerEventListenerPF(listenerFunction(listenerProbe.ref))
+      baker.registerEventListener(listenerFunction(listenerProbe.ref))
 
       // Skipped baking the process here, so the process with processId does not exist
 

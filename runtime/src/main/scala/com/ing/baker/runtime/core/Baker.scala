@@ -441,43 +441,13 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     }
   }
 
-  private def doRegisterEventListener(listener: EventListener, processFilter: String => Boolean): Boolean = {
-
-    registerEventListenerPF {
-
-      case EventReceived(_, recipeName, _, processId, _, event) if processFilter(recipeName) =>
-        listener.processEvent(processId, event)
-      case InteractionCompleted(_, _, recipeName, _, processId, _, Some(event)) if processFilter(recipeName) =>
-        listener.processEvent(processId, event)
-      case InteractionFailed(_, _, recipeName, _, processId, _, _, _, ExceptionStrategyOutcome.Continue(eventName)) if processFilter(recipeName) =>
-        listener.processEvent(processId, RuntimeEvent(eventName, Seq.empty))
-    }
-  }
-
-  /**
-    * Registers a listener to all runtime events for recipes with the given name run in this baker instance.
-    *
-    * Note that the delivery guarantee is *AT MOST ONCE*. Do not use it for critical functionality
-    */
-  def registerEventListener(recipeName: String, listener: EventListener): Boolean =
-    doRegisterEventListener(listener, _ == recipeName)
-
-  /**
-    * Registers a listener to all runtime events for all recipes that run in this Baker instance.
-    *
-    * Note that the delivery guarantee is *AT MOST ONCE*. Do not use it for critical functionality
-    */
-//  @deprecated("Use event bus instead", "1.4.0")
-  def registerEventListener(listener: EventListener): Boolean =
-    doRegisterEventListener(listener, _ => true)
-
   /**
     * This registers a listener function.
     *
     * @param pf A partial function that receives the events.
     * @return
     */
-  def registerEventListenerPF(pf: PartialFunction[BakerEvent, Unit]): Boolean = {
+  def registerEventListener(pf: PartialFunction[BakerEvent, Unit]): Boolean = {
 
     val listenerActor = actorSystem.actorOf(Props(new Actor() {
       override def receive: Receive = {
