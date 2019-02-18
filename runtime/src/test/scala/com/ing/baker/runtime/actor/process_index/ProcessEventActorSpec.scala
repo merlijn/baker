@@ -8,6 +8,7 @@ import akka.stream.testkit.TestSubscriber
 import akka.stream.testkit.scaladsl.TestSink
 import akka.testkit.{TestDuration, TestKit, TestProbe}
 import com.ing.baker.compiler.RecipeCompiler
+import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol.FireEvent
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol._
 import com.ing.baker.runtime.core.ProcessEvent
@@ -46,7 +47,7 @@ class ProcessEventActorSpec extends TestKit(ActorSystem("ProcessApiSpec", Proces
 
       val processProbe = TestProbe()
 
-      val processEventCmd = ProcessIndexProtocol.ProcessEvent("", ProcessEvent(webshop.orderPlaced.name, Seq.empty), None, true, 1 second)
+      val processEventCmd = FireEvent("", ProcessEvent(webshop.orderPlaced.name, Seq.empty), None, true, 1 second)
 
       val source: Source[Any, NotUsed] = ProcessEventActor.processEvent(processProbe.ref, webShopRecipe, processEventCmd)
 
@@ -66,7 +67,7 @@ class ProcessEventActorSpec extends TestKit(ActorSystem("ProcessApiSpec", Proces
 
       val processProbe = TestProbe()
 
-      val processEventCmd = ProcessIndexProtocol.ProcessEvent("", ProcessEvent(webshop.orderPlaced.name, Seq.empty), None, true, 1 second)
+      val processEventCmd = FireEvent("", ProcessEvent(webshop.orderPlaced.name, Seq.empty), None, true, 1 second)
 
       val source: Source[Any, NotUsed] = ProcessEventActor.processEvent(processProbe.ref, webShopRecipe, processEventCmd)
 
@@ -89,7 +90,7 @@ class ProcessEventActorSpec extends TestKit(ActorSystem("ProcessApiSpec", Proces
 
       def check(msg: Any) = {
         val processProbe = TestProbe()
-        val processEventCmd = ProcessIndexProtocol.ProcessEvent("", ProcessEvent(webshop.orderPlaced.name, Seq.empty), None, true, 1 second)
+        val processEventCmd = FireEvent("", ProcessEvent(webshop.orderPlaced.name, Seq.empty), None, true, 1 second)
 
         val source: Source[Any, NotUsed] = ProcessEventActor.processEvent(processProbe.ref, webShopRecipe, processEventCmd)
         val runSource: TestSubscriber.Probe[Any] = source.runWith(TestSink.probe)

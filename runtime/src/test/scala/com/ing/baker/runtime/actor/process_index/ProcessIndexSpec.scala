@@ -175,9 +175,9 @@ class ProcessIndexSpec extends TestKit(ActorSystem("ProcessIndexSpec", ProcessIn
 
       petriNetActorProbe.expectMsg(initializeMsg)
 
-      val runtimeEvent = new ProcessEvent("Event", Seq.empty)
+      val event = new ProcessEvent("Event", Seq.empty)
 
-      actorIndex ! ProcessIndexProtocol.ProcessEvent(processId, runtimeEvent, None, true, 1 seconds)
+      actorIndex ! FireEvent(processId, event, None, true, 1 seconds)
 
       petriNetActorProbe.expectMsgAllClassOf(classOf[FireTransition])
 
@@ -199,9 +199,9 @@ class ProcessIndexSpec extends TestKit(ActorSystem("ProcessIndexSpec", ProcessIn
       val transitions: Set[Transition] = Set(EventTransition(eventType, true, None))
       when(petrinetMock.transitions).thenReturn(transitions)
 
-      val RuntimeEvent = new ProcessEvent("Event", Seq.empty)
+      val event = new ProcessEvent("Event", Seq.empty)
 
-      actorIndex ! ProcessIndexProtocol.ProcessEvent(processId, RuntimeEvent, None, true, 1 seconds)
+      actorIndex ! FireEvent(processId, event, None, true, 1 seconds)
 
       expectProcessEventReply(NoSuchProcess(processId))
     }
@@ -229,9 +229,9 @@ class ProcessIndexSpec extends TestKit(ActorSystem("ProcessIndexSpec", ProcessIn
 
       petriNetActorProbe.expectMsg(initializeMsg)
 
-      val RuntimeEvent = new ProcessEvent("Event", Seq.empty)
+      val event = new ProcessEvent("Event", Seq.empty)
 
-      actorIndex ! ProcessIndexProtocol.ProcessEvent(processId, RuntimeEvent, None, true, 1 seconds)
+      actorIndex ! FireEvent(processId, event, None, true, 1 seconds)
 
       expectProcessEventReply(InvalidEvent(processId ,s"No event with name 'Event' found in recipe 'name'"))
     }
@@ -262,9 +262,9 @@ class ProcessIndexSpec extends TestKit(ActorSystem("ProcessIndexSpec", ProcessIn
 
       petriNetActorProbe.expectMsg(initializeMsg)
 
-      val RuntimeEvent = new ProcessEvent("Event", Seq.empty)
+      val event = new ProcessEvent("Event", Seq.empty)
 
-      actorIndex ! ProcessIndexProtocol.ProcessEvent(processId, RuntimeEvent, None, true, 1 seconds)
+      actorIndex ! FireEvent(processId, event, None, true, 1 seconds)
 
       expectProcessEventReply(InvalidEvent(processId ,s"Invalid event: no value was provided for ingredient 'ingredientName'"))
     }
@@ -296,9 +296,9 @@ class ProcessIndexSpec extends TestKit(ActorSystem("ProcessIndexSpec", ProcessIn
 
       petriNetActorProbe.expectMsg(initializeMsg)
 
-      val RuntimeEvent = new ProcessEvent("Event", Seq.empty)
+      val event = new ProcessEvent("Event", Seq.empty)
 
-      actorIndex ! ProcessIndexProtocol.ProcessEvent(processId, RuntimeEvent, None, true, 1 seconds)
+      actorIndex ! FireEvent(processId, event, None, true, 1 seconds)
 
       petriNetActorProbe.expectMsgAllClassOf(classOf[FireTransition])
 
@@ -306,7 +306,7 @@ class ProcessIndexSpec extends TestKit(ActorSystem("ProcessIndexSpec", ProcessIn
 
       Thread.sleep(receivePeriodTimeout.toMillis * 2)
 
-      actorIndex ! ProcessIndexProtocol.ProcessEvent(processId, RuntimeEvent, None, true, 1 seconds)
+      actorIndex ! FireEvent(processId, event, None, true, 1 seconds)
 
       petriNetActorProbe.expectNoMessage(noMsgExpectTimeout)
 

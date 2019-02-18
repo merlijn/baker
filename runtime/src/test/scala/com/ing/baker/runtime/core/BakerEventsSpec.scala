@@ -101,7 +101,7 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
       baker.registerEventListener(listenerFunction(listenerProbe.ref))
 
       baker.bake(recipeId, processId)
-      baker.processEvent(processId, InitialEvent(initialIngredientValue), Some("someId"))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue), Some("someId"))
 
       // TODO check the order of the timestamps later
       expectMsgInAnyOrderPF(listenerProbe,
@@ -134,7 +134,7 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
       baker.bake(recipeId, processId)
 
       // We used async function here because ThirdEvent is not part of the recipe and throws exception
-      baker.processEventAsync(processId, ThirdEvent(), Some("someId"))
+      baker.fireEventAsync(processId, ThirdEvent(), Some("someId"))
 
       listenerProbe.fishForSpecificMessage(eventReceiveTimeout) {
         case msg@EventRejected(_, `processId`, Some("someId"), ProcessEvent("ThirdEvent", Seq()), InvalidEvent) => msg
@@ -153,8 +153,8 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
       baker.registerEventListener(listenerFunction(listenerProbe.ref))
 
       baker.bake(recipeId, processId)
-      baker.processEvent(processId, InitialEvent(initialIngredientValue), Some("someId"))
-      baker.processEvent(processId, InitialEvent(initialIngredientValue), Some("someId")) // Same correlationId cannot be used twice
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue), Some("someId"))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue), Some("someId")) // Same correlationId cannot be used twice
 
       listenerProbe.fishForSpecificMessage(eventReceiveTimeout) {
         case msg@EventRejected(_, `processId`, Some("someId"), ProcessEvent("InitialEvent", Seq(Tuple2("initialIngredient", PrimitiveValue(`initialIngredientValue`)))), AlreadyReceived) => msg
@@ -173,8 +173,8 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
       baker.registerEventListener(listenerFunction(listenerProbe.ref))
 
       baker.bake(recipeId, processId)
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
-      baker.processEvent(processId, InitialEvent(initialIngredientValue)) // Firing limit is set to 1 in the recipe
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue)) // Firing limit is set to 1 in the recipe
 
       listenerProbe.fishForSpecificMessage(eventReceiveTimeout) {
         case msg@EventRejected(_, `processId`, None, ProcessEvent("InitialEvent", Seq(Tuple2("initialIngredient", PrimitiveValue(`initialIngredientValue`)))), FiringLimitMet) => msg
@@ -196,7 +196,7 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
 
       Thread.sleep(eventReceiveTimeout.toMillis)
 
-      baker.processEvent(processId, InitialEvent(initialIngredientValue), Some("someId"))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue), Some("someId"))
 
       listenerProbe.fishForSpecificMessage(eventReceiveTimeout) {
         case msg@EventRejected(_, `processId`, Some("someId"), ProcessEvent("InitialEvent", Seq(Tuple2("initialIngredient", PrimitiveValue(`initialIngredientValue`)))), ReceivePeriodExpired) => msg
@@ -217,7 +217,7 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
       // Skipped baking the process here, so the process with processId does not exist
 
       // use a different processId and use async function because the sync version throws NoSuchProcessException
-      baker.processEventAsync(processId, InitialEvent(initialIngredientValue), Some("someId"))
+      baker.fireEventAsync(processId, InitialEvent(initialIngredientValue), Some("someId"))
 
       listenerProbe.fishForSpecificMessage(eventReceiveTimeout) {
         case msg@EventRejected(_, `processId`, Some("someId"), ProcessEvent("InitialEvent", Seq(Tuple2("initialIngredient", PrimitiveValue(`initialIngredientValue`)))), NoSuchProcess) => msg

@@ -233,7 +233,7 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
         case _ => sender() ! ProcessAlreadyExists(processId)
       }
 
-    case cmd @ ProcessIndexProtocol.ProcessEvent(processId: String, event, _, waitForRetries, processEventTimout) =>
+    case cmd @ ProcessIndexProtocol.FireEvent(processId: String, event, _, waitForRetries, processEventTimout) =>
 
       def rejectWith(msg: Any, rejectReason: RejectReason): Unit = {
         context.system.eventStream.publish(events.EventRejected(System.currentTimeMillis(), cmd.processId, cmd.correlationId, cmd.event, rejectReason))

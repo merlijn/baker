@@ -9,6 +9,7 @@ import akka.stream.{Materializer, OverflowStrategy}
 import akka.util.Timeout
 import com.ing.baker.il.CompiledRecipe
 import com.ing.baker.il.petrinet.Transition
+import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol.FireEvent
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol.ExceptionStrategy.RetryWithDelay
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol._
 import com.ing.baker.runtime.core.events
@@ -21,7 +22,7 @@ object ProcessEventActor {
   /**
     * Returns a Source of all the messages from a process instance in response to a message.
     */
-  def processEvent(receiver: ActorRef, recipe: CompiledRecipe, cmd: ProcessIndexProtocol.ProcessEvent, waitForRetries: Boolean = false)
+  def processEvent(receiver: ActorRef, recipe: CompiledRecipe, cmd: FireEvent, waitForRetries: Boolean = false)
                   (implicit timeout: FiniteDuration, actorSystem: ActorSystem, materializer: Materializer): Source[Any, NotUsed] = {
 
     implicit val akkaTimeout: Timeout = timeout
@@ -45,7 +46,7 @@ object ProcessEventActor {
 /**
   * An actor that pushes all received messages on a SourceQueueWithComplete.
   */
-class ProcessEventActor(cmd: ProcessIndexProtocol.ProcessEvent, recipe: CompiledRecipe, queue: SourceQueueWithComplete[Any], waitForRetries: Boolean)(implicit timeout: FiniteDuration, system: ActorSystem) extends Actor {
+class ProcessEventActor(cmd: FireEvent, recipe: CompiledRecipe, queue: SourceQueueWithComplete[Any], waitForRetries: Boolean)(implicit timeout: FiniteDuration, system: ActorSystem) extends Actor {
   var runningJobs = Set.empty[Long]
   var firstReceived = false
 

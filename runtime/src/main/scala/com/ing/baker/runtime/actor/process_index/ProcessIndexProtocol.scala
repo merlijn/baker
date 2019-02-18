@@ -20,7 +20,7 @@ object ProcessIndexProtocol {
 
   case class CreateProcess(recipeId: String, override val processId: String) extends ProcessIndexMessage
 
-  case class ProcessEvent(override val processId: String, event: core.ProcessEvent, correlationId: Option[String], waitForRetries: Boolean, timeout: FiniteDuration) extends ProcessIndexMessage
+  case class FireEvent(override val processId: String, event: core.ProcessEvent, correlationId: Option[String], waitForRetries: Boolean, timeout: FiniteDuration) extends ProcessIndexMessage
 
   case class ProcessEventResponse(override val processId: String, sourceRef: SourceRef[Any]) extends ProcessIndexMessage
 

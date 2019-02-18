@@ -134,7 +134,7 @@ object ProtoEventAdapterSpec {
       correlationId <- Gen.option(processIdGen)
       waitForRetries <- Gen.oneOf(true, false)
       timeout <- Gen.posNum[Long].map(millis => FiniteDuration(millis, TimeUnit.MILLISECONDS))
-    } yield ProcessEvent(processId, event, correlationId, waitForRetries, timeout)
+    } yield FireEvent(processId, event, correlationId, waitForRetries, timeout)
 
     val getProcessStateGen = processIdGen.map(GetProcessState(_))
     val getCompiledRecipeGen = processIdGen.map(GetCompiledRecipe(_))

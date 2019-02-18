@@ -77,10 +77,10 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val event = InitialEvent("initialIngredient")
 
       intercept[NoSuchProcessException] {
-        baker.processEvent(UUID.randomUUID().toString, event)
+        baker.fireEvent(UUID.randomUUID().toString, event)
       }
 
-      val response = baker.processEventAsync(UUID.randomUUID().toString, event)
+      val response = baker.fireEventAsync(UUID.randomUUID().toString, event)
 
       intercept[NoSuchProcessException] {
         response.confirmReceived(timeout)
@@ -97,7 +97,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val processId = UUID.randomUUID().toString
       baker.bake(recipeId, processId)
       val intercepted: IllegalArgumentException = intercept[IllegalArgumentException] {
-        baker.processEvent(processId, SomeNotDefinedEvent("bla"))
+        baker.fireEvent(processId, SomeNotDefinedEvent("bla"))
       }
       intercepted.getMessage should startWith("No event with name 'SomeNotDefinedEvent' found in recipe 'NonExistingProcessEventTest")
     }
@@ -115,7 +115,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val processId = UUID.randomUUID().toString
 
       baker.bake(recipeId, processId)
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       verify(testInteractionOneMock).apply(processId.toString, "initialIngredient")
       baker.getIngredients(processId) shouldBe
@@ -152,7 +152,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val processId = UUID.randomUUID().toString
 
       baker.bake(recipeId, processId)
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       verify(testInteractionTwoMock).apply(initialIngredientValue)
       verify(testFireTwoEventsInteractionMock).apply(initialIngredientValue)
@@ -175,11 +175,11 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val processId = UUID.randomUUID().toString
       baker.bake(recipeId, processId)
 
-      val executedFirst = baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      val executedFirst = baker.fireEvent(processId, InitialEvent(initialIngredientValue))
       executedFirst shouldBe SensoryEventStatus.Completed
       verify(testInteractionOneMock).apply(processId.toString, "initialIngredient")
 
-      val executedSecond = baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      val executedSecond = baker.fireEvent(processId, InitialEvent(initialIngredientValue))
       executedSecond shouldBe SensoryEventStatus.FiringLimitMet
       verify(testInteractionOneMock).apply(processId.toString, "initialIngredient")
     }
@@ -198,11 +198,11 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val processId = UUID.randomUUID().toString
       baker.bake(recipeId, processId)
 
-      val executedFirst = baker.processEvent(processId, InitialEvent(initialIngredientValue), Some("abc"))
+      val executedFirst = baker.fireEvent(processId, InitialEvent(initialIngredientValue), Some("abc"))
       executedFirst shouldBe SensoryEventStatus.Completed
       verify(testInteractionOneMock).apply(processId.toString, "initialIngredient")
 
-      val executedSecond = baker.processEvent(processId, InitialEvent(initialIngredientValue), Some("abc"))
+      val executedSecond = baker.fireEvent(processId, InitialEvent(initialIngredientValue), Some("abc"))
       executedSecond shouldBe SensoryEventStatus.AlreadyReceived
       verifyNoMoreInteractions(testInteractionOneMock)
     }
@@ -221,18 +221,18 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val processId = UUID.randomUUID().toString
       baker.bake(recipeId, processId)
 
-      val executedFirst = baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      val executedFirst = baker.fireEvent(processId, InitialEvent(initialIngredientValue))
       executedFirst shouldBe SensoryEventStatus.Completed
       verify(testInteractionOneMock).apply(processId.toString, "initialIngredient")
 
-      val executedSecond = baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      val executedSecond = baker.fireEvent(processId, InitialEvent(initialIngredientValue))
       executedSecond shouldBe SensoryEventStatus.Completed
       verify(testInteractionOneMock, times(2)).apply(processId.toString, "initialIngredient")
 
       // This check is added to verify event list is still correct after firing the same event twice
       baker.events(processId).map(_.name).toList shouldBe List("InitialEvent", "InteractionOneSuccessful", "InitialEvent", "InteractionOneSuccessful")
 
-      val executedThird = baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      val executedThird = baker.fireEvent(processId, InitialEvent(initialIngredientValue))
       executedThird shouldBe SensoryEventStatus.FiringLimitMet
       verify(testInteractionOneMock, times(2)).apply(processId.toString, "initialIngredient")
     }
@@ -306,9 +306,9 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
           when(validateOrderMock.apply(anyString(), anyString())).thenReturn(new ValidateOrder.Valid())
 
           // process the events
-          baker.processEvent(processId, new CustomerInfoReceived(customerInfo));
-          baker.processEvent(processId, new OrderPlaced(order));
-          baker.processEvent(processId, new PaymentMade());
+          baker.fireEvent(processId, new CustomerInfoReceived(customerInfo));
+          baker.fireEvent(processId, new OrderPlaced(order));
+          baker.fireEvent(processId, new PaymentMade());
         }
 
         if (createNewCase)
@@ -360,7 +360,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val processId = UUID.randomUUID().toString
       baker.bake(recipeId, processId).toString
 
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       verify(testOptionalIngredientInteractionMock).apply(ingredientValue, Optional.empty(), Option.empty, Option.empty, initialIngredientValue)
       baker.getIngredients(processId) shouldBe ingredientMap("initialIngredient" -> initialIngredientValue)
@@ -379,7 +379,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val processId = UUID.randomUUID().toString
 
       baker.bake(recipeId, processId).toString
-      baker.processEvent(processId, UnboxedProviderEvent(initialIngredientValue, initialIngredientValue, initialIngredientValue))
+      baker.fireEvent(processId, UnboxedProviderEvent(initialIngredientValue, initialIngredientValue, initialIngredientValue))
 
       verify(testOptionalIngredientInteractionMock).apply(java.util.Optional.of(initialIngredientValue), Optional.empty(), Some(initialIngredientValue), Option.empty, initialIngredientValue)
       baker.getIngredients(processId) shouldBe ingredientMap("initialIngredient" -> initialIngredientValue, "missingJavaOptional" -> initialIngredientValue, "missingScalaOptional" -> initialIngredientValue)
@@ -403,7 +403,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val processId = UUID.randomUUID().toString
       baker.bake(recipeId, processId)
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
 //      verify(listenerMock).apply(processId.toString, Baker.extractEvent(InitialEvent(initialIngredientValue)))
 //      verify(listenerMock).apply(processId.toString, Baker.extractEvent(InteractionOneSuccessful(interactionOneIngredientValue)))
@@ -417,7 +417,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       baker.bake(recipeId, processId)
 
-      val response = baker.processEventAsync(processId, InitialEvent(initialIngredientValue))
+      val response = baker.fireEventAsync(processId, InitialEvent(initialIngredientValue))
 
       response.confirmReceived() shouldBe SensoryEventStatus.Received
       response.confirmCompleted() shouldBe SensoryEventStatus.Completed
@@ -444,7 +444,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val processId = UUID.randomUUID().toString
       baker.bake(recipeId, processId)
 
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       verify(testInteractionOneMock).apply(processId.toString, "initialIngredient")
       baker.getIngredients(processId) shouldBe ingredientMap("initialIngredient" -> initialIngredientValue, "interactionOneOriginalIngredient" -> interactionOneIngredientValue)
@@ -456,7 +456,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val processId = UUID.randomUUID().toString
       baker.bake(recipeId, processId)
 
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       verify(testInteractionOneMock).apply(processId.toString, initialIngredientValue)
       verify(testInteractionTwoMock).apply(initialIngredientValue)
@@ -470,8 +470,8 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val processId = UUID.randomUUID().toString
       baker.bake(recipeId, processId)
 
-      baker.processEvent(processId, InitialEvent("initialIngredient"))
-      baker.processEvent(processId, SecondEvent())
+      baker.fireEvent(processId, InitialEvent("initialIngredient"))
+      baker.fireEvent(processId, SecondEvent())
 
       verify(testInteractionOneMock).apply(processId.toString, "initialIngredient")
       verify(testInteractionTwoMock).apply("initialIngredient")
@@ -493,7 +493,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       baker.bake(recipeId, firstProcessId)
 
       // Fire one of the events for the first process
-      baker.processEvent(firstProcessId, InitialEvent("initialIngredient"))
+      baker.fireEvent(firstProcessId, InitialEvent("initialIngredient"))
       verify(testInteractionFourMock).apply()
 
       // reset interaction mocks and fire the other event for the second process
@@ -502,7 +502,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val secondProcessId = UUID.randomUUID().toString
       baker.bake(recipeId, secondProcessId)
 
-      baker.processEvent(secondProcessId, SecondEvent())
+      baker.fireEvent(secondProcessId, SecondEvent())
       verify(testInteractionFourMock).apply()
     }
 
@@ -519,10 +519,10 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       baker.bake(recipeId, firstProcessId)
 
       // Fire one of the events for the first process
-      baker.processEvent(firstProcessId, InitialEvent("initialIngredient"))
+      baker.fireEvent(firstProcessId, InitialEvent("initialIngredient"))
       verify(testInteractionFourMock, times(0)).apply()
 
-      baker.processEvent(firstProcessId, ThirdEvent())
+      baker.fireEvent(firstProcessId, ThirdEvent())
       verify(testInteractionFourMock).apply()
     }
 
@@ -533,7 +533,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val processId = UUID.randomUUID().toString
       baker.bake(recipeId, processId)
 
-      baker.processEvent(processId, InitialEvent("initialIngredient"))
+      baker.fireEvent(processId, InitialEvent("initialIngredient"))
 
       verify(testInteractionOneMock).apply(processId.toString, "initialIngredient")
       verify(testInteractionTwoMock).apply("initialIngredient")
@@ -546,12 +546,12 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val processId = UUID.randomUUID().toString
       baker.bake(recipeId, processId)
 
-      baker.processEvent(processId, InitialEvent("initialIngredient"))
+      baker.fireEvent(processId, InitialEvent("initialIngredient"))
 
       verify(testInteractionOneMock, times(1)).apply(processId.toString, "initialIngredient")
       verify(testInteractionTwoMock, times(1)).apply("initialIngredient")
 
-      baker.processEvent(processId, InitialEvent("initialIngredient"))
+      baker.fireEvent(processId, InitialEvent("initialIngredient"))
 
       verify(testInteractionOneMock, times(2)).apply(processId.toString, "initialIngredient")
       verify(testInteractionTwoMock, times(2)).apply("initialIngredient")
@@ -584,7 +584,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       Thread.sleep(2000)
 
       val executingTimeInMilliseconds = timeBlockInMilliseconds {
-        baker.processEvent(processId, InitialEvent(initialIngredientValue))
+        baker.fireEvent(processId, InitialEvent(initialIngredientValue))
       }
 
       val tookLessThanASecond = executingTimeInMilliseconds < 1000
@@ -613,7 +613,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       baker.bake(recipeId, processId)
 
       //Fire the first event
-      baker.processEvent(processId, InitialEvent(firstData))
+      baker.fireEvent(processId, InitialEvent(firstData))
 
       //Check that the first response returned
       baker.getIngredients(processId) shouldBe ingredientMap(
@@ -625,7 +625,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       )
 
       //Fire the second event
-      baker.processEvent(processId, InitialEvent(secondData))
+      baker.fireEvent(processId, InitialEvent(secondData))
 
       //Check that the second response is given
       baker.getIngredients(processId) shouldBe ingredientMap(
@@ -654,7 +654,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val processId = UUID.randomUUID().toString
 
       baker.bake(recipeId, processId)
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       verify(testInteractionOneMock).apply(processId.toString, initialIngredientValue)
 
@@ -663,7 +663,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
         "initialIngredient" -> initialIngredientValue,
         "interactionOneIngredient" -> interactionOneIngredientValue)
 
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       verifyZeroInteractions(testInteractionOneMock)
     }
@@ -675,7 +675,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val processId = UUID.randomUUID().toString
       baker.bake(recipeId, processId)
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
     }
 
     "not crash when one process crashes but the other does not" in {
@@ -692,13 +692,13 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       baker.bake(recipeId, secondProcessId)
 
       // start the first process with firing an event
-      baker.processEvent(firstProcessId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(firstProcessId, InitialEvent(initialIngredientValue))
 
       // start the second process and expect a failure
-      baker.processEvent(secondProcessId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(secondProcessId, InitialEvent(initialIngredientValue))
 
       // fire another event for the first process
-      baker.processEvent(firstProcessId, SecondEvent())
+      baker.fireEvent(firstProcessId, SecondEvent())
 
       // expect first process state is correct
       baker.getIngredients(firstProcessId) shouldBe finalState
@@ -713,7 +713,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       baker.bake(recipeId, processId)
 
       // Send failing event and after that send succeeding event
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       val result = baker.getIngredients(processId)
       result shouldBe ingredientMap(
@@ -731,7 +731,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val processId = UUID.randomUUID().toString
       baker.bake(recipeId, processId)
 
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       //Thread.sleep is needed since we need to wait for the expionental back of
       //100ms should be enough since it waits 20ms and then 40 ms
@@ -752,12 +752,12 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       baker.bake(recipeId, processId)
 
       // first fired event causes a failure in the action
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
       verify(testInteractionTwoMock, times(1)).apply(anyString())
       resetMocks
 
       // second fired, this should not re-execute InteractionOne and therefor not start InteractionThree
-      baker.processEvent(processId, SecondEvent())
+      baker.fireEvent(processId, SecondEvent())
 
       verify(testInteractionTwoMock, never()).apply(anyString())
 
@@ -785,7 +785,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       baker.bake(recipeId, processId)
 
       //Handle first event
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       Thread.sleep(50)
 
@@ -806,7 +806,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       baker.bake(recipeId, processId)
 
       //Handle first event
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       Thread.sleep(50)
 
@@ -832,7 +832,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       baker.bake(recipeId, processId)
 
       //Handle first event
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       Thread.sleep(50)
 
@@ -855,7 +855,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val processId = UUID.randomUUID().toString
 
       baker.bake(recipeId, processId)
-      val status = baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      val status = baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       baker.getIngredients(processId) shouldBe
         ingredientMap(
@@ -884,7 +884,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val processId = UUID.randomUUID().toString
 
       baker.bake(recipeId, processId)
-      val status = baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      val status = baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       baker.getIngredients(processId) shouldBe
         ingredientMap(
@@ -907,7 +907,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       baker.bake(recipeId, processId)
 
       //Handle first event
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       //Check if both the new event and the events occurred in the past are in the eventsList
       baker.events(processId) should contain only(
@@ -919,7 +919,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       )
 
       //Execute another event
-      baker.processEvent(processId, SecondEvent())
+      baker.fireEvent(processId, SecondEvent())
 
       //Check if both the new event and the events occurred in the past are in the eventsList
       baker.events(processId) should contain only(
@@ -941,8 +941,8 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       baker.bake(recipeId, processId)
 
       //Handle two event
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
-      baker.processEvent(processId, SecondEvent())
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, SecondEvent())
 
       //Check if both the new event and the events occurred in the past are in the eventsList
       baker.eventNames(processId) should contain only(
@@ -1008,8 +1008,8 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
         val baker1 = setupBakerWithNoRecipe()(system1)
         recipeId = baker1.addRecipe(compiledRecipe)
         baker1.bake(recipeId, processId)
-        baker1.processEvent(processId, InitialEvent(initialIngredientValue))
-        baker1.processEvent(processId, SecondEvent())
+        baker1.fireEvent(processId, InitialEvent(initialIngredientValue))
+        baker1.fireEvent(processId, SecondEvent())
         baker1.getIngredients(processId) shouldBe finalState
       } finally {
         TestKit.shutdownActorSystem(system1)
@@ -1044,7 +1044,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val processId = UUID.randomUUID().toString
       baker.bake(recipeId, processId)
-      val response: BakerResponse = baker.processEventAsync(processId, InitialEvent(initialIngredientValue))
+      val response: BakerResponse = baker.fireEventAsync(processId, InitialEvent(initialIngredientValue))
 
       response.confirmCompleted(3000 millis) shouldBe SensoryEventStatus.Completed
     }
@@ -1057,7 +1057,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val processId = UUID.randomUUID().toString
       baker.bake(recipeId, processId)
-      val response = baker.processEventAsync(processId, InitialEvent(initialIngredientValue))
+      val response = baker.fireEventAsync(processId, InitialEvent(initialIngredientValue))
 
       response.confirmReceived() shouldBe SensoryEventStatus.Received
 
@@ -1076,7 +1076,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val processId = UUID.randomUUID().toString
       baker.bake(recipeId, processId)
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       verify(testInteractionOneMock, times(1)).apply(processId.toString, initialIngredientValue)
       verify(testInteractionTwoMock, times(1)).apply(initialIngredientValue)
@@ -1097,7 +1097,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val processId = UUID.randomUUID().toString
 
       baker.bake(recipeId, processId)
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       verify(testInteractionOneMock, times(1)).apply(processId.toString, initialIngredientValue)
       verify(testInteractionThreeMock, times(1)).apply(interactionOneIngredientValue, interactionOneIngredientValue)
@@ -1121,7 +1121,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       Thread.sleep(receivePeriod.toMillis + 100)
 
-      baker.processEvent(processId, InitialEvent("")) shouldBe SensoryEventStatus.ReceivePeriodExpired
+      baker.fireEvent(processId, InitialEvent("")) shouldBe SensoryEventStatus.ReceivePeriodExpired
     }
 
     "accept sensory events before a specified receive period" in {
@@ -1139,7 +1139,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       baker.bake(recipeId, processId)
 
-      baker.processEvent(processId, InitialEvent("")) shouldBe SensoryEventStatus.Completed
+      baker.fireEvent(processId, InitialEvent("")) shouldBe SensoryEventStatus.Completed
     }
 
     "be able to visualize events that have been fired" in {
@@ -1153,14 +1153,14 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       //      System.out.println(noEventsGraph)
 
       //Handle first event
-      baker.processEvent(processId, InitialEvent("initialIngredient"))
+      baker.fireEvent(processId, InitialEvent("initialIngredient"))
 
       val firstEventGraph = baker.getVisualState(processId)
       //      System.out.println(firstEventGraph)
 
       noEventsGraph should not be firstEventGraph
 
-      baker.processEvent(processId, SecondEvent())
+      baker.fireEvent(processId, SecondEvent())
       val secondEventGraph = baker.getVisualState(processId)
       //      System.out.println(secondEventGraph)
 
@@ -1214,7 +1214,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       baker.bake(recipeId, processId)
 
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       verify(testInteractionOneMock).apply(processId, "initialIngredient")
       baker.getIngredients(processId) shouldBe ingredientMap("initialIngredient" -> initialIngredientValue)
@@ -1235,7 +1235,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       baker.bake(recipeId, processId)
 
-      baker.processEvent(processId, InitialEvent(initialIngredientValue))
+      baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       verify(testInteractionTwoMock).apply("initialIngredient")
       baker.getIngredients(processId) shouldBe ingredientMap("initialIngredient" -> initialIngredientValue)

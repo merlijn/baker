@@ -205,7 +205,7 @@ Using this list we can check if the `InvoiceWasSend` event was produced.
 
 ```scala tab="Scala"
 // Get all events that have happend for this process instance
-val events: Seq[RuntimeEvent] = baker.getEvents(processId)
+val events: Seq[ProcessEvent] = baker.getEvents(processId)
 if (events.exists(_.name == "InvoiceWasSend"))
     // Yes the invoice was send!
 ```

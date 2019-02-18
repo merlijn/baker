@@ -60,12 +60,12 @@ class BAASClient(val host: String, val port: Int)(implicit val actorSystem: Acto
 
     //Create request to give to Baker
     log.info("Creating runtime event to fire")
-    val runtimeEvent = Baker.extractEvent(event)
+    val processEvent = Baker.extractEvent(event)
 
     val request = HttpRequest(
         uri =  s"$baseUri/$requestId/event?confirm=${confirmation.name}",
         method = POST,
-        entity = ByteString.fromArray(defaultKryoPool.toBytesWithClass(runtimeEvent)))
+        entity = ByteString.fromArray(defaultKryoPool.toBytesWithClass(processEvent)))
 
     doRequestAndParseResponse[SensoryEventStatus](request)
   }

@@ -224,8 +224,8 @@ class Baker()(implicit val actorSystem: ActorSystem) {
   @throws[NoSuchProcessException]("When no process exists for the given id")
   @throws[ProcessDeletedException]("If the process is already deleted")
   @throws[TimeoutException]("When the request does not receive a reply within the given deadline")
-  def processEvent(processId: String, event: Any, correlationId: Option[String] = None, timeout: FiniteDuration = defaultProcessEventTimeout): SensoryEventStatus = {
-    processEventAsync(processId, event, correlationId, timeout).confirmCompleted(timeout)
+  def fireEvent(processId: String, event: Any, correlationId: Option[String] = None, timeout: FiniteDuration = defaultProcessEventTimeout): SensoryEventStatus = {
+    fireEventAsync(processId, event, correlationId, timeout).confirmCompleted(timeout)
   }
 
   /**
@@ -233,14 +233,14 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     *
     * If nothing is done with the BakerResponse there is NO guarantee that the event is received by the process instance.
     */
-  def processEventAsync(processId: String, event: Any, correlationId: Option[String] = None, timeout: FiniteDuration = defaultProcessEventTimeout): BakerResponse = {
+  def fireEventAsync(processId: String, event: Any, correlationId: Option[String] = None, timeout: FiniteDuration = defaultProcessEventTimeout): BakerResponse = {
 
     // transforms the given object into a RuntimeEvent instance
     val runtimeEvent: ProcessEvent = extractEvent(event)
 
     // sends the ProcessEvent command to the actor and retrieves a Source (stream) of responses.
     val response: Future[SourceRef[Any]] = processIndexActor
-      .ask(ProcessIndexProtocol.ProcessEvent(processId, runtimeEvent, correlationId, true, timeout))(timeout)
+      .ask(ProcessIndexProtocol.FireEvent(processId, runtimeEvent, correlationId, true, timeout))(timeout)
       .mapTo[ProcessEventResponse]
       .map(_.sourceRef)
 

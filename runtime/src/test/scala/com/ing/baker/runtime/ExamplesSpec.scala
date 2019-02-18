@@ -80,9 +80,9 @@ class ExamplesSpec extends BakerRuntimeTestBase  {
 
       // fire events
 
-      baker.processEvent(processId, orderPlaced.instance(testOrder))
-      baker.processEvent(processId, paymentMade.instance())
-      baker.processEvent(processId, customerInfoReceived.instance(testCustomerInfoData))
+      baker.fireEvent(processId, orderPlaced.instance(testOrder))
+      baker.fireEvent(processId, paymentMade.instance())
+      baker.fireEvent(processId, customerInfoReceived.instance(testCustomerInfoData))
 
       val expectedIngredients = IngredientMap(
         order -> testOrder,

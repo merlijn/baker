@@ -29,11 +29,11 @@ object RemoteInteractionRoutes extends Directives with BaasMarshalling {
 
               log.info(s"Executing interaction: $interactionName")
 
-              val runtimeEvent = implementation.execute(request.interaction, request.input).orNull
+              val processEvent = implementation.execute(request.interaction, request.input).orNull
 
               log.info(s"Interaction executed: ${interactionName}")
 
-              complete(runtimeEvent)
+              complete(processEvent)
             }
           }
         } ~

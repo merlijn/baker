@@ -50,7 +50,7 @@ class BakerProtobufSerializer(system: ExtendedActorSystem) extends SerializerWit
     Entry("ProcessIndexProtocol.GetIndex", ProcessIndexProtocol.GetIndex.getClass, actor.process_index.protobuf.GetIndex),
     Entry("ProcessIndexProtocol.Index", classOf[ProcessIndexProtocol.Index], actor.process_index.protobuf.Index),
     Entry("ProcessIndexProtocol.CreateProcess", classOf[ProcessIndexProtocol.CreateProcess], actor.process_index.protobuf.CreateProcess),
-    Entry("ProcessIndexProtocol.ProcessEvent", classOf[ProcessIndexProtocol.ProcessEvent], actor.process_index.protobuf.ProcessEvent),
+    Entry("ProcessIndexProtocol.ProcessEvent", classOf[ProcessIndexProtocol.FireEvent], actor.process_index.protobuf.ProcessEvent),
     Entry("ProcessIndexProtocol.RetryBlockedInteraction", classOf[ProcessIndexProtocol.RetryBlockedInteraction], actor.process_index.protobuf.RetryBlockedInteraction),
     Entry("ProcessIndexProtocol.ResolveBlockedInteraction", classOf[ProcessIndexProtocol.ResolveBlockedInteraction], actor.process_index.protobuf.ResolveBlockedInteraction),
     Entry("ProcessIndexProtocol.StopRetryingInteraction", classOf[ProcessIndexProtocol.StopRetryingInteraction], actor.process_index.protobuf.StopRetryingInteraction),

@@ -43,7 +43,7 @@ class ProcessIndexModule extends ProtoEventAdapterModule {
     case protocol.CreateProcess(recipeId, processId) =>
       protobuf.CreateProcess(Some(recipeId), Some(processId))
 
-    case protocol.ProcessEvent(processId, event, correlationId, waitForRetries, timeout) =>
+    case protocol.FireEvent(processId, event, correlationId, waitForRetries, timeout) =>
       protobuf.ProcessEvent(Some(processId), Some(ctx.toProto[RuntimeEvent](event)), correlationId, Some(waitForRetries), Some(timeout.toMillis))
 
     case protocol.RetryBlockedInteraction(processId, interactionName) =>
@@ -111,7 +111,7 @@ class ProcessIndexModule extends ProtoEventAdapterModule {
       protocol.CreateProcess(recipeId, processId)
 
     case protobuf.ProcessEvent(Some(processId), Some(event), correlationId, Some(waitForRetries), Some(timeoutMillis)) =>
-      protocol.ProcessEvent(processId, ctx.toDomain[core.ProcessEvent](event), correlationId, waitForRetries, FiniteDuration(timeoutMillis, TimeUnit.MILLISECONDS))
+      protocol.FireEvent(processId, ctx.toDomain[core.ProcessEvent](event), correlationId, waitForRetries, FiniteDuration(timeoutMillis, TimeUnit.MILLISECONDS))
 
     case protobuf.RetryBlockedInteraction(Some(processId), Some(interactionName)) =>
       protocol.RetryBlockedInteraction(processId, interactionName)
