@@ -5,4 +5,4 @@ package com.ing.baker.runtime.core
   *
   * @param msg
   */
-class ProcessDeletedException(msg: String) extends BakerException(msg)
+class ProcessDeletedException(msg: String) extends RuntimeException(msg)

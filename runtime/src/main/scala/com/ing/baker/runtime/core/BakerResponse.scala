@@ -29,7 +29,7 @@ object BakerResponse {
     case ProcessIndexProtocol.ReceivePeriodExpired(_) => SensoryEventStatus.ReceivePeriodExpired
     case ProcessIndexProtocol.ProcessDeleted(_) => SensoryEventStatus.ProcessDeleted
     case ProcessIndexProtocol.InvalidEvent(_, invalidEventMessage) => throw new IllegalArgumentException(invalidEventMessage)
-    case msg@_ => throw new BakerException(s"Unexpected actor response message: $msg")
+    case msg @_ => throw new IllegalStateException(s"Received unexpected message of type: ${msg.getClass}")
   }
 
   private def allMessages(processId: String, response: Future[Seq[Any]])(implicit ec: ExecutionContext): Future[CompletedResponse] =

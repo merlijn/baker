@@ -775,7 +775,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
           maximumRetries = 1,
           fireRetryExhaustedEvent = Some(None))))
 
-      when(testInteractionOneMock.apply(anyString(), anyString())).thenThrow(new BakerException())
+      when(testInteractionOneMock.apply(anyString(), anyString())).thenThrow(new RuntimeException())
 
       val (baker, recipeId) = setupBakerWithRecipe(recipe, mockImplementations)
 

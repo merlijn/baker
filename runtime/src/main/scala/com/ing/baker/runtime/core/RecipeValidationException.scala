@@ -5,4 +5,4 @@ package com.ing.baker.runtime.core
   *
   * @param reason A string with the validation errors.
   */
-class RecipeValidationException(reason: String) extends BakerException(reason)
+class RecipeValidationException(reason: String) extends RuntimeException(reason)

@@ -5,7 +5,6 @@ import com.ing.baker.recipe.annotations.FiresEvent;
 import com.ing.baker.recipe.annotations.ProcessId;
 import com.ing.baker.recipe.annotations.RequiresIngredient;
 import com.ing.baker.recipe.javadsl.Recipe;
-import com.ing.baker.runtime.core.BakerException;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -21,7 +20,7 @@ public class JavaCompiledRecipeTest {
     public final ExpectedException exception = ExpectedException.none();
 
     @Test
-    public void shouldCompileSimpleRecipe() throws BakerException {
+    public void shouldCompileSimpleRecipe() {
         Recipe recipe = setupSimpleRecipe();
 
         CompiledRecipe compiledRecipe = RecipeCompiler.compileRecipe(recipe);
@@ -33,7 +32,7 @@ public class JavaCompiledRecipeTest {
     }
 
     @Test
-    public void shouldCompileComplexRecipe() throws BakerException {
+    public void shouldCompileComplexRecipe() {
         Recipe recipe = setupComplexRecipe();
         CompiledRecipe compiledRecipe = RecipeCompiler.compileRecipe(recipe);
         assertEquals(compiledRecipe.getValidationErrors(), new ArrayList<String>());
@@ -48,7 +47,7 @@ public class JavaCompiledRecipeTest {
     }
 
     @Test
-    public void shouldCompileRecipeWithSieve() throws BakerException {
+    public void shouldCompileRecipeWithSieve() {
         Recipe recipe = setupComplexRecipe();
         CompiledRecipe compiledRecipe = RecipeCompiler.compileRecipe(recipe);
         assertEquals(compiledRecipe.getValidationErrors(), new ArrayList<String>());
@@ -56,7 +55,7 @@ public class JavaCompiledRecipeTest {
     }
 
     @Test
-    public void shouldShowVisualRecipe() throws BakerException {
+    public void shouldShowVisualRecipe() {
         Recipe recipe = setupComplexRecipe();
         CompiledRecipe compiledRecipe = RecipeCompiler.compileRecipe(recipe);
         assertEquals(compiledRecipe.getValidationErrors().size(), 0);
@@ -71,7 +70,7 @@ public class JavaCompiledRecipeTest {
     }
 
     @Test
-    public void shouldShowPetriNetVisual() throws BakerException {
+    public void shouldShowPetriNetVisual() {
         Recipe recipe = setupComplexRecipe();
         CompiledRecipe compileRecipe = RecipeCompiler.compileRecipe(recipe);
         assertEquals(compileRecipe.getValidationErrors().size(), 0);
@@ -84,7 +83,7 @@ public class JavaCompiledRecipeTest {
     }
 
     @Test
-    public void shouldShowFilteredVisualRecipe() throws BakerException {
+    public void shouldShowFilteredVisualRecipe() {
         Recipe recipe = setupComplexRecipe();
         CompiledRecipe compileRecipe = RecipeCompiler.compileRecipe(recipe);
         assertEquals(compileRecipe.getValidationErrors().size(), 0);
@@ -98,7 +97,7 @@ public class JavaCompiledRecipeTest {
     }
 
     @Test
-    public void shouldShowFilteredMultipleVisualRecipe() throws BakerException {
+    public void shouldShowFilteredMultipleVisualRecipe() {
         Recipe recipe = setupComplexRecipe();
         CompiledRecipe compileRecipe = RecipeCompiler.compileRecipe(recipe);
         assertEquals(compileRecipe.getValidationErrors().size(), 0);

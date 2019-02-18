@@ -135,7 +135,7 @@ class BakerSetupSpec extends BakerRuntimeTestBase {
 
         val baker = new Baker()
 
-        intercept[BakerException] {
+        intercept[IllegalStateException] {
           baker.addRecipe(RecipeCompiler.compileRecipe(recipe))
         } should have('message ("No implementation provided for interaction: InteractionOne"))
       }
@@ -151,7 +151,7 @@ class BakerSetupSpec extends BakerRuntimeTestBase {
 
         baker.addImplementation(new InteractionOneWrongApply())
 
-        intercept[BakerException] {
+        intercept[IllegalStateException] {
           baker.addRecipe(RecipeCompiler.compileRecipe(recipe))
         } should have('message ("No implementation provided for interaction: InteractionOne"))
       }

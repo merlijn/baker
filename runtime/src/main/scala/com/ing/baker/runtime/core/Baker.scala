@@ -115,7 +115,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     val implementationErrors = getImplementationErrors(compiledRecipe)
 
     if (implementationErrors.nonEmpty)
-      throw new BakerException(implementationErrors.mkString(", "))
+      throw new IllegalStateException(implementationErrors.mkString(", "))
 
     if (compiledRecipe.validationErrors.nonEmpty)
       throw new RecipeValidationException(compiledRecipe.validationErrors.mkString(", "))
@@ -123,7 +123,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     val futureResult = recipeManager.ask(AddRecipe(compiledRecipe))(timeout)
     Await.result(futureResult, timeout) match {
       case AddRecipeResponse(recipeId) => recipeId
-      case _ => throw new BakerException(s"Unexpected error happened when adding recipe")
+      case msg @ _ => throw new IllegalStateException(s"Received unexpected message of type ${msg.getClass}")
     }
   }
 
@@ -208,7 +208,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
       case msg: Initialized        => msg.state.asInstanceOf[ProcessState]
       case ProcessAlreadyExists(_) => throw new IllegalArgumentException(s"Process with id '$processId' already exists.")
       case NoRecipeFound(_)        => throw new IllegalArgumentException(s"Recipe with id '$recipeId' does not exist.")
-      case msg @ _                 => throw new BakerException(s"Unexpected message of type: ${msg.getClass}")
+      case msg @ _                 => throw new IllegalStateException(s"Received unexpected message of type: ${msg.getClass}")
     }
 
     eventualState
@@ -315,7 +315,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
       case RecipeFound(compiledRecipe, _) => getEventsForRecipe(processId, compiledRecipe)
       case ProcessDeleted(_)           => throw new ProcessDeletedException(s"Process $processId is deleted")
       case NoSuchProcess(_)            => throw new NoSuchProcessException(s"No process found for $processId")
-      case _                           => throw new BakerException("Unknown response received")
+      case msg @ _                     => throw new IllegalStateException(s"Received unexpected message of type: ${msg.getClass}")
     }
   }
 
@@ -392,7 +392,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
         case instance: InstanceState => Future.successful(instance.state.asInstanceOf[ProcessState])
         case NoSuchProcess(id)       => Future.failed(new NoSuchProcessException(s"No such process with: $id"))
         case ProcessDeleted(id)      => Future.failed(new ProcessDeletedException(s"Process $id is deleted"))
-        case msg                     => Future.failed(new BakerException(s"Unexpected actor response message: $msg"))
+        case msg                     => Future.failed(new IllegalStateException(s"Received unexpected message of type: ${msg.getClass}"))
       }
   }
 
