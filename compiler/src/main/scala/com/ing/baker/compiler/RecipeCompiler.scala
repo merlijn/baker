@@ -39,7 +39,7 @@ object RecipeCompiler {
 
     interaction.requiredEvents.toSeq.map { eventName =>
       // a new `Place` generated for each AND events
-      val eventPreconditionPlace = createPlace(label = s"$eventName-${interaction.name}", placeType = EventPreconditionPlace)
+      val eventPreconditionPlace = Place(label = s"$eventName-${interaction.name}", placeType = EventPreconditionPlace)
 
       buildEventPreconditionArcs(eventName,
         eventPreconditionPlace,
@@ -54,7 +54,7 @@ object RecipeCompiler {
 
     interaction.requiredOneOfEvents.toSeq.zipWithIndex.map { case (orGroup: Set[String], index: Int) =>
       // only one `Place` for all the OR events
-      val eventPreconditionPlace = createPlace(label = s"${interaction.name}-or-$index", placeType = EventOrPreconditionPlace)
+      val eventPreconditionPlace = Place(label = s"${interaction.name}-or-$index", placeType = EventOrPreconditionPlace)
 
       orGroup.toSeq.map { eventName =>
         buildEventPreconditionArcs(eventName,
@@ -88,7 +88,7 @@ object RecipeCompiler {
   // the (possible) event output arcs / places
   private def buildInteractionOutputArcs(interaction: InteractionTransition,
                                          eventTransitions: Seq[EventTransition]): Seq[Arc] = {
-    val resultPlace = createPlace(label = interaction.label, placeType = InteractionEventOutputPlace)
+    val resultPlace = Place(label = interaction.label, placeType = InteractionEventOutputPlace)
     if (interaction.eventsToFire.nonEmpty) {
       val eventArcs = interaction.eventsToFire.flatMap { event: EventDescriptor =>
         //Get the correct event transition
@@ -99,7 +99,7 @@ object RecipeCompiler {
         val eventTransitionCount = eventTransitions.count(e => e.event.name == event.name)
         if(eventTransitionCount > 1) {
           //Create a new intermediate event place
-          val eventCombinerPlace: Place = createPlace(label = event.name, placeType = IntermediatePlace)
+          val eventCombinerPlace: Place = Place(label = s"IntermediatePlace:$event.name", placeType = IntermediatePlace)
           //Create a new intermediate event transition
           val interactionToEventTransition: IntermediateTransition = IntermediateTransition(s"${interaction.interactionName}:${event.name}")
           //link the interaction output place to the intermediate transition
@@ -133,7 +133,7 @@ object RecipeCompiler {
 
     // the extra arcs to model multiple output transitions from one place
     val internalDataInputArcs = fieldNamesWithPrefixMulti flatMap { fieldName =>
-      val multiTransitionPlace = createPlace(s"${t.label}-$fieldName", placeType = MultiTransitionPlace)
+      val multiTransitionPlace = Place(s"${t.label}-$fieldName", placeType = MultiTransitionPlace)
       Seq(
         // one arc from multiplier place to the transition
         arc(getMultiTransition(fieldName, multipleConsumerFacilitatorTransitions),
@@ -143,10 +143,10 @@ object RecipeCompiler {
         arc(multiTransitionPlace, t, 1))
     }
     // the data input arcs / places
-    val dataInputArcs = fieldNamesWithoutPrefix.map(fieldName => arc(createPlace(fieldName, IngredientPlace), t, 1))
+    val dataInputArcs = fieldNamesWithoutPrefix.map(fieldName => arc(Place(fieldName, IngredientPlace), t, 1))
 
     val limitInteractionCountArc =
-      t.maximumInteractionCount.map(n => arc(createPlace(s"limit:${t.label}", FiringLimiterPlace(n)), t, 1))
+      t.maximumInteractionCount.map(n => arc(Place(s"limit:${t.label}", FiringLimiterPlace(n)), t, 1))
 
     dataInputArcs ++ internalDataInputArcs ++ limitInteractionCountArc
   }
@@ -189,9 +189,9 @@ object RecipeCompiler {
 
     // For inputs for which no matching output cannot be found, we do not want to generate a place.
     // It should be provided at runtime from outside the active petri net (marking)
-    val interactionTransitions = recipe.interactions.map(_.toInteractionTransition(recipe.defaultFailureStrategy, allIngredientNames))
+    val interactionTransitions = recipe.interactions.map(interactionTransitionOf(_, recipe.defaultFailureStrategy, allIngredientNames))
 
-    val sieveTransitions = recipe.sieves.map(_.toInteractionTransition(recipe.defaultFailureStrategy, allIngredientNames))
+    val sieveTransitions = recipe.sieves.map(interactionTransitionOf(_, recipe.defaultFailureStrategy, allIngredientNames))
 
     val allInteractionTransitions: Seq[InteractionTransition] = sieveTransitions ++ interactionTransitions
 
@@ -213,7 +213,7 @@ object RecipeCompiler {
       t.eventsToFire.flatMap { event =>
         event.ingredients.map { ingredient =>
           val from = interactionEventTransitions.find(_.label == event.name).get
-          arc(from, createPlace(ingredient.name, IngredientPlace), 1)
+          arc(from, Place(ingredient.name, IngredientPlace), 1)
         }
       }
     }
@@ -221,7 +221,7 @@ object RecipeCompiler {
     //Create event limiter places so that events can only fire x amount of times.
     val eventLimiterArcs: Seq[Arc] = sensoryEventTransitions.flatMap(
       t => t.maxFiringLimit match {
-        case Some(n) => Seq(arc(createPlace(s"limit:${t.label}", FiringLimiterPlace(n)), t, 1))
+        case Some(n) => Seq(arc(Place(s"limit:${t.label}", FiringLimiterPlace(n)), t, 1))
         case None => Seq.empty
       }
     )
@@ -248,7 +248,7 @@ object RecipeCompiler {
 
     // It connects a sensory event to an ingredient places
     val sensoryEventArcs: Seq[Arc] = sensoryEventWithIngredients
-      .flatMap(et => et.event.ingredients.map(ingredient => arc(et, createPlace(ingredient.name, IngredientPlace), 1)))
+      .flatMap(et => et.event.ingredients.map(ingredient => arc(et, Place(ingredient.name, IngredientPlace), 1)))
 
     val eventThatArePreconditions: Seq[String] =
       actionDescriptors.flatMap {
@@ -259,7 +259,7 @@ object RecipeCompiler {
     val sensoryEventArcsNoIngredientsArcs: Seq[Arc] = sensoryEventWithoutIngredients
       //Filter out events that are preconditions to interactions
       .filterNot(sensoryEvent => eventThatArePreconditions.contains(sensoryEvent.label))
-      .map(sensoryEvent => arc(sensoryEvent, createPlace(sensoryEvent.label, EmptyEventIngredientPlace), 1))
+      .map(sensoryEvent => arc(sensoryEvent, Place(sensoryEvent.label, EmptyEventIngredientPlace), 1))
 
     // First find the cases where multiple transitions depend on the same ingredient place
     val ingredientsWithMultipleConsumers: Map[String, Seq[InteractionTransition]] =
@@ -273,7 +273,7 @@ object RecipeCompiler {
 
     val multipleOutputFacilitatorArcs: Seq[Arc] =
       multipleConsumerFacilitatorTransitions.map(t =>
-        arc(createPlace(t.label, IngredientPlace), t, 1))
+        arc(Place(t.label, IngredientPlace), t, 1))
 
     val interactionArcs: Seq[Arc] =
       allInteractionTransitions.flatMap(
@@ -342,6 +342,4 @@ object RecipeCompiler {
 
     ingredientsWithMultipleConsumers
   }
-
-  private def createPlace(label: String, placeType: PlaceType): Place = Place(label = s"${placeType.labelPrepend}$label", placeType)
 }

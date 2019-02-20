@@ -6,14 +6,14 @@ import com.ing.baker.petrinet.api.Identifiable
 
 object Place {
 
-  sealed trait PlaceType {def labelPrepend: String = ""}
+  sealed trait PlaceType
 
   case object IngredientPlace extends PlaceType
   case object InteractionEventOutputPlace extends PlaceType
   case class  FiringLimiterPlace(maxLimit: Int) extends PlaceType
   case object EventPreconditionPlace extends PlaceType
-  case object EventOrPreconditionPlace extends PlaceType { override def labelPrepend: String = "EventOrPreconditionPlace:" }
-  case object IntermediatePlace extends PlaceType  { override def labelPrepend: String = "IntermediatePlace:" }
+  case object EventOrPreconditionPlace extends PlaceType
+  case object IntermediatePlace extends PlaceType
   case object EmptyEventIngredientPlace extends PlaceType
   case object MultiTransitionPlace extends PlaceType
 

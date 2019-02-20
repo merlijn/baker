@@ -18,7 +18,7 @@ object BakerResponse {
 
   case class CompletedResponse(sensoryEventStatus: SensoryEventStatus, events: Seq[ProcessEvent])
 
-  private def firstMessage(processId: String, response: Future[Any])(implicit ec: ExecutionContext): Future[SensoryEventStatus] =
+  private def parseFirstMessage(processId: String, response: Future[Any])(implicit ec: ExecutionContext): Future[SensoryEventStatus] =
     response.map(translateFirstMessage)
 
   private def translateFirstMessage(msg: Any): SensoryEventStatus = msg match {
@@ -32,7 +32,7 @@ object BakerResponse {
     case msg @_ => throw new IllegalStateException(s"Received unexpected message of type: ${msg.getClass}")
   }
 
-  private def allMessages(processId: String, response: Future[Seq[Any]])(implicit ec: ExecutionContext): Future[CompletedResponse] =
+  private def parseRemainingMessages(processId: String, response: Future[Seq[Any]])(implicit ec: ExecutionContext): Future[CompletedResponse] =
     response.map { msgs =>
 
       val sensoryEventStatus = msgs.headOption.map(translateFirstMessage).map {
@@ -41,15 +41,13 @@ object BakerResponse {
       }
         .getOrElse(throw new NoSuchProcessException(s"No such process: $processId"))
 
-      val events: Seq[ProcessEvent] = msgs.flatMap(translateOtherMessage)
+      val events: Seq[ProcessEvent] = msgs.flatMap {
+        case fired: ProcessInstanceProtocol.TransitionFired => Option(fired.output.asInstanceOf[ProcessEvent])
+        case _ => None
+      }
 
       CompletedResponse(sensoryEventStatus, events)
     }
-
-  private def translateOtherMessage(msg: Any): Option[ProcessEvent] = msg match {
-    case fired: ProcessInstanceProtocol.TransitionFired => Option(fired.output.asInstanceOf[ProcessEvent])
-    case _ => None
-  }
 
   private def createFlow(processId: String, source: Source[Any, NotUsed])(implicit materializer: Materializer, ec: ExecutionContext):
                                                               (Future[SensoryEventStatus], Future[CompletedResponse]) = {
@@ -72,7 +70,7 @@ object BakerResponse {
 
     val (firstResponse, allResponses) = graph.run(materializer)
 
-    (firstMessage(processId, firstResponse), allMessages(processId, allResponses))
+    (parseFirstMessage(processId, firstResponse), parseRemainingMessages(processId, allResponses))
   }
 }
 
