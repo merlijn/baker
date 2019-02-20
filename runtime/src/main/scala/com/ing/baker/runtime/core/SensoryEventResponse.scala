@@ -36,7 +36,7 @@ object SensoryEventResponse {
     response.map { msgs =>
 
       val sensoryEventStatus = msgs.headOption.map(translateFirstMessage).map {
-        case SensoryEventStatus.Received => SensoryEventStatus.Completed // If the first message is success, then it means we have all the events completed
+        case SensoryEventStatus.Received => SensoryEventStatus.Received // If the first message is success, then it means we have all the events completed
         case other => other
       }
         .getOrElse(throw new NoSuchProcessException(s"No such process: $processId"))

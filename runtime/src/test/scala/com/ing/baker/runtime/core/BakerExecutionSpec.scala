@@ -176,7 +176,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       baker.createProcess(recipeId, processId)
 
       val executedFirst = baker.fireEvent(processId, InitialEvent(initialIngredientValue))
-      executedFirst shouldBe SensoryEventStatus.Completed
+      executedFirst shouldBe SensoryEventStatus.Received
       verify(testInteractionOneMock).apply(processId.toString, "initialIngredient")
 
       val executedSecond = baker.fireEvent(processId, InitialEvent(initialIngredientValue))
@@ -199,7 +199,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       baker.createProcess(recipeId, processId)
 
       val executedFirst = baker.fireEvent(processId, InitialEvent(initialIngredientValue), Some("abc"))
-      executedFirst shouldBe SensoryEventStatus.Completed
+      executedFirst shouldBe SensoryEventStatus.Received
       verify(testInteractionOneMock).apply(processId.toString, "initialIngredient")
 
       val executedSecond = baker.fireEvent(processId, InitialEvent(initialIngredientValue), Some("abc"))
@@ -222,11 +222,11 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       baker.createProcess(recipeId, processId)
 
       val executedFirst = baker.fireEvent(processId, InitialEvent(initialIngredientValue))
-      executedFirst shouldBe SensoryEventStatus.Completed
+      executedFirst shouldBe SensoryEventStatus.Received
       verify(testInteractionOneMock).apply(processId.toString, "initialIngredient")
 
       val executedSecond = baker.fireEvent(processId, InitialEvent(initialIngredientValue))
-      executedSecond shouldBe SensoryEventStatus.Completed
+      executedSecond shouldBe SensoryEventStatus.Received
       verify(testInteractionOneMock, times(2)).apply(processId.toString, "initialIngredient")
 
       // This check is added to verify event list is still correct after firing the same event twice
@@ -420,7 +420,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val response = baker.fireEventAsync(processId, InitialEvent(initialIngredientValue))
 
       response.confirmReceived() shouldBe SensoryEventStatus.Received
-      response.confirmCompleted() shouldBe SensoryEventStatus.Completed
+      response.confirmCompleted() shouldBe SensoryEventStatus.Received
 
       response.confirmAllEvents(timeout) should contain only (
          ProcessEvent("InitialEvent", Seq(initialIngredient("initialIngredient"))),
@@ -1046,7 +1046,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       baker.createProcess(recipeId, processId)
       val response: SensoryEventResponse = baker.fireEventAsync(processId, InitialEvent(initialIngredientValue))
 
-      response.confirmCompleted(3000 millis) shouldBe SensoryEventStatus.Completed
+      response.confirmCompleted(3000 millis) shouldBe SensoryEventStatus.Received
     }
 
     "acknowledge the first and final event while rest processing failed" in {
@@ -1062,7 +1062,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       response.confirmReceived() shouldBe SensoryEventStatus.Received
 
       // The process is completed because it is in a BLOCKED state
-      response.confirmCompleted(3 seconds) shouldBe SensoryEventStatus.Completed
+      response.confirmCompleted(3 seconds) shouldBe SensoryEventStatus.Received
     }
 
     "bind multi transitions correctly even if ingredient name overlaps" in {
@@ -1139,7 +1139,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       baker.createProcess(recipeId, processId)
 
-      baker.fireEvent(processId, InitialEvent("")) shouldBe SensoryEventStatus.Completed
+      baker.fireEvent(processId, InitialEvent("")) shouldBe SensoryEventStatus.Received
     }
 
     "be able to visualize events that have been fired" in {

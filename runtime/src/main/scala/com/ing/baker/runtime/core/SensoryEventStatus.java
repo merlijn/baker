@@ -9,10 +9,6 @@ public enum SensoryEventStatus {
      */
     Received,
     /**
-     * The event was received and all resulting actions were executed.
-     */
-    Completed,
-    /**
      * The firing limit, the number of times this event may fire, was met.
      */
     FiringLimitMet,
