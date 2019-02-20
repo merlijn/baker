@@ -139,7 +139,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     * @return
     */
   @throws[TimeoutException]("When the request does not receive a reply within the given deadline")
-  def getRecipe(recipeId: String, timeout: FiniteDuration = defaultInquireTimeout): RecipeInformation = {
+  def getRecipeInformation(recipeId: String, timeout: FiniteDuration = defaultInquireTimeout): RecipeInformation = {
     // here we ask the RecipeManager actor to return us the recipe for the given id
     val futureResult = recipeManager.ask(GetRecipe(recipeId))(timeout)
     Await.result(futureResult, timeout) match {
@@ -148,15 +148,9 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     }
   }
 
-  /**
-    * Returns the compiled recipe for the given RecipeId
-    *
-    * @param recipeId
-    * @return
-    */
-  @throws[TimeoutException]("When the request does not receive a reply within the given deadline")
-  def getCompiledRecipe(recipeId: String, timeout: FiniteDuration = defaultInquireTimeout): CompiledRecipe = {
-    this.getRecipe(recipeId, timeout).compiledRecipe
+  def getRecipe(recipeId: String, timeout: FiniteDuration = defaultInquireTimeout): CompiledRecipe = {
+
+    getRecipeInformation(recipeId, timeout).recipe
   }
 
   /**
@@ -240,7 +234,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     // sends the ProcessEvent command to the actor and retrieves a Source (stream) of responses.
     val response: Future[SourceRef[Any]] = processIndexActor
       .ask(ProcessIndexProtocol.FireEvent(processId, runtimeEvent, correlationId, true, timeout))(timeout)
-      .mapTo[ProcessEventResponse]
+      .mapTo[FireEventResponse]
       .map(_.sourceRef)
 
     val source = Await.result(response, timeout)

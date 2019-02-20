@@ -55,7 +55,7 @@ class ProcessIndexModule extends ProtoEventAdapterModule {
     case protocol.StopRetryingInteraction(processId, interactionName) =>
       protobuf.StopRetryingInteraction(Some(processId), Some(interactionName))
 
-    case protocol.ProcessEventResponse(processId, sourceRef) =>
+    case protocol.FireEventResponse(processId, sourceRef) =>
       val serializedSourceRef = ctx.toProtoAny(sourceRef)
       protobuf.ProcessEventResponse(Some(processId), Some(serializedSourceRef))
 
@@ -124,7 +124,7 @@ class ProcessIndexModule extends ProtoEventAdapterModule {
 
     case protobuf.ProcessEventResponse(Some(processId), Some(sourceRef)) =>
       val deserializedSourceRef = ctx.toDomain[SourceRef[Any]](sourceRef)
-      protocol.ProcessEventResponse(processId, deserializedSourceRef)
+      protocol.FireEventResponse(processId, deserializedSourceRef)
 
     case protobuf.GetProcessState(Some(processId)) =>
       protocol.GetProcessState(processId)

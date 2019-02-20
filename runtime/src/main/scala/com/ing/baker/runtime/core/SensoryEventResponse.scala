@@ -10,6 +10,7 @@ import akka.stream.{ClosedShape, Materializer}
 import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol
 
+import scala.collection.immutable
 import scala.compat.java8.FutureConverters
 import scala.concurrent.duration.{FiniteDuration, SECONDS}
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -29,16 +30,14 @@ object SensoryEventResponse {
     case ProcessIndexProtocol.ReceivePeriodExpired(_) => SensoryEventStatus.ReceivePeriodExpired
     case ProcessIndexProtocol.ProcessDeleted(_) => SensoryEventStatus.ProcessDeleted
     case ProcessIndexProtocol.InvalidEvent(_, invalidEventMessage) => throw new IllegalArgumentException(invalidEventMessage)
-    case msg @_ => throw new IllegalStateException(s"Received unexpected message of type: ${msg.getClass}")
+    case msg @ _ => throw new IllegalStateException(s"Received unexpected message of type: ${msg.getClass}")
   }
 
   private def parseRemainingMessages(processId: String, response: Future[Seq[Any]])(implicit ec: ExecutionContext): Future[CompletedResponse] =
     response.map { msgs =>
 
-      val sensoryEventStatus = msgs.headOption.map(translateFirstMessage).map {
-        case SensoryEventStatus.Received => SensoryEventStatus.Received // If the first message is success, then it means we have all the events completed
-        case other => other
-      }
+      val sensoryEventStatus = msgs
+        .headOption.map(translateFirstMessage)
         .getOrElse(throw new NoSuchProcessException(s"No such process: $processId"))
 
       val events: Seq[ProcessEvent] = msgs.flatMap {
@@ -52,8 +51,8 @@ object SensoryEventResponse {
   private def createFlow(processId: String, source: Source[Any, NotUsed])(implicit materializer: Materializer, ec: ExecutionContext):
                                                               (Future[SensoryEventStatus], Future[CompletedResponse]) = {
 
-    val sinkHead = Sink.head[Any]
-    val sinkLast = Sink.seq[Any]
+    val sinkHead: Sink[Any, Future[Any]] = Sink.head[Any]
+    val sinkLast: Sink[Any, Future[immutable.Seq[Any]]] = Sink.seq[Any]
 
     val graph = RunnableGraph.fromGraph(GraphDSL.create(sinkHead, sinkLast)((_, _)) {
       implicit b =>

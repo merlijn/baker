@@ -81,7 +81,7 @@ class ProcessIndexSpec extends TestKit(ActorSystem("ProcessIndexSpec", ProcessIn
 
   def expectProcessEventReply(reply: Any): Unit = {
 
-    expectMsgType[ProcessEventResponse]
+    expectMsgType[FireEventResponse]
       .sourceRef
       .runWith(TestSink.probe)
       .requestNext(reply)
@@ -181,7 +181,7 @@ class ProcessIndexSpec extends TestKit(ActorSystem("ProcessIndexSpec", ProcessIn
 
       petriNetActorProbe.expectMsgAllClassOf(classOf[FireTransition])
 
-      expectMsgType[ProcessEventResponse]
+      expectMsgType[FireEventResponse]
     }
 
     "reply with a Unititalized message when attempting to fire an event to a not existing process" in {
@@ -302,7 +302,7 @@ class ProcessIndexSpec extends TestKit(ActorSystem("ProcessIndexSpec", ProcessIn
 
       petriNetActorProbe.expectMsgAllClassOf(classOf[FireTransition])
 
-      expectMsgType[ProcessEventResponse]
+      expectMsgType[FireEventResponse]
 
       Thread.sleep(receivePeriodTimeout.toMillis * 2)
 

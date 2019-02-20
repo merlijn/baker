@@ -237,7 +237,7 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
 
       def rejectWith(msg: Any, rejectReason: RejectReason): Unit = {
         context.system.eventStream.publish(events.EventRejected(System.currentTimeMillis(), cmd.processId, cmd.correlationId, cmd.event, rejectReason))
-        Source.single(msg).runWith(StreamRefs.sourceRef()).map(ProcessEventResponse(processId, _)).pipeTo(sender())
+        Source.single(msg).runWith(StreamRefs.sourceRef()).map(FireEventResponse(processId, _)).pipeTo(sender())
       }
 
       def forwardEvent(actorRef: ActorRef, recipe: CompiledRecipe): Unit = {
@@ -263,7 +263,7 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
                   val source = FireEventActor.fireEvent(actorRef, recipe, cmd, waitForRetries)(processEventTimout, context.system, materializer)
                   val sourceRef = source.runWith(StreamRefs.sourceRef().addAttributes(StreamRefAttributes.subscriptionTimeout(processEventTimout)))
 
-                  sourceRef.map(ProcessEventResponse(processId, _)).pipeTo(sender())
+                  sourceRef.map(FireEventResponse(processId, _)).pipeTo(sender())
               }
             }
         }

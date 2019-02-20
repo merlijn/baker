@@ -1020,7 +1020,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
         val baker2 = new Baker()(system2)
         baker2.addImplementations(mockImplementations)
         baker2.getIngredients(processId) shouldBe finalState
-        baker2.getRecipe(recipeId).compiledRecipe shouldBe compiledRecipe
+        baker2.getRecipeInformation(recipeId).recipe shouldBe compiledRecipe
         baker2.addRecipe(compiledRecipe) shouldBe recipeId
       } finally {
         TestKit.shutdownActorSystem(system2)

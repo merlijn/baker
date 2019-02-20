@@ -31,7 +31,7 @@ class BakerInquireSpec extends BakerRuntimeTestBase {
 
     "return recipe if asked" in {
       val (baker, recipeId) = setupBakerWithRecipe("returnRecipe", false)
-      val recipe: CompiledRecipe = baker.getRecipe(recipeId).compiledRecipe
+      val recipe: CompiledRecipe = baker.getRecipe(recipeId)
       recipe.name shouldBe "returnRecipe"
     }
 
@@ -40,13 +40,13 @@ class BakerInquireSpec extends BakerRuntimeTestBase {
       val recipeId2 = baker.addRecipe(RecipeCompiler.compileRecipe(getRecipe("returnAllRecipes2")))
       val recipes: Map[String, RecipeInformation] = baker.getAllRecipes()
       recipes.size shouldBe 2
-      recipes(recipeId).compiledRecipe.name shouldBe "returnAllRecipes"
-      recipes(recipeId2).compiledRecipe.name shouldBe "returnAllRecipes2"
+      recipes(recipeId).recipe.name shouldBe "returnAllRecipes"
+      recipes(recipeId2).recipe.name shouldBe "returnAllRecipes2"
     }
 
     "return no errors of a recipe with no errors if asked" in {
       val (baker, recipeId) = setupBakerWithRecipe("returnHealthRecipe", false)
-      val recipeInformation: RecipeInformation = baker.getRecipe(recipeId)
+      val recipeInformation: RecipeInformation = baker.getRecipeInformation(recipeId)
       recipeInformation should have(
         'recipeId (recipeId),
         'errors (Set.empty)
