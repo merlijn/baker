@@ -1044,7 +1044,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val processId = UUID.randomUUID().toString
       baker.createProcess(recipeId, processId)
-      val response: BakerResponse = baker.fireEventAsync(processId, InitialEvent(initialIngredientValue))
+      val response: SensoryEventResponse = baker.fireEventAsync(processId, InitialEvent(initialIngredientValue))
 
       response.confirmCompleted(3000 millis) shouldBe SensoryEventStatus.Completed
     }

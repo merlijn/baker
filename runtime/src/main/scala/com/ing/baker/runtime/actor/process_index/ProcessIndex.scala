@@ -260,7 +260,7 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
 
                 // otherwise the event is forwarded
                 case _ =>
-                  val source = ProcessEventActor.processEvent(actorRef, recipe, cmd, waitForRetries)(processEventTimout, context.system, materializer)
+                  val source = FireEventActor.fireEvent(actorRef, recipe, cmd, waitForRetries)(processEventTimout, context.system, materializer)
                   val sourceRef = source.runWith(StreamRefs.sourceRef().addAttributes(StreamRefAttributes.subscriptionTimeout(processEventTimout)))
 
                   sourceRef.map(ProcessEventResponse(processId, _)).pipeTo(sender())

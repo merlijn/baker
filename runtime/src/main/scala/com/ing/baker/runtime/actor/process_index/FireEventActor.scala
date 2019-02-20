@@ -17,17 +17,17 @@ import com.ing.baker.runtime.core.events.RejectReason
 
 import scala.concurrent.duration.FiniteDuration
 
-object ProcessEventActor {
+object FireEventActor {
 
   /**
     * Returns a Source of all the messages from a process instance in response to a message.
     */
-  def processEvent(receiver: ActorRef, recipe: CompiledRecipe, cmd: FireEvent, waitForRetries: Boolean = false)
-                  (implicit timeout: FiniteDuration, actorSystem: ActorSystem, materializer: Materializer): Source[Any, NotUsed] = {
+  def fireEvent(receiver: ActorRef, recipe: CompiledRecipe, cmd: FireEvent, waitForRetries: Boolean = false)
+               (implicit timeout: FiniteDuration, actorSystem: ActorSystem, materializer: Materializer): Source[Any, NotUsed] = {
 
     implicit val akkaTimeout: Timeout = timeout
     Source.queue[Any](100, OverflowStrategy.fail).mapMaterializedValue { queue ⇒
-      val sender = actorSystem.actorOf(Props(new ProcessEventActor(cmd, recipe, queue, waitForRetries)(timeout, actorSystem)))
+      val sender = actorSystem.actorOf(Props(new FireEventActor(cmd, recipe, queue, waitForRetries)(timeout, actorSystem)))
 
       require(cmd.event != null, "Event can not be null")
 
@@ -46,7 +46,7 @@ object ProcessEventActor {
 /**
   * An actor that pushes all received messages on a SourceQueueWithComplete.
   */
-class ProcessEventActor(cmd: FireEvent, recipe: CompiledRecipe, queue: SourceQueueWithComplete[Any], waitForRetries: Boolean)(implicit timeout: FiniteDuration, system: ActorSystem) extends Actor {
+class FireEventActor(cmd: FireEvent, recipe: CompiledRecipe, queue: SourceQueueWithComplete[Any], waitForRetries: Boolean)(implicit timeout: FiniteDuration, system: ActorSystem) extends Actor {
   var runningJobs = Set.empty[Long]
   var firstReceived = false
 

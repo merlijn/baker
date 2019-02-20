@@ -19,7 +19,7 @@ import org.scalatest.WordSpecLike
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
-object ProcessEventActorSpec {
+object FireEventActorSpec {
   val config: Config = ConfigFactory.parseString(
     """
       |akka.persistence.journal.plugin = "inmemory-journal"
@@ -28,7 +28,7 @@ object ProcessEventActorSpec {
     """.stripMargin)
 }
 
-class ProcessEventActorSpec extends TestKit(ActorSystem("ProcessApiSpec", ProcessEventActorSpec.config)) with WordSpecLike {
+class FireEventActorSpec extends TestKit(ActorSystem("ProcessApiSpec", FireEventActorSpec.config)) with WordSpecLike {
 
   implicit val materializer = ActorMaterializer()
   implicit val ec: ExecutionContext = system.dispatcher
@@ -49,7 +49,7 @@ class ProcessEventActorSpec extends TestKit(ActorSystem("ProcessApiSpec", Proces
 
       val processEventCmd = FireEvent("", ProcessEvent(webshop.orderPlaced.name, Seq.empty), None, true, 1 second)
 
-      val source: Source[Any, NotUsed] = ProcessEventActor.processEvent(processProbe.ref, webShopRecipe, processEventCmd)
+      val source: Source[Any, NotUsed] = FireEventActor.fireEvent(processProbe.ref, webShopRecipe, processEventCmd)
 
       val runSource: TestSubscriber.Probe[Long] = source.map(_.asInstanceOf[TransitionResponse].transitionId).runWith(TestSink.probe)
 
@@ -69,7 +69,7 @@ class ProcessEventActorSpec extends TestKit(ActorSystem("ProcessApiSpec", Proces
 
       val processEventCmd = FireEvent("", ProcessEvent(webshop.orderPlaced.name, Seq.empty), None, true, 1 second)
 
-      val source: Source[Any, NotUsed] = ProcessEventActor.processEvent(processProbe.ref, webShopRecipe, processEventCmd)
+      val source: Source[Any, NotUsed] = FireEventActor.fireEvent(processProbe.ref, webShopRecipe, processEventCmd)
 
       val runSource = source.map(_.asInstanceOf[TransitionResponse].transitionId).runWith(TestSink.probe)
 
@@ -92,7 +92,7 @@ class ProcessEventActorSpec extends TestKit(ActorSystem("ProcessApiSpec", Proces
         val processProbe = TestProbe()
         val processEventCmd = FireEvent("", ProcessEvent(webshop.orderPlaced.name, Seq.empty), None, true, 1 second)
 
-        val source: Source[Any, NotUsed] = ProcessEventActor.processEvent(processProbe.ref, webShopRecipe, processEventCmd)
+        val source: Source[Any, NotUsed] = FireEventActor.fireEvent(processProbe.ref, webShopRecipe, processEventCmd)
         val runSource: TestSubscriber.Probe[Any] = source.runWith(TestSink.probe)
 
         processProbe.expectMsgType[FireTransition]

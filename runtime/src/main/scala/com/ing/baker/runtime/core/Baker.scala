@@ -232,7 +232,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     *
     * If nothing is done with the BakerResponse there is NO guarantee that the event is received by the process instance.
     */
-  def fireEventAsync(processId: String, event: Any, correlationId: Option[String] = None, timeout: FiniteDuration = defaultProcessEventTimeout): BakerResponse = {
+  def fireEventAsync(processId: String, event: Any, correlationId: Option[String] = None, timeout: FiniteDuration = defaultProcessEventTimeout): SensoryEventResponse = {
 
     // transforms the given object into a RuntimeEvent instance
     val runtimeEvent: ProcessEvent = extractEvent(event)
@@ -245,7 +245,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
 
     val source = Await.result(response, timeout)
 
-    new BakerResponse(processId, source)
+    new SensoryEventResponse(processId, source)
   }
 
   /**

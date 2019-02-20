@@ -14,7 +14,7 @@ import scala.compat.java8.FutureConverters
 import scala.concurrent.duration.{FiniteDuration, SECONDS}
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-object BakerResponse {
+object SensoryEventResponse {
 
   case class CompletedResponse(sensoryEventStatus: SensoryEventStatus, events: Seq[ProcessEvent])
 
@@ -74,13 +74,13 @@ object BakerResponse {
   }
 }
 
-class BakerResponse(processId: String, source: Source[Any, NotUsed])(implicit materializer: Materializer, ec: ExecutionContext) {
+class SensoryEventResponse(processId: String, source: Source[Any, NotUsed])(implicit materializer: Materializer, ec: ExecutionContext) {
 
-  val (receivedFuture, completedFuture) = BakerResponse.createFlow(processId, source)
+  val (receivedFuture, completedFuture) = SensoryEventResponse.createFlow(processId, source)
 
   val defaultWaitTimeout: FiniteDuration = FiniteDuration.apply(10, SECONDS)
 
-  def completedFutureJava: CompletableFuture[BakerResponse.CompletedResponse] =
+  def completedFutureJava: CompletableFuture[SensoryEventResponse.CompletedResponse] =
     FutureConverters.toJava(completedFuture).toCompletableFuture
 
   def receivedFutureJava: CompletableFuture[SensoryEventStatus] =

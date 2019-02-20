@@ -98,6 +98,7 @@ object ProcessInstanceProtocol {
 
   /**
    * Response indicating that a transition has fired successfully
+   * TODO This class should contain a timestamp
    */
   case class TransitionFired(
     jobId: Long,
