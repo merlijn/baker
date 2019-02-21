@@ -230,7 +230,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       verify(testInteractionOneMock, times(2)).apply(processId.toString, "initialIngredient")
 
       // This check is added to verify event list is still correct after firing the same event twice
-      baker.events(processId).map(_.name).toList shouldBe List("InitialEvent", "InteractionOneSuccessful", "InitialEvent", "InteractionOneSuccessful")
+      baker.getEvents(processId).map(_.name).toList shouldBe List("InitialEvent", "InteractionOneSuccessful", "InitialEvent", "InteractionOneSuccessful")
 
       val executedThird = baker.fireEvent(processId, InitialEvent(initialIngredientValue))
       executedThird shouldBe SensoryEventStatus.FiringLimitMet
@@ -332,7 +332,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
         baker.getIngredients(processId) shouldBe expectedIngredients
 
-        baker.events(processId) shouldBe expectedEvents
+        baker.getEvents(processId) shouldBe expectedEvents
 
       } finally {
 
@@ -352,7 +352,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val baker = new Baker()
 
-      baker.addImplementations(mockImplementations)
+      baker.addImplementationMethods(mockImplementations)
 
       val compiledRecipe = RecipeCompiler.compileRecipe(recipe)
       val recipeId = baker.addRecipe(compiledRecipe)
@@ -789,7 +789,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       Thread.sleep(50)
 
-      baker.events(processId).map(_.name) should contain(interactionOne.retryExhaustedEventName)
+      baker.getEvents(processId).map(_.name) should contain(interactionOne.retryExhaustedEventName)
     }
 
     "not fire the exhausted retry event if the interaction passes" in {
@@ -811,7 +811,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       Thread.sleep(50)
 
       //Since the defaultEventExhaustedName is set the retryExhaustedEventName of interactionOne will be picked.
-      baker.events(processId).map(_.name) should not contain interactionOne.retryExhaustedEventName
+      baker.getEvents(processId).map(_.name) should not contain interactionOne.retryExhaustedEventName
     }
 
     "fire a specified failure event for an interaction immediately after it fails" in {
@@ -839,7 +839,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 //      verify(listenerMock).apply(EventReceived(processId.toString, Baker.extractEvent(InitialEvent(initialIngredientValue))))
 //      verify(listenerMock).apply(processId.toString, RuntimeEvent(interactionOne.retryExhaustedEventName, Seq.empty))
 
-      baker.events(processId).map(_.name) should contain(interactionOne.retryExhaustedEventName)
+      baker.getEvents(processId).map(_.name) should contain(interactionOne.retryExhaustedEventName)
     }
 
     "resolve a blocked interaction" in {
@@ -910,7 +910,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
 
       //Check if both the new event and the events occurred in the past are in the eventsList
-      baker.events(processId) should contain only(
+      baker.getEvents(processId) should contain only(
         Baker.extractEvent(InitialEvent(initialIngredientValue)),
         Baker.extractEvent(SieveInteractionSuccessful(sievedIngredientValue)),
         Baker.extractEvent(EventFromInteractionTwo(interactionTwoIngredientValue)),
@@ -922,7 +922,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       baker.fireEvent(processId, SecondEvent())
 
       //Check if both the new event and the events occurred in the past are in the eventsList
-      baker.events(processId) should contain only(
+      baker.getEvents(processId) should contain only(
         Baker.extractEvent(InitialEvent(initialIngredientValue)),
         Baker.extractEvent(EventFromInteractionTwo(interactionTwoIngredientValue)),
         ProcessEvent("SecondEvent", Seq.empty),
@@ -1018,7 +1018,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val system2 = ActorSystem("persistenceTest2", localLevelDBConfig("persistenceTest2"))
       try {
         val baker2 = new Baker()(system2)
-        baker2.addImplementations(mockImplementations)
+        baker2.addImplementationMethods(mockImplementations)
         baker2.getIngredients(processId) shouldBe finalState
         baker2.getRecipeInformation(recipeId).recipe shouldBe compiledRecipe
         baker2.addRecipe(compiledRecipe) shouldBe recipeId
@@ -1186,7 +1186,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       //Should not fail
       baker.getIngredients(processId)
 
-      baker.events(processId)
+      baker.getEvents(processId)
 
       Thread.sleep(FiniteDuration(retentionPeriod.toMillis + 1000, TimeUnit.MILLISECONDS).dilated.toMillis)
 
@@ -1196,7 +1196,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       }
 
       intercept[ProcessDeletedException] {
-        baker.events(processId)
+        baker.getEvents(processId)
       }
     }
 

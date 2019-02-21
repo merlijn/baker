@@ -35,25 +35,27 @@ package object api extends MultiSetOps with MarkingOps {
 
   implicit class IdentifiableOps[T : Identifiable](e: T) {
 
-    def getId: Long = implicitly[Identifiable[T]].apply(e)
+    def getId: Id = implicitly[Identifiable[T]].apply(e)
   }
 
   implicit class IdentifiableSeqOps[T : Identifiable](seq: Iterable[T]) {
-    def findById(id: Long): Option[T] = seq.find(e ⇒ implicitly[Identifiable[T]].apply(e) == id)
-    def getById(id: Long, name: String = "element"): T = findById(id).getOrElse { throw new IllegalStateException(s"No $name found with id: $id") }
+
+    def findById(id: Id): Option[T] = seq.find(e ⇒ implicitly[Identifiable[T]].apply(e) == id)
+
+    def getById(id: Id, name: String = "element"): T = findById(id).getOrElse { throw new IllegalStateException(s"No $name found with id: $id") }
   }
 
   implicit class MarkingMarshall[P : Identifiable](marking: Marking[P]) {
 
-    def marshall: Marking[Id] = translateKeys(marking, (p: P) => implicitly[Identifiable[P]].apply(p))
+    def marshall: Marking[Id] = translateMapKeys(marking, (p: P) => implicitly[Identifiable[P]].apply(p))
   }
 
   implicit class MarkingUnMarshall(marking: Marking[Id]) {
 
-    def unmarshall[P : Identifiable](places: Iterable[P]): Marking[P] = translateKeys(marking, (id: Long) => places.getById(id, "place in petrinet"))
+    def unmarshall[P : Identifiable](places: Iterable[P]): Marking[P] = translateMapKeys(marking, (id: Id) => places.getById(id, "place in petrinet"))
   }
 
-  def translateKeys[K1, K2, V](map: Map[K1, V], fn: K1 => K2): Map[K2, V] = map.map { case (key, value) ⇒ fn(key) -> value }
+  def translateMapKeys[K1, K2, V](map: Map[K1, V], fn: K1 => K2): Map[K2, V] = map.map { case (key, value) ⇒ fn(key) -> value }
 
   implicit class PetriNetGraphNodeOps[P, T](val node: PetriNetGraph[P, T]#NodeT) {
 

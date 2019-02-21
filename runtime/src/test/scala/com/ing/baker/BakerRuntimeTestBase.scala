@@ -211,7 +211,7 @@ trait BakerRuntimeTestBase
                                     (implicit actorSystem: ActorSystem): (Baker, String) = {
 
     val baker = new Baker()(actorSystem)
-    baker.addImplementations(implementations)
+    baker.addImplementationMethods(implementations)
     val recipeId = baker.addRecipe(RecipeCompiler.compileRecipe(recipe))
     (baker, recipeId)
   }
@@ -219,7 +219,7 @@ trait BakerRuntimeTestBase
   protected def setupBakerWithNoRecipe()(implicit actorSystem: ActorSystem): Baker = {
     setupMockResponse()
     val baker = new Baker()(actorSystem)
-    baker.addImplementations(mockImplementations)
+    baker.addImplementationMethods(mockImplementations)
     baker
   }
 

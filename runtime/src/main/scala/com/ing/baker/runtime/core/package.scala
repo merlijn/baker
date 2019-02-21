@@ -17,7 +17,7 @@ package object core {
     def handleException[Y >: T](pf: PartialFunction[Throwable, Y]): IO[Y] =
       io.attempt.flatMap {
         case Right(result)   => IO.pure(result)
-        case Left(throwable) => pf.lift(throwable).map(IO.pure(_)).getOrElse(IO.raiseError(throwable))
+        case Left(throwable) => pf.lift(throwable).map(IO.pure).getOrElse(IO.raiseError(throwable))
       }
 
     def handleExceptionWith[Y >: T](pf: PartialFunction[Throwable, IO[Y]]): IO[Y] =

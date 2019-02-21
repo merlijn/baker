@@ -8,9 +8,14 @@ import org.slf4j.LoggerFactory
 
 import scala.util.Try
 
-case class MethodInteractionImplementation(implementation: AnyRef) extends InteractionImplementation {
+/**
+  * Implementation of an interaction that calls an "apply" method on a given object.
+  *
+  * @param implementation The implementation object.
+  */
+case class InteractionImplementationMethod(implementation: AnyRef) extends InteractionImplementation {
 
-  val log = LoggerFactory.getLogger(classOf[MethodInteractionImplementation])
+  val log = LoggerFactory.getLogger(classOf[InteractionImplementationMethod])
 
   val method = {
 

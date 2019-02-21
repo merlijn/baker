@@ -35,7 +35,7 @@ object APIRoutes extends Directives with BaasMarshalling {
       } ~
       path("events") {
         get {
-          val events = baker.events(requestId).toList
+          val events = baker.getEvents(requestId).toList
           complete(events)
         }
       } ~

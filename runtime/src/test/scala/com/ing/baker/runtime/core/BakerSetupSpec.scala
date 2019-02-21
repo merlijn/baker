@@ -33,7 +33,7 @@ class BakerSetupSpec extends BakerRuntimeTestBase {
 
         val baker = new Baker()
 
-        baker.addImplementations(mockImplementations)
+        baker.addImplementationMethods(mockImplementations)
 
         when(testInteractionOneMock.apply(anyString(), anyString())).thenReturn(InteractionOneSuccessful("foobar"))
 
@@ -49,14 +49,14 @@ class BakerSetupSpec extends BakerRuntimeTestBase {
 
         val baker = new Baker()
 
-        baker.addImplementations(mockImplementations)
+        baker.addImplementationMethods(mockImplementations)
       }
 
       "providing an implementation with the class simplename same as the interaction" in {
 
         val baker = new Baker()
 
-        baker.addImplementation(new implementations.InteractionOne())
+        baker.addImplementationMethod(new implementations.InteractionOne())
       }
 
       "providing an implementation for a renamed interaction" in {
@@ -67,7 +67,7 @@ class BakerSetupSpec extends BakerRuntimeTestBase {
 
         val baker = new Baker()
 
-        baker.addImplementation(new implementations.InteractionOne())
+        baker.addImplementationMethod(new implementations.InteractionOne())
 
         baker.addRecipe(RecipeCompiler.compileRecipe(recipe))
       }
@@ -80,7 +80,7 @@ class BakerSetupSpec extends BakerRuntimeTestBase {
 
         val baker = new Baker()
 
-        baker.addImplementation(new InteractionOneFieldName())
+        baker.addImplementationMethod(new InteractionOneFieldName())
 
         baker.addRecipe(RecipeCompiler.compileRecipe(recipe))
       }
@@ -93,7 +93,7 @@ class BakerSetupSpec extends BakerRuntimeTestBase {
 
         val baker = new Baker()
 
-        baker.addImplementation(new InteractionOneInterfaceImplementation())
+        baker.addImplementationMethod(new InteractionOneInterfaceImplementation())
 
         baker.addRecipe(RecipeCompiler.compileRecipe(recipe))
       }
@@ -105,7 +105,7 @@ class BakerSetupSpec extends BakerRuntimeTestBase {
 
         val baker = new Baker()
 
-        baker.addImplementation(mock[ComplexIngredientInteraction])
+        baker.addImplementationMethod(mock[ComplexIngredientInteraction])
 
         baker.addRecipe(RecipeCompiler.compileRecipe(recipe))
       }
@@ -120,7 +120,7 @@ class BakerSetupSpec extends BakerRuntimeTestBase {
 
         val baker = new Baker()
 
-        baker.addImplementations(mockImplementations)
+        baker.addImplementationMethods(mockImplementations)
 
         intercept[IllegalArgumentException] {
           baker.addRecipe(RecipeCompiler.compileRecipe(recipe))
@@ -149,7 +149,7 @@ class BakerSetupSpec extends BakerRuntimeTestBase {
 
         val baker = new Baker()
 
-        baker.addImplementation(new InteractionOneWrongApply())
+        baker.addImplementationMethod(new InteractionOneWrongApply())
 
         intercept[IllegalStateException] {
           baker.addRecipe(RecipeCompiler.compileRecipe(recipe))

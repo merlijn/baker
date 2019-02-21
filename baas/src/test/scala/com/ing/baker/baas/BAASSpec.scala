@@ -11,7 +11,7 @@ import com.ing.baker.compiler.RecipeCompiler
 import com.ing.baker.il.CompiledRecipe
 import com.ing.baker.recipe.scaladsl.{Event, Ingredient, Interaction, processId}
 import com.ing.baker.recipe.{commonserialize, scaladsl}
-import com.ing.baker.runtime.core.internal.MethodInteractionImplementation
+import com.ing.baker.runtime.core.internal.InteractionImplementationMethod
 import com.ing.baker.runtime.core.{Baker, ProcessState, SensoryEventStatus}
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 
@@ -37,7 +37,7 @@ class BAASSpec extends TestKit(ActorSystem("BAASSpec")) with WordSpecLike with M
 
   // host the local implementations
   val launcher = RemoteInteractionLauncher.apply(
-    MethodInteractionImplementation.toImplementationMap(localImplementations), "localhost", 8090)
+    InteractionImplementationMethod.toImplementationMap(localImplementations), "localhost", 8090)
 
   launcher.start()
 

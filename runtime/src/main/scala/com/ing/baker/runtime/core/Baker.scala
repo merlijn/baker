@@ -24,7 +24,7 @@ import com.ing.baker.runtime.actor.serialization.Encryption.NoEncryption
 import com.ing.baker.runtime.core
 import com.ing.baker.runtime.core.Baker._
 import com.ing.baker.runtime.core.events.BakerEvent
-import com.ing.baker.runtime.core.internal.{InteractionManager, MethodInteractionImplementation, RecipeRuntime}
+import com.ing.baker.runtime.core.internal.{InteractionManager, InteractionImplementationMethod, RecipeRuntime}
 import com.ing.baker.types.{Converters, RecordValue, Value}
 import net.ceedubs.ficus.Ficus._
 import org.slf4j.LoggerFactory
@@ -301,7 +301,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     * @param processId The process identifier.
     * @return The source of events.
     */
-  def eventsWithTimestampAsync(processId: String): Source[(ProcessEvent, Long), NotUsed] = {
+  def getEventsWithTimestampAsync(processId: String): Source[(ProcessEvent, Long), NotUsed] = {
 
     val futureResult = processIndexActor.ask(GetCompiledRecipe(processId))(defaultInquireTimeout)
 
@@ -319,8 +319,8 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     * @param processId The process identifier.
     * @return A sequence of events with their timestamps.
     */
-  def eventsAsync(processId: String): Source[ProcessEvent, NotUsed] =
-    eventsWithTimestampAsync(processId).map { case (event, _) => event }
+  def getEventsAsync(processId: String): Source[ProcessEvent, NotUsed] =
+    getEventsWithTimestampAsync(processId).map { case (event, _) => event }
 
   /**
     * Synchronously returns a sequence of all events for a process.
@@ -328,7 +328,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     * @param processId The process identifier.
     * @param timeout How long to wait to retrieve the events.
     */
-  def events(processId: String, timeout: FiniteDuration = defaultInquireTimeout): Seq[ProcessEvent] =
+  def getEvents(processId: String, timeout: FiniteDuration = defaultInquireTimeout): Seq[ProcessEvent] =
     eventsWithTimestamp(processId, timeout).map { case (event, _) => event }
 
   /**
@@ -339,7 +339,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     * @return A sequence of events with their timestamps.
     */
   def eventsWithTimestamp(processId: String, timeout: FiniteDuration = defaultInquireTimeout): Seq[(ProcessEvent, Long)] = {
-    val futureEventSeq = eventsWithTimestampAsync(processId).runWith(Sink.seq)
+    val futureEventSeq = getEventsWithTimestampAsync(processId).runWith(Sink.seq)
     Await.result(futureEventSeq, timeout)
   }
 
@@ -428,7 +428,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
         RecipeVisualizer.visualizeRecipe(
           compiledRecipe,
           config,
-          eventNames = events(processId).map(_.name).toSet,
+          eventNames = getEvents(processId).map(_.name).toSet,
           ingredientNames = getIngredients(processId).keySet)
       case ProcessDeleted(_) => throw new ProcessDeletedException(s"Process $processId is deleted")
       case Uninitialized(_)  => throw new NoSuchProcessException(s"Process $processId is not found")
@@ -455,22 +455,22 @@ class Baker()(implicit val actorSystem: ActorSystem) {
   }
 
   /**
-    * Adds an interaction implementation to baker.
+    * Adds a method implementation for an interaction to baker.
     *
     * This is assumed to be a an object with a method named 'apply' defined on it.
     *
-    * @param implementation The implementation object
+    * @param implementation The method implementation.
     */
-  def addImplementation(implementation: AnyRef): Unit =
-    interactionManager.addImplementation(new MethodInteractionImplementation(implementation))
+  def addImplementationMethod(implementation: AnyRef): Unit =
+    interactionManager.addImplementation(InteractionImplementationMethod(implementation))
 
   /**
-    * Adds a sequence of interaction implementation to baker.
+    * Adds a sequence of method implementations for a interactions to baker.
     *
-    * @param implementations The implementation object
+    * @param implementations The sequence of method implementations.
     */
-  def addImplementations(implementations: Seq[AnyRef]): Unit =
-    implementations.foreach(addImplementation)
+  def addImplementationMethods(implementations: Seq[AnyRef]): Unit =
+    implementations.foreach(addImplementationMethod)
 
   /**
     * Adds an interaction implementation to baker.
@@ -479,6 +479,14 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     */
   def addImplementation(implementation: InteractionImplementation): Unit =
     interactionManager.addImplementation(implementation)
+
+  /**
+    * Adds a sequence of interaction implementations to baker.
+    *
+    * @param implementations A sequence of InteractionImplementation instances
+    */
+  def addImplementations(implementations: Seq[InteractionImplementation]): Unit =
+    implementations.foreach(interactionManager.addImplementation)
 
   /**
     * Attempts to gracefully shutdown the baker system.
