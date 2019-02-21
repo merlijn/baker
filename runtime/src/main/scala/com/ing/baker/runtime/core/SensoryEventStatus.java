@@ -5,9 +5,9 @@ package com.ing.baker.runtime.core;
  */
 public enum SensoryEventStatus {
     /**
-     * The event was received and accepted.
+     * The event was successfully received.
      */
-    Received,
+    OK,
     /**
      * The firing limit, the number of times this event may fire, was met.
      */

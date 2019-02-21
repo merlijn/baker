@@ -341,6 +341,7 @@ class ProcessInstance[P : Identifiable, T : Identifiable, S, E](
     runtime.allEnabledJobs.run(instance).value match {
       case (updatedInstance, jobs) ⇒
 
+        // if there are no new jobs and there is an idle ttl is defined a message is scheduled to be sent to this actor
         if (jobs.isEmpty && updatedInstance.activeJobs.isEmpty)
           settings.idleTTL.foreach { ttl ⇒
             system.scheduler.scheduleOnce(ttl, context.self, IdleStop(updatedInstance.sequenceNr))

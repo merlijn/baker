@@ -23,7 +23,7 @@ object SensoryEventResponse {
     response.map(translateFirstMessage)
 
   private def translateFirstMessage(msg: Any): SensoryEventStatus = msg match {
-    case _: ProcessInstanceProtocol.TransitionFired => SensoryEventStatus.Received
+    case _: ProcessInstanceProtocol.TransitionFired => SensoryEventStatus.OK
     case _: ProcessInstanceProtocol.TransitionNotEnabled => SensoryEventStatus.FiringLimitMet
     case _: ProcessInstanceProtocol.AlreadyReceived => SensoryEventStatus.AlreadyReceived
     case ProcessIndexProtocol.NoSuchProcess(processId) => throw new NoSuchProcessException(s"No such process: $processId")
@@ -128,7 +128,7 @@ class SensoryEventResponse(processId: String, source: Source[Any, NotUsed])(impl
     * val response = baker.processEvent(someEvent);
     *
     * response.confirmReceived() match {
-    *   case Received =>
+    *   case OK =>
     *
     *     response.confirmAllEvents()
     *
