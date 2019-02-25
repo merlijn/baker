@@ -26,7 +26,6 @@ public class RecipeTest {
                 .withInteraction(of(SimpleInteraction.class));
         assertEquals(recipe.getEvents().size(), 0);
         assertEquals(recipe.getInteractions().size(), 1);
-        assertEquals(recipe.getSieves().size(), 0);
     }
 
     @Test
@@ -38,29 +37,8 @@ public class RecipeTest {
                         of(SimpleInteraction.class));
         assertEquals(recipe.getEvents().size(), 0);
         assertEquals(recipe.getInteractions().size(), 3);
-        assertEquals(recipe.getSieves().size(), 0);
     }
 
-    @Test
-    public void shouldSetupRecipeWithOneSieveDescriptor() {
-        Recipe recipe = new Recipe("OneSieveRecipe")
-                .withSieve(of(SimpleInteraction.class));
-        assertEquals(recipe.getEvents().size(), 0);
-        assertEquals(recipe.getInteractions().size(), 0);
-        assertEquals(recipe.getSieves().size(), 1);
-    }
-
-    @Test
-    public void shouldSetupRecipeWithMultipleSieveDescriptors() {
-        Recipe recipe = new Recipe("MultipleInteractionsRecipe")
-                .withSieves(
-                        of(RequiresProcessIdStringInteraction.class),
-                        of(FiresTwoEventInteraction.class),
-                        of(SimpleInteraction.class));
-        assertEquals(recipe.getEvents().size(), 0);
-        assertEquals(recipe.getInteractions().size(), 0);
-        assertEquals(recipe.getSieves().size(), 3);
-    }
 
     @Test
     public void shouldSetupRecipeWithOneSensoryEvent() {
@@ -68,7 +46,6 @@ public class RecipeTest {
                 .withSensoryEvent(SensoryEventWithIngredient.class);
         assertEquals(recipe.getEvents().size(), 1);
         assertEquals(recipe.getInteractions().size(), 0);
-        assertEquals(recipe.getSieves().size(), 0);
         assertEquals(recipe.getEvents().get(0), sensoryEventWithIngredientCheck());
     }
 
@@ -80,7 +57,6 @@ public class RecipeTest {
                         SensoryEventWithoutIngredient.class);
         assertEquals(recipe.getEvents().size(), 2);
         assertEquals(recipe.getInteractions().size(), 0);
-        assertEquals(recipe.getSieves().size(), 0);
         assertEquals(recipe.getEvents().get(0), sensoryEventWithIngredientCheck());
         assertEquals(recipe.getEvents().get(1), sensoryEventWithoutIngredientCheck());
     }
@@ -93,7 +69,6 @@ public class RecipeTest {
 
         assertEquals(recipe.getEvents().size(), 2);
         assertEquals(recipe.getInteractions().size(), 0);
-        assertEquals(recipe.getSieves().size(), 0);
         assertEquals(recipe.getEvents().get(0), sensoryEventWithIngredientCheck());
         assertEquals(recipe.getEvents().get(1), sensoryEventWithoutIngredientCheck());
         assertEquals(recipe.getEvents().get(0).maxFiringLimit().get(), new Integer(1));
@@ -109,7 +84,6 @@ public class RecipeTest {
 
         assertEquals(recipe.getEvents().size(), 2);
         assertEquals(recipe.getInteractions().size(), 0);
-        assertEquals(recipe.getSieves().size(), 0);
         assertEquals(recipe.getEvents().get(0), sensoryEventWithIngredientCheck());
         assertEquals(recipe.getEvents().get(1), sensoryEventWithoutIngredientCheck());
         assertEquals(recipe.getEvents().get(0).maxFiringLimit(), scala.Option.empty());

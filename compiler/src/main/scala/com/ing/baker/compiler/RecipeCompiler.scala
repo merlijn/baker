@@ -176,7 +176,7 @@ object RecipeCompiler {
     //All ingredient names provided by sensory events or by interactions
     val allIngredientNames: Set[String] =
       recipe.sensoryEvents.flatMap(e => e.providedIngredients.map(i => i.name)) ++
-        (recipe.interactions ++ recipe.sieves).flatMap(i => i.output.flatMap { e =>
+        (recipe.interactions).flatMap(i => i.output.flatMap { e =>
             // check if the event was renamed (check if there is a transformer for this event)
             i.eventOutputTransformers.get(e) match {
               case Some(transformer) => e.providedIngredients.map(ingredient => transformer.ingredientRenames.getOrElse(ingredient.name, ingredient.name))
@@ -185,15 +185,11 @@ object RecipeCompiler {
           }
         )
 
-    val actionDescriptors: Seq[InteractionDescriptor] = recipe.interactions ++ recipe.sieves
+    val actionDescriptors: Seq[InteractionDescriptor] = recipe.interactions
 
     // For inputs for which no matching output cannot be found, we do not want to generate a place.
     // It should be provided at runtime from outside the active petri net (marking)
-    val interactionTransitions = recipe.interactions.map(interactionTransitionOf(_, recipe.defaultFailureStrategy, allIngredientNames))
-
-    val sieveTransitions = recipe.sieves.map(interactionTransitionOf(_, recipe.defaultFailureStrategy, allIngredientNames))
-
-    val allInteractionTransitions: Seq[InteractionTransition] = sieveTransitions ++ interactionTransitions
+    val interactionTransitions: Seq[InteractionTransition] = recipe.interactions.map(interactionTransitionOf(_, recipe.defaultFailureStrategy, allIngredientNames))
 
     // events provided from outside
     val sensoryEventTransitions: Seq[EventTransition] = recipe.sensoryEvents.map {
@@ -201,7 +197,7 @@ object RecipeCompiler {
     }.toSeq
 
     // events provided by other transitions / actions
-    val interactionEventTransitions: Seq[EventTransition] = allInteractionTransitions.flatMap { t =>
+    val interactionEventTransitions: Seq[EventTransition] = interactionTransitions.flatMap { t =>
       t.eventsToFire.map(event => EventTransition(event, isSensoryEvent = false))
     }
 
@@ -209,7 +205,7 @@ object RecipeCompiler {
 
     // Given the event classes, it is creating the ingredient places and
     // connecting a transition to a ingredient place.
-    val internalEventArcs: Seq[Arc] = allInteractionTransitions.flatMap { t =>
+    val internalEventArcs: Seq[Arc] = interactionTransitions.flatMap { t =>
       t.eventsToFire.flatMap { event =>
         event.ingredients.map { ingredient =>
           val from = interactionEventTransitions.find(_.label == event.name).get
@@ -228,7 +224,7 @@ object RecipeCompiler {
 
     def findEventTransitionByEventName(eventName: String) = allEventTransitions.find(_.event.name == eventName)
 
-    def findInteractionByLabel(label: String) = allInteractionTransitions.find(_.label == label)
+    def findInteractionByLabel(label: String) = interactionTransitions.find(_.label == label)
 
     // This generates precondition arcs for Required Events (AND).
     val (eventPreconditionArcs, preconditionANDErrors) = actionDescriptors.map { t =>
@@ -263,7 +259,7 @@ object RecipeCompiler {
 
     // First find the cases where multiple transitions depend on the same ingredient place
     val ingredientsWithMultipleConsumers: Map[String, Seq[InteractionTransition]] =
-      getIngredientsWithMultipleConsumers(allInteractionTransitions)
+      getIngredientsWithMultipleConsumers(interactionTransitions)
 
     // Add one new transition for each duplicate input (the newly added one in the image above)
     val multipleConsumerFacilitatorTransitions: Seq[Transition] =
@@ -276,7 +272,7 @@ object RecipeCompiler {
         arc(Place(t.label, IngredientPlace), t, 1))
 
     val interactionArcs: Seq[Arc] =
-      allInteractionTransitions.flatMap(
+      interactionTransitions.flatMap(
         buildInteractionArcs(
           multipleConsumerFacilitatorTransitions,
           ingredientsWithMultipleConsumers,

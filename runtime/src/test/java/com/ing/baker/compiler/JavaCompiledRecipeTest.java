@@ -47,14 +47,6 @@ public class JavaCompiledRecipeTest {
     }
 
     @Test
-    public void shouldCompileRecipeWithSieve() {
-        Recipe recipe = setupComplexRecipe();
-        CompiledRecipe compiledRecipe = RecipeCompiler.compileRecipe(recipe);
-        assertEquals(compiledRecipe.getValidationErrors(), new ArrayList<String>());
-        Assert.assertTrue(recipe.getSieves().stream().anyMatch(a -> a.name().equals("SieveImpl")));
-    }
-
-    @Test
     public void shouldShowVisualRecipe() {
         Recipe recipe = setupComplexRecipe();
         CompiledRecipe compiledRecipe = RecipeCompiler.compileRecipe(recipe);
@@ -121,24 +113,6 @@ public class JavaCompiledRecipeTest {
 
         public ProvideAppendRequestIds(String appendedRequestIds) {
             AppendedRequestIds = appendedRequestIds;
-        }
-    }
-
-    public static class SieveImpl {
-        @FiresEvent(oneOf = {ProvideAppendRequestIds.class} )
-        public ProvideAppendRequestIds apply(@RequiresIngredient("RequestIDStringOne") String requestIDStringOne,
-                               @RequiresIngredient("RequestIDStringTwo") String requestIDStringTwo) {
-            return new ProvideAppendRequestIds(requestIDStringOne + requestIDStringTwo);
-        }
-    }
-
-    public static class SieveImplWithoutDefaultConstruct {
-        public SieveImplWithoutDefaultConstruct(String param){}
-
-        @FiresEvent(oneOf = {ProvideAppendRequestIds.class} )
-        public ProvideAppendRequestIds apply(@RequiresIngredient("RequestIDStringOne") String requestIDStringOne,
-                            @RequiresIngredient("RequestIDStringTwo") String requestIDStringTwo) {
-            return new ProvideAppendRequestIds(requestIDStringOne + requestIDStringTwo);
         }
     }
 
@@ -232,8 +206,6 @@ public class JavaCompiledRecipeTest {
                 .withSensoryEvents(
                         EventOne.class,
                         EventTwo.class,
-                        EventWithoutIngredientsNorPreconditions.class)
-                .withSieve(
-                        of(SieveImpl.class));
+                        EventWithoutIngredientsNorPreconditions.class);
     }
 }

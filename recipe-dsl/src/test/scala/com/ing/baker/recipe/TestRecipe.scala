@@ -27,7 +27,7 @@ object TestRecipe {
   val interactionSixIngredient = Ingredient[String]("interactionSixIngredient")
   val interactionSevenIngredient1 = Ingredient[String]("interactionSevenIngredient1")
   val interactionSevenIngredient2 = Ingredient[String]("interactionSevenIngredient2")
-  val sievedIngredient = Ingredient[String]("sievedIngredient")
+  val interactionNineIngredient = Ingredient[String]("interactionNineIngredient")
   val complexObjectIngredient = Ingredient[ComplexObjectIngredient]("complexOjectIngredient")
   val caseClassIngredient = Ingredient[CaseClassIngredient]("caseClassIngredient")
   val missingJavaOptional: Ingredient[Optional[String]] = Ingredient[Optional[String]]("missingJavaOptional")
@@ -217,18 +217,18 @@ object TestRecipe {
     def apply(initialIngredient: String): Unit
   }
 
-  case class SieveInteractionSuccessful(sievedIngredient: String)
+  case class InteractionNineSuccessful(interactionNineIngredient: String)
 
-  val sieveInteraction =
+  val interactionNine =
     Interaction(
-      name = "SieveInteraction",
+      name = "InteractionNine",
       inputIngredients = Seq(processId, initialIngredient),
-      output = Seq(Event[SieveInteractionSuccessful]))
+      output = Seq(Event[InteractionNineSuccessful]))
 
-  trait SieveInteraction {
-    val name: String = "SieveInteraction"
+  trait InteractionNine {
+    val name: String = "InteractionNine"
 
-    def apply(processId: String, initialIngredient: String): SieveInteractionSuccessful
+    def apply(processId: String, initialIngredient: String): InteractionNineSuccessful
   }
 
   case class ComplexIngredientInteractionSuccessful(complexOjectIngredient: ComplexObjectIngredient)
@@ -319,7 +319,7 @@ object TestRecipe {
         interactionFive,
         interactionSix,
         providesNothingInteraction,
-        sieveInteraction
+        interactionNine
       )
       .withSensoryEvents(
         initialEvent,

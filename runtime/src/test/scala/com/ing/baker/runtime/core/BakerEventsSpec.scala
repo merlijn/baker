@@ -59,7 +59,7 @@ object BakerEventsSpec {
         interactionFive,
         interactionSix,
         providesNothingInteraction,
-        sieveInteraction
+        interactionNine
       )
       .withSensoryEvents(
         initialEvent.withMaxFiringLimit(1),
@@ -107,7 +107,7 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
       expectMsgInAnyOrderPF(listenerProbe,
         { case msg@ProcessCreated(_, `recipeId`, `recipeName`, `processId`) => msg },
         { case msg@EventReceived(_, _, _, `processId`, Some("someId"), ProcessEvent("InitialEvent", Seq(Tuple2("initialIngredient", PrimitiveValue(`initialIngredientValue`))))) => msg },
-        { case msg@InteractionStarted(_, _, _, `processId`, "SieveInteraction") => msg },
+        { case msg@InteractionStarted(_, _, _, `processId`, "InteractionNine") => msg },
         { case msg@InteractionStarted(_, _, _, `processId`, "InteractionOne") => msg },
         { case msg@InteractionStarted(_, _, _, `processId`, "InteractionTwo") => msg },
         { case msg@InteractionStarted(_, _, _, `processId`, "InteractionThree") => msg },
@@ -116,7 +116,7 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
         { case msg@InteractionCompleted(_, _, _, _, `processId`, "InteractionTwo", Some(ProcessEvent("EventFromInteractionTwo", Seq(Tuple2("interactionTwoIngredient", PrimitiveValue("interactionTwoIngredient")))))) => msg },
         { case msg@InteractionCompleted(_, _, _, _, `processId`, "InteractionThree", Some(ProcessEvent("InteractionThreeSuccessful", Seq(Tuple2("interactionThreeIngredient", PrimitiveValue("interactionThreeIngredient")))))) => msg },
         { case msg@InteractionCompleted(_, _, _, _, `processId`, "ProvidesNothingInteraction", None) => msg },
-        { case msg@InteractionCompleted(_, _, _, _, `processId`, "SieveInteraction", Some(ProcessEvent("SieveInteractionSuccessful", Seq(Tuple2("sievedIngredient", PrimitiveValue("sievedIngredient")))))) => msg }
+        { case msg@InteractionCompleted(_, _, _, _, `processId`, "InteractionNine", Some(ProcessEvent("InteractionNineSuccessful", Seq(Tuple2("interactionNineIngredient", PrimitiveValue("interactionNineIngredient")))))) => msg }
       )
 
       listenerProbe.expectNoMessage(eventReceiveTimeout)

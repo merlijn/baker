@@ -107,13 +107,4 @@ class RecipeVisualStyle(config: Config) {
     DotAttr("label", "OR"),
     DotAttr("style", "filled")
   )
-
-  // this will be removed soon
-  val sieveAttributes: List[DotAttr] = List(
-    DotAttr("shape", "rect"),
-    DotAttr("margin", 0.5D),
-    DotAttr("color", "\"#7594d6\""),
-    DotAttr("style", "rounded, filled"),
-    DotAttr("penwidth", 2)
-  )
 }

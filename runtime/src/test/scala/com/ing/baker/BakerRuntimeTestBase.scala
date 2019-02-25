@@ -35,7 +35,7 @@ trait BakerRuntimeTestBase
 
   //Default values to be used for the ingredients in the tests
   protected val initialIngredientValue = "initialIngredient"
-  protected val sievedIngredientValue = "sievedIngredient"
+  protected val interactionNineIngredientValue = "interactionNineIngredient"
   protected val interactionOneOriginalIngredientValue = "interactionOneOriginalIngredient"
   protected val interactionOneIngredientValue = "interactionOneIngredient"
   protected val interactionTwoIngredientValue = "interactionTwoIngredient"
@@ -55,7 +55,7 @@ trait BakerRuntimeTestBase
   //Can be used to check the state after firing the initialEvent
   protected val afterInitialState = ingredientMap(
     "initialIngredient" -> initialIngredientValue,
-    "sievedIngredient" -> sievedIngredientValue,
+    "interactionNineIngredient" -> interactionNineIngredientValue,
     "interactionOneIngredient" -> interactionOneIngredientValue,
     "interactionTwoIngredient" -> interactionTwoIngredientValue,
     "interactionThreeIngredient" -> interactionThreeIngredientValue
@@ -64,7 +64,7 @@ trait BakerRuntimeTestBase
   //Can be used to check the state after firing the initialEvent and SecondEvent
   protected val finalState = ingredientMap(
     "initialIngredient" -> initialIngredientValue,
-    "sievedIngredient" -> sievedIngredientValue,
+    "interactionNineIngredient" -> interactionNineIngredientValue,
     "interactionOneIngredient" -> interactionOneIngredientValue,
     "interactionTwoIngredient" -> interactionTwoIngredientValue,
     "interactionThreeIngredient" -> interactionThreeIngredientValue,
@@ -82,7 +82,7 @@ trait BakerRuntimeTestBase
   protected val testCaseClassIngredientInteractionMock: CaseClassIngredientInteraction = mock[CaseClassIngredientInteraction]
   protected val testCaseClassIngredientInteraction2Mock: CaseClassIngredientInteraction2 = mock[CaseClassIngredientInteraction2]
   protected val testNonMatchingReturnTypeInteractionMock: NonMatchingReturnTypeInteraction = mock[NonMatchingReturnTypeInteraction]
-  protected val testSieveInteractionMock: SieveInteraction = mock[SieveInteraction]
+  protected val testInteractionNineMock: InteractionNine = mock[InteractionNine]
   protected val testOptionalIngredientInteractionMock: OptionalIngredientInteraction = mock[OptionalIngredientInteraction]
   protected val testProvidesNothingInteractionMock: ProvidesNothingInteraction = mock[ProvidesNothingInteraction]
 
@@ -99,7 +99,7 @@ trait BakerRuntimeTestBase
       testCaseClassIngredientInteractionMock,
       testCaseClassIngredientInteraction2Mock,
       testNonMatchingReturnTypeInteractionMock,
-      testSieveInteractionMock,
+      testInteractionNineMock,
       testOptionalIngredientInteractionMock,
       testProvidesNothingInteractionMock)
 
@@ -230,7 +230,7 @@ trait BakerRuntimeTestBase
     when(testInteractionFourMock.apply()).thenReturn(InteractionFourSuccessful(interactionFourIngredientValue))
     when(testInteractionFiveMock.apply(anyString(), anyString(), anyString())).thenReturn(InteractionFiveSuccessful(interactionFiveIngredientValue))
     when(testInteractionSixMock.apply(anyString())).thenReturn(InteractionSixSuccessful(interactionSixIngredientValue))
-    when(testSieveInteractionMock.apply(anyString(), anyString())).thenReturn(SieveInteractionSuccessful(sievedIngredientValue))
+    when(testInteractionNineMock.apply(anyString(), anyString())).thenReturn(InteractionNineSuccessful(interactionNineIngredientValue))
   }
 
   protected def timeBlockInMilliseconds[T](block: => T): Long = {

@@ -424,7 +424,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       response.confirmAllEvents(timeout) should contain only (
          ProcessEvent("InitialEvent", Seq(initialIngredient("initialIngredient"))),
-         ProcessEvent("SieveInteractionSuccessful", Seq(sievedIngredient("sievedIngredient"))),
+         ProcessEvent("InteractionNineSuccessful", Seq(interactionNineIngredient("interactionNineIngredient"))),
          ProcessEvent("InteractionOneSuccessful", Seq(interactionOneIngredient("interactionOneIngredient"))),
          ProcessEvent("EventFromInteractionTwo", Seq(interactionTwoIngredient("interactionTwoIngredient"))),
          ProcessEvent("InteractionThreeSuccessful", Seq(interactionThreeIngredient("interactionThreeIngredient")))
@@ -619,7 +619,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       baker.getIngredients(processId) shouldBe ingredientMap(
         "initialIngredient" -> firstData,
         "interactionOneIngredient" -> firstResponse,
-        "sievedIngredient" -> sievedIngredientValue,
+        "interactionNineIngredient" -> interactionNineIngredientValue,
         "interactionTwoIngredient" -> interactionTwoIngredientValue,
         "interactionThreeIngredient" -> interactionThreeIngredientValue
       )
@@ -631,7 +631,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       baker.getIngredients(processId) shouldBe ingredientMap(
         "initialIngredient" -> secondData,
         "interactionOneIngredient" -> secondResponse,
-        "sievedIngredient" -> sievedIngredientValue,
+        "interactionNineIngredient" -> interactionNineIngredientValue,
         "interactionTwoIngredient" -> interactionTwoIngredientValue,
         "interactionThreeIngredient" -> interactionThreeIngredientValue
       )
@@ -718,7 +718,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val result = baker.getIngredients(processId)
       result shouldBe ingredientMap(
         "initialIngredient" -> initialIngredientValue,
-        "sievedIngredient" -> sievedIngredientValue,
+        "interactionNineIngredient" -> interactionNineIngredientValue,
         "interactionTwoIngredient" -> interactionTwoIngredientValue)
     }
 
@@ -764,7 +764,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       val result = baker.getIngredients(processId)
       result shouldBe ingredientMap(
         "initialIngredient" -> initialIngredientValue,
-        "sievedIngredient" -> sievedIngredientValue,
+        "interactionNineIngredient" -> interactionNineIngredientValue,
         "interactionOneIngredient" -> interactionOneIngredientValue)
     }
 
@@ -912,7 +912,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       //Check if both the new event and the events occurred in the past are in the eventsList
       baker.getEvents(processId) should contain only(
         Baker.extractEvent(InitialEvent(initialIngredientValue)),
-        Baker.extractEvent(SieveInteractionSuccessful(sievedIngredientValue)),
+        Baker.extractEvent(InteractionNineSuccessful(interactionNineIngredientValue)),
         Baker.extractEvent(EventFromInteractionTwo(interactionTwoIngredientValue)),
         ProcessEvent("InteractionOneSuccessful", Seq("interactionOneIngredient" -> Converters.toValue(interactionOneIngredientValue))),
         Baker.extractEvent(InteractionThreeSuccessful(interactionThreeIngredientValue))
@@ -927,7 +927,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
         Baker.extractEvent(EventFromInteractionTwo(interactionTwoIngredientValue)),
         ProcessEvent("SecondEvent", Seq.empty),
         ProcessEvent("InteractionOneSuccessful", Seq("interactionOneIngredient" -> Converters.toValue(interactionOneIngredientValue))),
-        Baker.extractEvent(SieveInteractionSuccessful(sievedIngredientValue)),
+        Baker.extractEvent(InteractionNineSuccessful(interactionNineIngredientValue)),
         Baker.extractEvent(InteractionThreeSuccessful(interactionThreeIngredientValue)),
         Baker.extractEvent(InteractionFourSuccessful(interactionFourIngredientValue))
       )
@@ -950,7 +950,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
         "EventFromInteractionTwo",
         "SecondEvent",
         "InteractionOneSuccessful",
-        "SieveInteractionSuccessful",
+        "InteractionNineSuccessful",
         "InteractionThreeSuccessful",
         "InteractionFourSuccessful"
       )

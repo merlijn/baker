@@ -135,12 +135,6 @@ object AllTypeRecipe {
     output = Seq(scalaDataEvent)
   )
 
-  val sieveInteraction = Interaction(
-    name = "sieveInteraction",
-    inputIngredients = Seq(javaIntegerIngredient),
-    output = Seq(scalaDataEvent)
-  )
-
   val allTypesInteraction = Interaction(
     name = "allTypesInteraction",
     inputIngredients = Seq(bigPayloadIngredient, javaBooleanIngredient, javaByteIngredient, javaShortIngredient, javaCharacterIngredient, javaIntegerIngredient,
@@ -183,7 +177,6 @@ object AllTypeRecipe {
           .withFailureStrategy(InteractionFailureStrategy.FireEventAfterFailure()),
         interactionSix,
         interactionSeven,
-        sieveInteraction,
         allTypesInteraction.withPredefinedIngredients(
           bigPayloadIngredient(Payload(Map("stringKey" -> "stringValue"), Map("someOtherStringKey" -> java.lang.Integer.MAX_VALUE))),
           javaBooleanIngredient(java.lang.Boolean.TRUE),
