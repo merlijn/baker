@@ -56,11 +56,6 @@ trait InteractionDescriptor {
   val overriddenIngredientNames: Map[String, String]
 
   /**
-    * This is used to overwrite the name used for the output ingredient
-    */
-  val overriddenOutputIngredientName: Option[String]
-
-  /**
     * This is used to overwrite the name used for the output event and for the ingredients created by the event
     */
   val eventOutputTransformers: Map[Event, EventOutputTransformer]

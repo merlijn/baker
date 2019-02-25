@@ -34,7 +34,6 @@ case class Recipe(
 
   /**
     * Adds the interaction to the recipe.
-    * To get a JInteractionDescriptor from a JInteraction call the of method on JInteractionDescriptor
     *
     * @param newInteraction the interaction to add
     * @return
@@ -44,7 +43,6 @@ case class Recipe(
 
   /**
     * Adds the interactions to the recipe.
-    * To get a JInteractionDescriptor from a JInteraction call the of method on JInteractionDescriptor
     *
     * @param newInteractions The interactions to add
     * @return

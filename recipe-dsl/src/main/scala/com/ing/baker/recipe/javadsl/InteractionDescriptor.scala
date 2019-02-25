@@ -14,7 +14,6 @@ case class InteractionDescriptor private(
                           override val requiredOneOfEvents: Set[Set[String]],
                           override val predefinedIngredients: Map[String, com.ing.baker.types.Value],
                           override val overriddenIngredientNames: Map[String, String],
-                          override val overriddenOutputIngredientName: Option[String] = Option.empty[String],
                           override val maximumInteractionCount: Option[Int],
                           override val failureStrategy: Option[common.InteractionFailureStrategy] = None,
                           override val eventOutputTransformers: Map[common.Event, common.EventOutputTransformer] = Map.empty,

@@ -57,6 +57,6 @@ package object javadsl {
       else Seq.empty
     }
 
-    InteractionDescriptor(name, inputIngredients, output, Set.empty, Set.empty, Map.empty, Map.empty, None, None, None, Map.empty, newName)
+    InteractionDescriptor(name, inputIngredients, output, Set.empty, Set.empty, Map.empty, Map.empty, None, None, Map.empty, newName)
   }
 }
