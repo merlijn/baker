@@ -9,6 +9,7 @@ import com.ing.baker.recipe.javadsl.interactions.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import scala.Option;
 
 import static com.ing.baker.recipe.javadsl.InteractionDescriptor.of;
 import static com.ing.baker.recipe.javadsl.JavadslTestHelper.*;
@@ -24,6 +25,8 @@ public class InteractionDescriptorTest {
     public void shouldCreateInteractionDescriptorWithDefaultName() {
         InteractionDescriptor id = of(SimpleInteraction.class);
         assertEquals("SimpleInteraction", id.name());
+        assertEquals(id.output().size(), 1);
+        assertEquals(id.output().apply(0), Event.apply(SimpleInteraction.InitialIngredientEvent.class, Option.empty()));
     }
 
     @Test

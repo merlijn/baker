@@ -14,7 +14,7 @@ object Event {
 
   def apply[T : TypeTag]: common.Event = {
     val runtimeClass = mirror.runtimeClass(mirror.typeOf[T])
-    javadsl.eventClassToCommonEvent(runtimeClass, None)
+    javadsl.createEventFromClass(runtimeClass, None)
   }
 }
 

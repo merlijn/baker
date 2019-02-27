@@ -24,9 +24,9 @@ package object javadsl {
     }
   }
 
-  def eventClassToCommonEvent(eventClass: Class[_], firingLimit: Option[Int]): common.Event = new javadsl.Event(eventClass, firingLimit)
+  def createEventFromClass(eventClass: Class[_], firingLimit: Option[Int]): common.Event = new javadsl.Event(eventClass, firingLimit)
 
-  def interactionClassToCommonInteraction(interactionClass: Class[_], newName: Option[String]): InteractionDescriptor = {
+  def createInteractionFromClass(interactionClass: Class[_], newName: Option[String]): InteractionDescriptor = {
 
     val name: String = interactionClass.getSimpleName
 
@@ -43,34 +43,39 @@ package object javadsl {
             s"Unsupported type for ingredient '$name' on interaction '${interactionClass.getName}'")))
 
     def getOutputClasses(): Seq[Class[_]] = {
-      import scala.collection.JavaConverters._
+
+      def autoDetectOutput(): Seq[Class[_]] = {
+
+        import scala.collection.JavaConverters._
+
+        val returnType = method.getReturnType
+
+        if (classOf[Unit].equals(returnType) || classOf[java.lang.Void].equals(returnType))
+          Seq.empty
+
+        // in case the return type is an interface we find all implementations in the same package
+        else if (returnType.isInterface) {
+
+          val packageName = returnType.getPackage.getName
+
+          val reflections = new Reflections(packageName)
+
+          val classes = reflections.getSubTypesOf(returnType).asScala.toSeq
+
+          classes
+        }
+        // otherwise there is only a single return event
+        else {
+          Seq(returnType)
+        }
+      }
 
       if (method.isAnnotationPresent(classOf[annotations.FiresEvent])) {
 
         val outputEventClasses: Seq[Class[_]] = method.getAnnotation(classOf[annotations.FiresEvent]).oneOf()
 
         if (outputEventClasses.isEmpty) {
-
-          val returnType = method.getReturnType
-
-          if (classOf[Unit].equals(returnType) || classOf[java.lang.Void].equals(returnType))
-            Seq.empty
-
-          // in case the return type is an interface we find all implementations in the same package
-          else if (returnType.isInterface) {
-
-            val packageName = returnType.getPackage.getName
-
-            val reflections = new Reflections(packageName)
-
-            val classes = reflections.getSubTypesOf(returnType).asScala.toSeq
-
-            classes
-          }
-          // otherwise there is only a single return event
-          else {
-            Seq(returnType)
-          }
+          autoDetectOutput()
         }
         else {
           outputEventClasses.foreach {
@@ -82,10 +87,10 @@ package object javadsl {
           outputEventClasses
         }
       }
-      else Seq.empty
+      else autoDetectOutput()
     }
 
-    val output: Seq[common.Event] = getOutputClasses().map(eventClassToCommonEvent(_, None))
+    val output: Seq[common.Event] = getOutputClasses().map(createEventFromClass(_, None))
 
     InteractionDescriptor(name, inputIngredients, output, Set.empty, Set.empty, Map.empty, Map.empty, None, None, Map.empty, newName)
   }

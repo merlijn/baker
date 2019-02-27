@@ -1,7 +1,5 @@
 package com.ing.baker.recipe.javadsl.interactions;
 
-import com.ing.baker.recipe.annotations.FiresEvent;
-
 import javax.inject.Named;
 
 public interface SimpleInteraction {
@@ -13,6 +11,5 @@ public interface SimpleInteraction {
         }
     }
 
-    @FiresEvent(oneOf = { InitialIngredientEvent.class })
     InitialIngredientEvent apply(@Named("initialIngredient") String initialIngredient);
 }

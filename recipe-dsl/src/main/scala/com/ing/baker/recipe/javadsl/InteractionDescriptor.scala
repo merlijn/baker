@@ -211,7 +211,7 @@ case class InteractionDescriptor private(
   private def withEventTransformation(eventClazz: Class[_],
                                       newEventName: String,
                                       ingredientRenames: Map[String, String]): InteractionDescriptor = {
-    val originalEvent: common.Event = eventClassToCommonEvent(eventClazz, None)
+    val originalEvent: common.Event = createEventFromClass(eventClazz, None)
 
     if (!output.contains(originalEvent))
       throw new common.RecipeValidationException(s"Event transformation given for Interaction $name but does not fire event $originalEvent")
@@ -235,7 +235,7 @@ case class InteractionDescriptor private(
 }
 
 object InteractionDescriptor {
-  def of[T](interactionClass: Class[T]): InteractionDescriptor = interactionClassToCommonInteraction(interactionClass, None)
+  def of[T](interactionClass: Class[T]): InteractionDescriptor = createInteractionFromClass(interactionClass, None)
 
-  def of[T](interactionClass: Class[T], name: String): InteractionDescriptor = interactionClassToCommonInteraction(interactionClass, Some(name))
+  def of[T](interactionClass: Class[T], name: String): InteractionDescriptor = createInteractionFromClass(interactionClass, Some(name))
 }

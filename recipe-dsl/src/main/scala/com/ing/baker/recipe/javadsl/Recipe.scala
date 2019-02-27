@@ -69,7 +69,7 @@ case class Recipe(
     * @return
     */
   def withSensoryEvent(newEvent: Class[_], maxFiringLimit: Int): Recipe =
-    copy(sensoryEvents = sensoryEvents + eventClassToCommonEvent(newEvent, Some(maxFiringLimit)))
+    copy(sensoryEvents = sensoryEvents + createEventFromClass(newEvent, Some(maxFiringLimit)))
 
   /**
     * Adds the sensory events to the recipe with the firing limit set to 1
@@ -80,7 +80,7 @@ case class Recipe(
   @SafeVarargs
   @varargs
   def withSensoryEvents(eventsToAdd: Class[_]*): Recipe =
-    copy(sensoryEvents = sensoryEvents ++ eventsToAdd.map(eventClassToCommonEvent(_, Some(1))))
+    copy(sensoryEvents = sensoryEvents ++ eventsToAdd.map(createEventFromClass(_, Some(1))))
 
   /**
     * Adds the sensory event to the recipe with firing limit set to unlimited
@@ -101,7 +101,7 @@ case class Recipe(
   @SafeVarargs
   @varargs
   def withSensoryEventsNoFiringLimit(eventsToAdd: Class[_]*): Recipe =
-    copy(sensoryEvents = sensoryEvents ++ eventsToAdd.map(eventClassToCommonEvent(_, None)))
+    copy(sensoryEvents = sensoryEvents ++ eventsToAdd.map(createEventFromClass(_, None)))
 
   /**
     * This set the failure strategy as default for this recipe.
