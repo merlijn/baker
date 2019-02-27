@@ -1,7 +1,8 @@
 package com.ing.baker.recipe.javadsl.interactions;
 
 import com.ing.baker.recipe.annotations.FiresEvent;
-import com.ing.baker.recipe.annotations.RequiresIngredient;
+
+import javax.inject.Named;
 
 public interface SimpleInteraction {
 
@@ -13,5 +14,5 @@ public interface SimpleInteraction {
     }
 
     @FiresEvent(oneOf = { InitialIngredientEvent.class })
-    InitialIngredientEvent apply(@RequiresIngredient("initialIngredient") String initialIngredient);
+    InitialIngredientEvent apply(@Named("initialIngredient") String initialIngredient);
 }

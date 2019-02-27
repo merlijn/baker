@@ -3,13 +3,13 @@ package com.ing.baker.compiler;
 import com.ing.baker.il.CompiledRecipe;
 import com.ing.baker.recipe.annotations.FiresEvent;
 import com.ing.baker.recipe.annotations.ProcessId;
-import com.ing.baker.recipe.annotations.RequiresIngredient;
 import com.ing.baker.recipe.javadsl.Recipe;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import javax.inject.Named;
 import java.util.ArrayList;
 
 import static com.ing.baker.recipe.javadsl.InteractionDescriptor.of;
@@ -157,8 +157,8 @@ public class JavaCompiledRecipeTest {
     }
 
     public interface InteractionThree {
-        void apply(@RequiresIngredient("RequestIDStringOne") String requestIDStringOne,
-                   @RequiresIngredient("RequestIDStringTwo") String requestIDStringTwo);
+        void apply(@Named("RequestIDStringOne") String requestIDStringOne,
+                   @Named("RequestIDStringTwo") String requestIDStringTwo);
     }
 
     public static class InteractionThreeImpl implements InteractionThree {
@@ -181,7 +181,7 @@ public class JavaCompiledRecipeTest {
         }
 
         @FiresEvent(oneOf = { ProvidesRequestIDStringThree.class })
-        public ProvidesRequestIDStringThree apply(@ProcessId String requestId, @RequiresIngredient("RequestIDStringOne") String requestIDStringOne) {
+        public ProvidesRequestIDStringThree apply(@ProcessId String requestId, @Named("RequestIDStringOne") String requestIDStringOne) {
             return new ProvidesRequestIDStringThree(requestId);
         }
     }

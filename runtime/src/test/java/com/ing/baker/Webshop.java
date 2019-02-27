@@ -1,28 +1,25 @@
 package com.ing.baker;
 
-import akka.actor.ActorSystem;
-import com.google.common.collect.ImmutableList;
 import com.ing.baker.compiler.RecipeCompiler;
 import com.ing.baker.il.CompiledRecipe;
 import com.ing.baker.recipe.annotations.FiresEvent;
 import com.ing.baker.recipe.annotations.ProcessId;
-import com.ing.baker.recipe.annotations.RequiresIngredient;
 import com.ing.baker.recipe.javadsl.Interaction;
 import com.ing.baker.recipe.javadsl.InteractionFailureStrategy;
 import com.ing.baker.recipe.javadsl.Recipe;
-//import com.ing.baker.runtime.java_api.JBaker;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import org.junit.Test;
 
+import javax.inject.Named;
 import java.time.Duration;
-import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 import static com.ing.baker.recipe.javadsl.InteractionDescriptor.of;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+//import com.ing.baker.runtime.java_api.JBaker;
 
 public class Webshop {
 
@@ -62,7 +59,7 @@ public class Webshop {
         class Valid implements Outcome { }
 
         @FiresEvent(oneOf = {Failed.class, Valid.class})
-        Outcome apply(@ProcessId String processId, @RequiresIngredient("order") String key);
+        Outcome apply(@ProcessId String processId, @Named("order") String key);
     }
 
     public interface ManufactureGoods extends Interaction {
@@ -74,7 +71,7 @@ public class Webshop {
         }
 
         @FiresEvent(oneOf = { GoodsManufactured.class })
-        GoodsManufactured apply(@RequiresIngredient("order") String order);
+        GoodsManufactured apply(@Named("order") String order);
     }
 
     public interface SendInvoice extends Interaction {
@@ -82,7 +79,7 @@ public class Webshop {
         class InvoiceWasSent { }
 
         @FiresEvent(oneOf = { InvoiceWasSent.class})
-        InvoiceWasSent apply(@RequiresIngredient("customerInfo") CustomerInfo customerInfo);
+        InvoiceWasSent apply(@Named("customerInfo") CustomerInfo customerInfo);
     }
 
     public interface ShipGoods extends Interaction {
@@ -96,7 +93,7 @@ public class Webshop {
         }
 
         @FiresEvent(oneOf = { GoodsShipped.class })
-        GoodsShipped apply(@RequiresIngredient("goods") String goods, @RequiresIngredient("customerInfo") CustomerInfo customerInfo);
+        GoodsShipped apply(@Named("goods") String goods, @Named("customerInfo") CustomerInfo customerInfo);
     }
 
     public static class PaymentMade { }
