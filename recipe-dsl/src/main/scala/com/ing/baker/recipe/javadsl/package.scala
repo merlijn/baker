@@ -4,6 +4,7 @@ import java.lang.reflect.Method
 
 import com.ing.baker.recipe.javadsl.ReflectionHelpers._
 import com.ing.baker.types.{Converters, Type}
+import org.reflections.Reflections
 
 package object javadsl {
 
@@ -41,21 +42,50 @@ package object javadsl {
             method.parameterTypeForName(name).get,
             s"Unsupported type for ingredient '$name' on interaction '${interactionClass.getName}'")))
 
-    val output: Seq[common.Event] = {
+    def getOutputClasses(): Seq[Class[_]] = {
+      import scala.collection.JavaConverters._
 
       if (method.isAnnotationPresent(classOf[annotations.FiresEvent])) {
+
         val outputEventClasses: Seq[Class[_]] = method.getAnnotation(classOf[annotations.FiresEvent]).oneOf()
 
-        outputEventClasses.foreach {
-          eventClass =>
-            if (!method.getReturnType.isAssignableFrom(eventClass))
-              throw new common.RecipeValidationException(s"Interaction $name provides event '${eventClass.getName}' that is incompatible with it's return type")
-        }
+        if (outputEventClasses.isEmpty) {
 
-        outputEventClasses.map(eventClassToCommonEvent(_, None))
+          val returnType = method.getReturnType
+
+          if (classOf[Unit].equals(returnType) || classOf[java.lang.Void].equals(returnType))
+            Seq.empty
+
+          // in case the return type is an interface we find all implementations in the same package
+          else if (returnType.isInterface) {
+
+            val packageName = returnType.getPackage.getName
+
+            val reflections = new Reflections(packageName)
+
+            val classes = reflections.getSubTypesOf(returnType).asScala.toSeq
+
+            classes
+          }
+          // otherwise there is only a single return event
+          else {
+            Seq(returnType)
+          }
+        }
+        else {
+          outputEventClasses.foreach {
+            eventClass =>
+              if (!method.getReturnType.isAssignableFrom(eventClass))
+                throw new common.RecipeValidationException(s"Interaction $name provides event '${eventClass.getName}' that is incompatible with it's return type")
+          }
+
+          outputEventClasses
+        }
       }
       else Seq.empty
     }
+
+    val output: Seq[common.Event] = getOutputClasses().map(eventClassToCommonEvent(_, None))
 
     InteractionDescriptor(name, inputIngredients, output, Set.empty, Set.empty, Map.empty, Map.empty, None, None, Map.empty, newName)
   }

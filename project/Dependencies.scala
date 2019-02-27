@@ -46,7 +46,7 @@ object Dependencies {
 
   def scalaReflect(scalaV: String): ModuleID = "org.scala-lang"%  "scala-reflect"                      % scalaV
   val javaxInject =               "javax.inject"               %  "javax.inject"                       % "1"
-
+  val reflections =               "org.reflections"            % "reflections"                         % "0.9.11"
   val paranamer =                 "com.thoughtworks.paranamer" %  "paranamer"                          % "2.8"
   val guava =                     "com.google.guava"           %  "guava"                              % "19.0"
   val findbugs =                  "com.google.code.findbugs"   %  "jsr305"                             % "1.3.9"

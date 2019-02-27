@@ -157,6 +157,7 @@ lazy val recipeDsl = project.in(file("recipe-dsl"))
       compileDeps(
         javaxInject,
         paranamer,
+        reflections,
         scalaReflect(scalaVersion.value),
       ) ++
         testDeps(

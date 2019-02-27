@@ -8,5 +8,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface FiresEvent {
-    Class<?>[] oneOf();
+    Class<?>[] oneOf() default { };
 }

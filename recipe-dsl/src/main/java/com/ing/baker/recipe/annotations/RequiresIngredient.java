@@ -7,6 +7,7 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
+@Deprecated
 public @interface RequiresIngredient {
     String value() default "";
 }
