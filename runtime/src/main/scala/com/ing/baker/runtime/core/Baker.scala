@@ -129,7 +129,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
 
   private def getImplementationErrors(compiledRecipe: CompiledRecipe): Set[String] = {
     compiledRecipe.interactionTransitions.filterNot(interactionManager.getImplementation(_).isDefined)
-      .map(s => s"No implementation provided for interaction: ${s.originalInteractionName}")
+      .map(s => s"No implementation provided for interaction: ${s.originalName}")
   }
 
   /**

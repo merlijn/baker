@@ -95,49 +95,49 @@ object AllTypeRecipe {
 
   val interactionOne = Interaction(
     name = "interactionOne",
-    inputIngredients = Seq(bigPayloadIngredient),
+    input = Seq(bigPayloadIngredient),
     output = Seq(javaDataEvent)
   )
 
   val interactionTwo = Interaction(
     name = "interactionTwo",
-    inputIngredients = Seq(javaBooleanIngredient, javaByteIngredient),
+    input = Seq(javaBooleanIngredient, javaByteIngredient),
     output = Seq(byteArrayEvent, otherEvent)
   )
 
   val interactionThree = Interaction(
     name = "interactionThree",
-    inputIngredients = Seq(bigPayloadIngredient, javaByteIngredient),
+    input = Seq(bigPayloadIngredient, javaByteIngredient),
     output = Seq(emptyEvent, otherEvent, mapEvent)
   )
 
   val interactionFour = Interaction(
     name = "interactionFour",
-    inputIngredients = Seq(javaIntegerIngredient),
+    input = Seq(javaIntegerIngredient),
     output = Seq(jodaEvent)
   )
 
   val interactionFive = Interaction(
     name = "interactionFive",
-    inputIngredients = Seq.empty,
+    input = Seq.empty,
     output = Seq(emptyEvent)
   )
 
   val interactionSix = Interaction(
     name = "interactionSix",
-    inputIngredients = Seq(jodaLocalDateIngredient),
+    input = Seq(jodaLocalDateIngredient),
     output = Seq()
   )
 
   val interactionSeven = Interaction(
     name = "interactionSeven",
-    inputIngredients = Seq(javaIntegerIngredient),
+    input = Seq(javaIntegerIngredient),
     output = Seq(scalaDataEvent)
   )
 
   val allTypesInteraction = Interaction(
     name = "allTypesInteraction",
-    inputIngredients = Seq(bigPayloadIngredient, javaBooleanIngredient, javaByteIngredient, javaShortIngredient, javaCharacterIngredient, javaIntegerIngredient,
+    input = Seq(bigPayloadIngredient, javaBooleanIngredient, javaByteIngredient, javaShortIngredient, javaCharacterIngredient, javaIntegerIngredient,
       javaLongIngredient, javaFloatIngredient, javaDoubleIngredient, javaStringIngredient, javaBigDecimalIngredient, javaBigIntegerIngredient, byteArrayIngredient,
       jodaDateTimeIngredient, jodaLocalDateIngredient, jodaLocalDateTimeIngredient, booleanIngredient, byteIngredient, shortIngredient, charIngredient, intIngredient,
       longIngredient, floatIngredient, doubleIngredient, stringIngredient, bigDecimalIngredient, bigIntIngredient, optionalIngredient, optionalIngredientForNone,

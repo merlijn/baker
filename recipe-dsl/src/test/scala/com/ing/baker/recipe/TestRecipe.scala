@@ -92,7 +92,7 @@ object TestRecipe {
   val interactionOne =
     Interaction(
       name = "InteractionOne",
-      inputIngredients = Seq(processId, initialIngredient),
+      input = Seq(processId, initialIngredient),
       output = Seq(interactionOneSuccessful))
 
   trait InteractionOne {
@@ -104,7 +104,7 @@ object TestRecipe {
   val interactionTwo =
     Interaction(
       name = "InteractionTwo",
-      inputIngredients = Seq(initialIngredientOld),
+      input = Seq(initialIngredientOld),
       output = Seq(eventFromInteractionTwo))
 
   trait InteractionTwo {
@@ -118,7 +118,7 @@ object TestRecipe {
   val interactionThree =
     Interaction(
       name = "InteractionThree",
-      inputIngredients = Seq(interactionOneIngredient, interactionTwoIngredient),
+      input = Seq(interactionOneIngredient, interactionTwoIngredient),
       output = Seq(Event[InteractionThreeSuccessful]))
 
   trait InteractionThree {
@@ -132,7 +132,7 @@ object TestRecipe {
   val interactionFour =
     Interaction(
       name = "InteractionFour",
-      inputIngredients = Seq.empty,
+      input = Seq.empty,
       output = Seq(Event[InteractionFourSuccessful]))
 
   trait InteractionFour {
@@ -146,7 +146,7 @@ object TestRecipe {
   val interactionFive =
     Interaction(
       name = "InteractionFive",
-      inputIngredients = Seq(processId, initialIngredient, initialIngredientExtendedName),
+      input = Seq(processId, initialIngredient, initialIngredientExtendedName),
       output = Seq(Event[InteractionFiveSuccessful]))
 
   trait InteractionFive {
@@ -160,7 +160,7 @@ object TestRecipe {
   val interactionSix =
     Interaction(
       name = "InteractionSix",
-      inputIngredients = Seq(initialIngredientExtendedName),
+      input = Seq(initialIngredientExtendedName),
       output = Seq(Event[InteractionSixSuccessful]))
 
   trait InteractionSix {
@@ -172,7 +172,7 @@ object TestRecipe {
   val interactionSeven =
     Interaction(
       name = "InteractionSeven",
-      inputIngredients = Seq(initialIngredient),
+      input = Seq(initialIngredient),
       output = Seq(event1FromInteractionSeven, event2FromInteractionSeven))
 
   trait InteractionSeven {
@@ -184,7 +184,7 @@ object TestRecipe {
   val interactionEight =
     Interaction(
       name = "InteractionEight",
-      inputIngredients = Seq(interactionSevenIngredient1, interactionSevenIngredient2),
+      input = Seq(interactionSevenIngredient1, interactionSevenIngredient2),
       output = Seq.empty)
 
   trait InteractionEight {
@@ -196,7 +196,7 @@ object TestRecipe {
   val fireTwoEventsInteraction =
     Interaction(
       name = "fireTwoEventsInteraction",
-      inputIngredients = Seq(initialIngredient),
+      input = Seq(initialIngredient),
       output = Seq(eventFromInteractionTwo, event1FromInteractionSeven))
 
   trait fireTwoEventsInteraction {
@@ -208,7 +208,7 @@ object TestRecipe {
   val providesNothingInteraction =
     Interaction(
       name = "ProvidesNothingInteraction",
-      inputIngredients = Seq(initialIngredient),
+      input = Seq(initialIngredient),
       output = Seq.empty)
 
   trait ProvidesNothingInteraction {
@@ -222,7 +222,7 @@ object TestRecipe {
   val interactionNine =
     Interaction(
       name = "InteractionNine",
-      inputIngredients = Seq(processId, initialIngredient),
+      input = Seq(processId, initialIngredient),
       output = Seq(Event[InteractionNineSuccessful]))
 
   trait InteractionNine {
@@ -236,7 +236,7 @@ object TestRecipe {
   val complexIngredientInteraction =
     Interaction(
       name = "ComplexIngredientInteraction",
-      inputIngredients = Seq(initialIngredient),
+      input = Seq(initialIngredient),
       Seq(Event[ComplexIngredientInteractionSuccessful]))
 
   trait ComplexIngredientInteraction {
@@ -250,7 +250,7 @@ object TestRecipe {
   val caseClassIngredientInteraction =
     Interaction(
       name = "CaseClassIngredientInteraction",
-      inputIngredients = Seq(initialIngredient),
+      input = Seq(initialIngredient),
       output = Seq(Event[CaseClassIngredientInteractionSuccessful]))
 
   trait CaseClassIngredientInteraction {
@@ -262,7 +262,7 @@ object TestRecipe {
   val caseClassIngredientInteraction2 =
     Interaction(
       name = "CaseClassIngredientInteraction2",
-      inputIngredients = Seq(caseClassIngredient),
+      input = Seq(caseClassIngredient),
       output = Seq(emptyEvent))
 
   trait CaseClassIngredientInteraction2 {
@@ -274,7 +274,7 @@ object TestRecipe {
   val NonMatchingReturnTypeInteraction =
     Interaction(
       name="NonMatchingReturnTypeInteraction",
-      inputIngredients = Seq(initialIngredient),
+      input = Seq(initialIngredient),
       output = Seq(eventFromInteractionTwo))
 
   trait NonMatchingReturnTypeInteraction {
@@ -286,7 +286,7 @@ object TestRecipe {
   val optionalIngredientInteraction =
     Interaction(
       name = "OptionalIngredientInteraction",
-      inputIngredients = Seq(
+      input = Seq(
         missingJavaOptional,
         missingJavaOptional2,
         missingScalaOptional,

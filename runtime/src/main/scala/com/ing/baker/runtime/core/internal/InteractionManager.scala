@@ -19,7 +19,7 @@ class InteractionManager(private var interactionImplementations: Seq[Interaction
     new ConcurrentHashMap[InteractionTransition, InteractionImplementation]
 
   private def isCompatibleImplementation(interaction: InteractionTransition, implementation: InteractionImplementation): Boolean = {
-    interaction.originalInteractionName == implementation.name &&
+    interaction.originalName == implementation.name &&
       implementation.inputTypes.size == interaction.requiredIngredients.size &&
       implementation.inputTypes.zip(interaction.requiredIngredients.map(_.`type`)).forall {
         case (typeA, typeB) => typeA.isAssignableFrom(typeB)

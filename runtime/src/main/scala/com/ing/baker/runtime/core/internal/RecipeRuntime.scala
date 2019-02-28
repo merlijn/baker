@@ -53,8 +53,8 @@ object RecipeRuntime {
 
       // an event was expected but none was provided
       case None =>
-        if (!interaction.eventsToFire.isEmpty)
-          Some(s"Interaction '${interaction.interactionName}' did not provide any output, expected one of: ${interaction.eventsToFire.map(_.name).mkString(",")}")
+        if (!interaction.events.isEmpty)
+          Some(s"Interaction '${interaction.name}' did not provide any output, expected one of: ${interaction.events.map(_.name).mkString(",")}")
         else
           None
 
@@ -66,12 +66,12 @@ object RecipeRuntime {
 
         // null values for ingredients are NOT allowed
         if(nullIngredientNames.nonEmpty)
-          Some(s"Interaction '${interaction.interactionName}' returned null for the following ingredients: ${nullIngredientNames.mkString(",")}")
+          Some(s"Interaction '${interaction.name}' returned null for the following ingredients: ${nullIngredientNames.mkString(",")}")
         else
         // the event name must match an event name from the interaction output
         interaction.originalEvents.find(_.name == event.name) match {
           case None =>
-            Some(s"Interaction '${interaction.interactionName}' returned unknown event '${event.name}, expected one of: ${interaction.eventsToFire.map(_.name).mkString(",")}")
+            Some(s"Interaction '${interaction.name}' returned unknown event '${event.name}, expected one of: ${interaction.events.map(_.name).mkString(",")}")
           case Some(eventType) =>
             val errors = event.validateEvent(eventType)
 
@@ -93,7 +93,7 @@ object RecipeRuntime {
     val processId: (String, Value) = processIdName -> PrimitiveValue(state.processId.toString)
 
     // a map of all ingredients
-    val allIngredients: Map[String, Value] = interaction.predefinedParameters ++ state.ingredients + processId
+    val allIngredients: Map[String, Value] = interaction.predefinedIngredients ++ state.ingredients + processId
 
     // arranges the ingredients in the expected order
     interaction.requiredIngredients.map {
@@ -202,7 +202,7 @@ class RecipeRuntime(recipe: CompiledRecipe, interactionManager: InteractionManag
         val timeStarted = System.currentTimeMillis()
 
         // publish the fact that we started the interaction
-        eventStream.publish(InteractionStarted(timeStarted, recipe.name, recipe.recipeId, processState.processId, interaction.interactionName))
+        eventStream.publish(InteractionStarted(timeStarted, recipe.name, recipe.recipeId, processState.processId, interaction.name))
 
         // executes the interaction and obtain the (optional) output event
         val interactionOutput: Option[ProcessEvent] = implementation.execute(input)
@@ -219,7 +219,7 @@ class RecipeRuntime(recipe: CompiledRecipe, interactionManager: InteractionManag
         val timeCompleted = System.currentTimeMillis()
 
         // publish the fact that the interaction completed
-        eventStream.publish(InteractionCompleted(timeCompleted, timeCompleted - timeStarted, recipe.name, recipe.recipeId, processState.processId, interaction.interactionName, outputEvent))
+        eventStream.publish(InteractionCompleted(timeCompleted, timeCompleted - timeStarted, recipe.name, recipe.recipeId, processState.processId, interaction.name, outputEvent))
 
         // create the output marking for the petri net
         val outputMarking: Marking[Place] = RecipeRuntime.createProducedMarking(outAdjacent, outputEvent)

@@ -60,7 +60,7 @@ object RecipeVisualizer {
         case Left(_: Place) if node.incomingTransitions.isEmpty => style.missingIngredientAttributes
         case Left(Place(label, _)) if ingredientNames contains label ⇒ style.providedIngredientAttributes
         case Left(_) ⇒ style.ingredientAttributes
-        case Right(t: InteractionTransition) if eventNames.intersect(t.eventsToFire.map(_.name).toSet).nonEmpty => style.firedInteractionAttributes
+        case Right(t: InteractionTransition) if eventNames.intersect(t.events.map(_.name).toSet).nonEmpty => style.firedInteractionAttributes
         case Right(_: InteractionTransition) ⇒ style.interactionAttributes
         case Right(transition: Transition) if eventNames.contains(transition.label) ⇒ style.eventFiredAttributes
         case Right(_: MultiFacilitatorTransition) => style.choiceAttributes

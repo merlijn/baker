@@ -6,6 +6,7 @@ import com.ing.baker.il.petrinet.Place._
 import com.ing.baker.il.petrinet._
 import com.ing.baker.il.{CompiledRecipe, EventDescriptor, ValidationSettings}
 import com.ing.baker.petrinet.api._
+import com.ing.baker.recipe.common
 import com.ing.baker.recipe.common._
 import scalax.collection.edge.WLDiEdge
 import scalax.collection.immutable.Graph
@@ -18,6 +19,36 @@ object RecipeCompiler {
     def unzipFlatten: (Seq[A], Seq[B]) = seq.unzip match {
       case (a, b) => (a.flatten, b.flatten)
     }
+  }
+
+  private def getMultiTransition(internalRepresentationName: String,
+                                 transitions: Seq[Transition]): Transition = {
+    transitions
+      .find(t => t.label.equals(internalRepresentationName))
+      .getOrElse(throw new NoSuchElementException(s"No multi transition found with name $internalRepresentationName"))
+  }
+
+  /**
+    * Obtains a map of each input place name that is used multiple times and the reflected transitions using it.
+    *
+    * @param actionTransitions Seq of reflected transition.
+    * @return A map from input place name to reflected transitions (where the transitions have as input the place).
+    */
+  private def getIngredientsWithMultipleConsumers(actionTransitions: Seq[InteractionTransition]): Map[String, Seq[InteractionTransition]] = {
+    // Obtain a list of field name with their transition
+    val placeNameWithTransition: Seq[(String, InteractionTransition)] = for {
+      transition <- actionTransitions
+      inputPlaceName <- transition.nonProvidedIngredients.map(_.name)
+    } yield (inputPlaceName, transition)
+
+    // Then obtain the places with multiple out-adjacent transitions
+    val ingredientsWithMultipleConsumers = placeNameWithTransition.groupBy {
+      case (placeName, _) => placeName
+    } // Group by place name
+      .filter { case (_, interactions) => interactions.size >= 2 } // Only keep those place names which have more than one out-adjacent transition
+      .map { case (placeName, interactions) => (placeName, interactions.map(_._2)) } // Cleanup the data structure
+
+    ingredientsWithMultipleConsumers
   }
 
   def arc(t: Transition, p: Place, weight: Long): Arc = WLDiEdge[Node, Edge](Right(t), Left(p))(weight, Edge(None))
@@ -89,8 +120,8 @@ object RecipeCompiler {
   private def buildInteractionOutputArcs(interaction: InteractionTransition,
                                          eventTransitions: Seq[EventTransition]): Seq[Arc] = {
     val resultPlace = Place(label = interaction.label, placeType = InteractionEventOutputPlace)
-    if (interaction.eventsToFire.nonEmpty) {
-      val eventArcs = interaction.eventsToFire.flatMap { event: EventDescriptor =>
+    if (interaction.events.nonEmpty) {
+      val eventArcs = interaction.events.flatMap { event: EventDescriptor =>
         //Get the correct event transition
         val eventTransition = eventTransitions.find(_.event.name == event.name).get
         //Decide if there are multiple interactions that fire this transition,
@@ -101,7 +132,7 @@ object RecipeCompiler {
           //Create a new intermediate event place
           val eventCombinerPlace: Place = Place(label = s"IntermediatePlace:$event.name", placeType = IntermediatePlace)
           //Create a new intermediate event transition
-          val interactionToEventTransition: IntermediateTransition = IntermediateTransition(s"${interaction.interactionName}:${event.name}")
+          val interactionToEventTransition: IntermediateTransition = IntermediateTransition(s"${interaction.name}:${event.name}")
           //link the interaction output place to the intermediate transition
           val interactionOutputPlaceToIntermediateTransition: Arc = arc(resultPlace, interactionToEventTransition, 1, Some(event.name))
           //link the intermediate transition to the intermediate input place
@@ -146,7 +177,7 @@ object RecipeCompiler {
     val dataInputArcs = fieldNamesWithoutPrefix.map(fieldName => arc(Place(fieldName, IngredientPlace), t, 1))
 
     val limitInteractionCountArc =
-      t.maximumInteractionCount.map(n => arc(Place(s"limit:${t.label}", FiringLimiterPlace(n)), t, 1))
+      t.maximumExecutionCount.map(n => arc(Place(s"limit:${t.label}", FiringLimiterPlace(n)), t, 1))
 
     dataInputArcs ++ internalDataInputArcs ++ limitInteractionCountArc
   }
@@ -173,32 +204,35 @@ object RecipeCompiler {
 
     val precompileErrors: Seq[String] = Assertions.preCompileAssertions(recipe)
 
+    val sensoryEventIngredients = recipe.sensoryEvents.flatMap(e => e.providedIngredients.map(_.name))
+
+    // all ingredients provided by interactions
+    val interactionIngredients: Seq[String] = recipe.interactions.flatMap(i => i.output.flatMap { e =>
+        // check if the event was renamed (check if there is a transformer for this event)
+        i.eventOutputTransformers.get(e) match {
+          case Some(transformer) => e.providedIngredients.map(_.name).map(name => transformer.ingredientRenames.getOrElse(name, name))
+          case None              => e.providedIngredients.map(_.name)
+        }
+      }
+    )
+
     //All ingredient names provided by sensory events or by interactions
-    val allIngredientNames: Set[String] =
-      recipe.sensoryEvents.flatMap(e => e.providedIngredients.map(i => i.name)) ++
-        (recipe.interactions).flatMap(i => i.output.flatMap { e =>
-            // check if the event was renamed (check if there is a transformer for this event)
-            i.eventOutputTransformers.get(e) match {
-              case Some(transformer) => e.providedIngredients.map(ingredient => transformer.ingredientRenames.getOrElse(ingredient.name, ingredient.name))
-              case None => e.providedIngredients.map(_.name)
-            }
-          }
-        )
+    val allIngredientNames: Set[String] = (sensoryEventIngredients ++ interactionIngredients).toSet
 
     val actionDescriptors: Seq[InteractionDescriptor] = recipe.interactions
 
     // For inputs for which no matching output cannot be found, we do not want to generate a place.
     // It should be provided at runtime from outside the active petri net (marking)
-    val interactionTransitions: Seq[InteractionTransition] = recipe.interactions.map(interactionTransitionOf(_, recipe.defaultFailureStrategy, allIngredientNames))
+    val interactionTransitions: Seq[InteractionTransition] = recipe.interactions.map(parseDSLInteraction(_, recipe.defaultFailureStrategy, allIngredientNames))
 
     // events provided from outside
     val sensoryEventTransitions: Seq[EventTransition] = recipe.sensoryEvents.map {
-      event => EventTransition(eventToCompiledEvent(event), isSensoryEvent = true, event.maxFiringLimit)
-    }.toSeq
+      event => EventTransition(parseDSLEvent(event), isSensoryEvent = true, event.maxFiringLimit)
+    }
 
     // events provided by other transitions / actions
     val interactionEventTransitions: Seq[EventTransition] = interactionTransitions.flatMap { t =>
-      t.eventsToFire.map(event => EventTransition(event, isSensoryEvent = false))
+      t.events.map(event => EventTransition(event, isSensoryEvent = false))
     }
 
     val allEventTransitions: Seq[EventTransition] = sensoryEventTransitions ++ interactionEventTransitions
@@ -206,7 +240,7 @@ object RecipeCompiler {
     // Given the event classes, it is creating the ingredient places and
     // connecting a transition to a ingredient place.
     val internalEventArcs: Seq[Arc] = interactionTransitions.flatMap { t =>
-      t.eventsToFire.flatMap { event =>
+      t.events.flatMap { event =>
         event.ingredients.map { ingredient =>
           val from = interactionEventTransitions.find(_.label == event.name).get
           arc(from, Place(ingredient.name, IngredientPlace), 1)
@@ -308,34 +342,4 @@ object RecipeCompiler {
   }
 
   def compileRecipe(recipe: Recipe): CompiledRecipe = compileRecipe(recipe, ValidationSettings.defaultValidationSettings)
-
-  private def getMultiTransition(internalRepresentationName: String,
-                                 transitions: Seq[Transition]): Transition = {
-    transitions
-      .find(t => t.label.equals(internalRepresentationName))
-      .getOrElse(throw new NoSuchElementException(s"No multi transition found with name $internalRepresentationName"))
-  }
-
-  /**
-    * Obtains a map of each input place name that is used multiple times and the reflected transitions using it.
-    *
-    * @param actionTransitions Seq of reflected transition.
-    * @return A map from input place name to reflected transitions (where the transitions have as input the place).
-    */
-  private def getIngredientsWithMultipleConsumers(actionTransitions: Seq[InteractionTransition]): Map[String, Seq[InteractionTransition]] = {
-    // Obtain a list of field name with their transition
-    val placeNameWithTransition: Seq[(String, InteractionTransition)] = for {
-      transition <- actionTransitions
-      inputPlaceName <- transition.nonProvidedIngredients.map(_.name)
-    } yield (inputPlaceName, transition)
-
-    // Then obtain the places with multiple out-adjacent transitions
-    val ingredientsWithMultipleConsumers = placeNameWithTransition.groupBy {
-      case (placeName, _) => placeName
-    } // Group by place name
-      .filter { case (_, interactions) => interactions.size >= 2 } // Only keep those place names which have more than one out-adjacent transition
-      .map { case (placeName, interactions) => (placeName, interactions.map(_._2)) } // Cleanup the data structure
-
-    ingredientsWithMultipleConsumers
-  }
 }

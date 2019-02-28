@@ -68,14 +68,14 @@ class IntermediateLanguageModule extends ProtoEventAdapterModule {
 
           case t: il.petrinet.InteractionTransition =>
             val pt = protobuf.InteractionTransition(
-              eventsToFire = t.eventsToFire.map(ctx.toProto[protobuf.EventDescriptor]),
+              eventsToFire = t.events.map(ctx.toProto[protobuf.EventDescriptor]),
               originalEvents = t.originalEvents.map(ctx.toProto[protobuf.EventDescriptor]),
               providedIngredientEvent = None,
               requiredIngredients = t.requiredIngredients.map(ctx.toProto[protobuf.IngredientDescriptor]),
-              interactionName = Option(t.interactionName),
-              originalInteractionName = Option(t.originalInteractionName),
-              predefinedParameters = t.predefinedParameters.mapValues(ctx.toProto[protobuf.Value]),
-              maximumInteractionCount = t.maximumInteractionCount,
+              interactionName = Option(t.name),
+              originalInteractionName = Option(t.originalName),
+              predefinedParameters = t.predefinedIngredients.mapValues(ctx.toProto[protobuf.Value]),
+              maximumInteractionCount = t.maximumExecutionCount,
               failureStrategy = Option(ctx.toProto[protobuf.InteractionFailureStrategy](t.failureStrategy)),
               eventOutputTransformers = t.eventOutputTransformers.mapValues(ctx.toProto[protobuf.EventOutputTransformer])
             )
@@ -168,13 +168,12 @@ class IntermediateLanguageModule extends ProtoEventAdapterModule {
             val providedIngredientEvent = t.providedIngredientEvent.map(ctx.toDomain[il.EventDescriptor])
 
             Right(il.petrinet.InteractionTransition(
-              eventsToFire = t.eventsToFire.map(ctx.toDomain[il.EventDescriptor]) ++ providedIngredientEvent,
               originalEvents = t.originalEvents.map(ctx.toDomain[il.EventDescriptor])  ++ providedIngredientEvent,
               requiredIngredients = t.requiredIngredients.map(ctx.toDomain[il.IngredientDescriptor]),
-              interactionName = t.interactionName.getOrMissing("interactionName"),
-              originalInteractionName = t.originalInteractionName.getOrMissing("originalInteractionName"),
-              predefinedParameters = t.predefinedParameters.mapValues(ctx.toDomain[Value]),
-              maximumInteractionCount = t.maximumInteractionCount,
+              name = t.interactionName.getOrMissing("interactionName"),
+              originalName = t.originalInteractionName.getOrMissing("originalInteractionName"),
+              predefinedIngredients = t.predefinedParameters.mapValues(ctx.toDomain[Value]),
+              maximumExecutionCount = t.maximumInteractionCount,
               failureStrategy = t.failureStrategy.map(ctx.toDomain[il.failurestrategy.InteractionFailureStrategy]).getOrMissing("failureStrategy"),
               eventOutputTransformers = t.eventOutputTransformers.mapValues(ctx.toDomain[il.EventOutputTransformer])
             ))

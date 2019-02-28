@@ -1,26 +1,30 @@
 package com.ing.baker.recipe.javadsl
 
-import com.ing.baker.recipe.common
+import java.lang.reflect.Method
+
+import com.ing.baker.recipe.{annotations, common, javadsl}
 import com.ing.baker.types.Converters
+import org.reflections.Reflections
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
+import com.ing.baker.recipe.javadsl.ReflectionHelpers._
 
 case class InteractionDescriptor private(
-                          override val originalName: String,
-                          override val inputIngredients: Seq[common.Ingredient],
-                          override val output: Seq[common.Event],
-                          override val requiredEvents: Set[String],
-                          override val requiredOneOfEvents: Set[Set[String]],
-                          override val predefinedIngredients: Map[String, com.ing.baker.types.Value],
-                          override val overriddenIngredientNames: Map[String, String],
-                          override val maximumInteractionCount: Option[Int],
-                          override val failureStrategy: Option[common.InteractionFailureStrategy] = None,
-                          override val eventOutputTransformers: Map[common.Event, common.EventOutputTransformer] = Map.empty,
-                          newName: Option[String] = None)
-  extends common.InteractionDescriptor {
 
-  override val name: String = newName.getOrElse(originalName)
+                                          override val name: String,
+                                          override val originalName: Option[String],
+                                          override val input: Seq[common.Ingredient],
+                                          override val output: Seq[common.Event],
+                                          override val requiredEvents: Set[String],
+                                          override val requiredOneOfEvents: Set[Set[String]],
+                                          override val predefinedIngredients: Map[String, com.ing.baker.types.Value],
+                                          override val renamedInputIngredients: Map[String, String],
+                                          override val maximumExecutionCount: Option[Int],
+                                          override val failureStrategy: Option[common.InteractionFailureStrategy] = None,
+                                          override val eventOutputTransformers: Map[common.Event, common.EventOutputTransformer] = Map.empty)
+
+  extends common.InteractionDescriptor {
 
   /**
     * This sets a requirement for this interaction that a specific event needs to have been fired before it can execute.
@@ -29,7 +33,7 @@ case class InteractionDescriptor private(
     * @return
     */
   def withRequiredEvent(newRequiredEvent: Class[_]): InteractionDescriptor =
-    this.copy(requiredEvents = requiredEvents + newRequiredEvent.getSimpleName)
+    copy(requiredEvents = requiredEvents + newRequiredEvent.getSimpleName)
 
   /**
     * This sets a requirement for this interaction that some specific events needs to have been fired before it can execute.
@@ -40,7 +44,7 @@ case class InteractionDescriptor private(
   @SafeVarargs
   @varargs
   def withRequiredEvents(newRequiredEvents: Class[_]*): InteractionDescriptor =
-    this.copy(requiredEvents = requiredEvents ++ newRequiredEvents.map(_.getSimpleName))
+    copy(requiredEvents = requiredEvents ++ newRequiredEvents.map(_.getSimpleName))
 
   /**
     * This sets a requirement for this interaction that some specific events needs to have been fired before it can execute.
@@ -49,7 +53,7 @@ case class InteractionDescriptor private(
     * @return
     */
   def withRequiredEvents(newRequiredEvents: java.util.Set[Class[_]]): InteractionDescriptor =
-    this.copy(requiredEvents = requiredEvents ++ newRequiredEvents.asScala.map(_.getSimpleName))
+    copy(requiredEvents = requiredEvents ++ newRequiredEvents.asScala.map(_.getSimpleName))
 
 
   /**
@@ -59,7 +63,7 @@ case class InteractionDescriptor private(
     * @return
     */
   def withRequiredEventFromName(newRequiredEventName: String): InteractionDescriptor =
-    this.copy(requiredEvents = requiredEvents + newRequiredEventName)
+    copy(requiredEvents = requiredEvents + newRequiredEventName)
 
   /**
     * This sets a requirement for this interaction that some specific events needs to have been fired before it can execute.
@@ -70,7 +74,7 @@ case class InteractionDescriptor private(
   @SafeVarargs
   @varargs
   def withRequiredEventsFromName(newRequiredEventNames: String*): InteractionDescriptor =
-    this.copy(requiredEvents = requiredEvents ++ newRequiredEventNames)
+    copy(requiredEvents = requiredEvents ++ newRequiredEventNames)
 
   /**
     * This sets a requirement for this interaction that some specific events needs to have been fired before it can execute.
@@ -79,7 +83,7 @@ case class InteractionDescriptor private(
     * @return
     */
   def withRequiredEventsFromName(newRequiredEvents: java.util.Set[String]): InteractionDescriptor =
-    this.copy(requiredEvents = requiredEvents ++ newRequiredEvents.asScala)
+    copy(requiredEvents = requiredEvents ++ newRequiredEvents.asScala)
 
   /**
     * This sets a requirement for this interaction that one of the given events needs to have been fired before it can execute.
@@ -173,7 +177,7 @@ case class InteractionDescriptor private(
     addPredefinedIngredient(newPredefinedIngredients.asScala.toMap)
 
   private def addPredefinedIngredient(params: Map[String, AnyRef]): InteractionDescriptor =
-    this.copy(predefinedIngredients = predefinedIngredients ++ params.map{case (key, value) => key -> Converters.toValue(value)})
+    copy(predefinedIngredients = predefinedIngredients ++ params.map{case (key, value) => key -> Converters.toValue(value)})
 
   /**
     * This renames a input ingredient
@@ -184,8 +188,7 @@ case class InteractionDescriptor private(
     */
   def renameRequiredIngredient(name: String,
                                toName: String): InteractionDescriptor =
-    this.copy(
-      overriddenIngredientNames = overriddenIngredientNames + (name -> toName))
+    copy(renamedInputIngredients = renamedInputIngredients + (name -> toName))
 
   /**
     * This renames the given input ingredients
@@ -194,7 +197,7 @@ case class InteractionDescriptor private(
     * @return new InteractionDescriptor with new ingredient names
     */
   def renameRequiredIngredients(newOverriddenIngredients: java.util.Map[String, String]): InteractionDescriptor = {
-    this.copy(overriddenIngredientNames = overriddenIngredientNames ++ newOverriddenIngredients.asScala.toMap)
+    copy(renamedInputIngredients = renamedInputIngredients ++ newOverriddenIngredients.asScala.toMap)
   }
 
   def withEventTransformation(eventClazz: Class[_],
@@ -211,7 +214,8 @@ case class InteractionDescriptor private(
   private def withEventTransformation(eventClazz: Class[_],
                                       newEventName: String,
                                       ingredientRenames: Map[String, String]): InteractionDescriptor = {
-    val originalEvent: common.Event = createEventFromClass(eventClazz, None)
+
+    val originalEvent: common.Event = javadsl.Event(eventClazz, None)
 
     if (!output.contains(originalEvent))
       throw new common.RecipeValidationException(s"Event transformation given for Interaction $name but does not fire event $originalEvent")
@@ -231,11 +235,88 @@ case class InteractionDescriptor private(
     * @return
     */
   def withMaximumInteractionCount(times: Int): InteractionDescriptor =
-    this.copy(maximumInteractionCount = Some(times))
+    this.copy(maximumExecutionCount = Some(times))
 }
 
 object InteractionDescriptor {
-  def of[T](interactionClass: Class[T]): InteractionDescriptor = createInteractionFromClass(interactionClass, None)
 
-  def of[T](interactionClass: Class[T], name: String): InteractionDescriptor = createInteractionFromClass(interactionClass, Some(name))
+  private val interactionMethodName: String = "apply"
+
+  def apply(interactionClass: Class[_], newName: Option[String]): InteractionDescriptor = {
+
+    val name: String = interactionClass.getSimpleName
+
+    val applyMethod: Method = interactionClass.getDeclaredMethods
+      .find(_.getName == interactionMethodName)
+      .getOrElse(throw new IllegalStateException(
+        s"No method named '$interactionMethodName' defined on '${interactionClass.getName}'"))
+
+    val inputIngredients: Seq[common.Ingredient] =
+      applyMethod.getParameterNames.map(name =>
+        IngredientDescription(name,
+          ReflectionHelpers.parseType(
+            applyMethod.parameterTypeForName(name).get,
+            s"Unsupported type for ingredient '$name' on interaction '${interactionClass.getName}'")))
+
+    def getOutputClasses(): Seq[Class[_]] = {
+
+      def autoDetectOutput(): Seq[Class[_]] = {
+
+        import scala.collection.JavaConverters._
+
+        val returnType = applyMethod.getReturnType
+
+        if (classOf[Unit].equals(returnType) || classOf[java.lang.Void].equals(returnType))
+          Seq.empty
+
+        // in case the return type is an interface we find all implementations in the same package
+        else if (returnType.isInterface) {
+
+          val packageName = returnType.getPackage.getName
+
+          val reflections = new Reflections(packageName)
+
+          val classes = reflections.getSubTypesOf(returnType).asScala.toSeq
+
+          classes
+        }
+        // otherwise there is only a single return event
+        else {
+          Seq(returnType)
+        }
+      }
+
+      if (applyMethod.isAnnotationPresent(classOf[annotations.FiresEvent])) {
+
+        val outputEventClasses: Seq[Class[_]] = applyMethod.getAnnotation(classOf[annotations.FiresEvent]).oneOf()
+
+        if (outputEventClasses.isEmpty) {
+          autoDetectOutput()
+        }
+        else {
+          outputEventClasses.foreach {
+            eventClass =>
+              if (!applyMethod.getReturnType.isAssignableFrom(eventClass))
+                throw new common.RecipeValidationException(s"Interaction $name provides event '${eventClass.getName}' that is incompatible with it's return type")
+          }
+
+          outputEventClasses
+        }
+      }
+      else autoDetectOutput()
+    }
+
+    val output: Seq[common.Event] = getOutputClasses().map(javadsl.Event(_, None))
+
+    val originalName: Option[String] = newName match {
+      case None => Some(name)
+      case _    => None
+    }
+
+    InteractionDescriptor(newName.getOrElse(name), originalName, inputIngredients, output, Set.empty, Set.empty, Map.empty, Map.empty, None, None, Map.empty)
+  }
+
+  def of[T](interactionClass: Class[T]): InteractionDescriptor = apply(interactionClass, None)
+
+  def of[T](interactionClass: Class[T], name: String): InteractionDescriptor = apply(interactionClass, Some(name))
 }

@@ -13,9 +13,9 @@ trait InteractionDescriptor {
   val name: String
 
   /**
-    * The original name of the interaction.
+    * The original name of the interaction in case the interaction was renamed.
     */
-  val originalName: String
+  val originalName: Option[String]
 
   /**
     * The retry exhausted event name
@@ -26,9 +26,8 @@ trait InteractionDescriptor {
 
   /**
     * The input ingredients.
-    *
     */
-  val inputIngredients: Seq[Ingredient]
+  val input: Seq[Ingredient]
 
   /**
     * The interaction output.
@@ -53,7 +52,7 @@ trait InteractionDescriptor {
   /**
     * A map of overridden Ingredient Names for the input
     */
-  val overriddenIngredientNames: Map[String, String]
+  val renamedInputIngredients: Map[String, String]
 
   /**
     * This is used to overwrite the name used for the output event and for the ingredients created by the event
@@ -61,9 +60,9 @@ trait InteractionDescriptor {
   val eventOutputTransformers: Map[Event, EventOutputTransformer]
 
   /**
-    * Indicates the maximum number of times the interaction may be called.
+    * Indicates the maximum number of times the interaction may be executed.
     */
-  val maximumInteractionCount: Option[Int]
+  val maximumExecutionCount: Option[Int]
 
   /**
     * An optional strategy how to deal with failures. Falls back to the default strategy specified in the recipe.

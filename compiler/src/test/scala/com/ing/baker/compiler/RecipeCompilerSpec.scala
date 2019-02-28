@@ -63,7 +63,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
       val wrongProcessIdInteraction =
         Interaction(
           name = "wrongProcessIdInteraction",
-          inputIngredients = Seq(new Ingredient[Int](common.processIdName), initialIngredient),
+          input = Seq(new Ingredient[Int](common.processIdName), initialIngredient),
           output = Seq.empty)
 
       val recipe = Recipe("NonProvidedIngredient")
@@ -97,7 +97,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
       val interactionOptional =
         Interaction(
           name = "InteractionWithOptional",
-          inputIngredients = Seq(processId, initialIngredientOptionalInt, initialIngredientOptionInt),
+          input = Seq(processId, initialIngredientOptionalInt, initialIngredientOptionInt),
           output = Seq.empty)
 
       val recipe = Recipe("WrongTypedOptionalIngredient")
@@ -123,7 +123,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
       val interactionOptional =
         Interaction(
           name = "InteractionWithOptional",
-          inputIngredients = Seq(processId, initialIngredientInt),
+          input = Seq(processId, initialIngredientInt),
           output = Seq.empty)
 
       val recipe = Recipe("CorrectTypedOptionalIngredient")
@@ -214,12 +214,12 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
       compiledRecipe.validationErrors shouldBe List.empty
       compiledRecipe.interactionTransitions
         .map(it =>
-          if (it.interactionName.equals("OptionalIngredientInteraction")) {
-            it.predefinedParameters.size shouldBe 4
-            it.predefinedParameters("missingJavaOptional") shouldBe NullValue
-            it.predefinedParameters("missingJavaOptional2") shouldBe NullValue
-            it.predefinedParameters("missingScalaOptional") shouldBe NullValue
-            it.predefinedParameters("missingScalaOptional2") shouldBe NullValue
+          if (it.name.equals("OptionalIngredientInteraction")) {
+            it.predefinedIngredients.size shouldBe 4
+            it.predefinedIngredients("missingJavaOptional") shouldBe NullValue
+            it.predefinedIngredients("missingJavaOptional2") shouldBe NullValue
+            it.predefinedIngredients("missingScalaOptional") shouldBe NullValue
+            it.predefinedIngredients("missingScalaOptional2") shouldBe NullValue
           })
     }
 
@@ -234,11 +234,11 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
       compiledRecipe.validationErrors shouldBe List.empty
       compiledRecipe.interactionTransitions
         .map(it =>
-          if (it.interactionName.equals("OptionalIngredientInteraction")) {
-            it.predefinedParameters.size shouldBe 3
-            it.predefinedParameters("missingJavaOptional2") shouldBe NullValue
-            it.predefinedParameters("missingScalaOptional") shouldBe NullValue
-            it.predefinedParameters("missingScalaOptional2") shouldBe NullValue
+          if (it.name.equals("OptionalIngredientInteraction")) {
+            it.predefinedIngredients.size shouldBe 3
+            it.predefinedIngredients("missingJavaOptional2") shouldBe NullValue
+            it.predefinedIngredients("missingScalaOptional") shouldBe NullValue
+            it.predefinedIngredients("missingScalaOptional2") shouldBe NullValue
           })
 
     }
@@ -263,7 +263,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
 //      println(compiledRecipe.getRecipeVisualization)
       compiledRecipe.validationErrors shouldBe empty
 
-      val transition = compiledRecipe.interactionTransitions.find(_.interactionName == "secondInteraction").get
+      val transition = compiledRecipe.interactionTransitions.find(_.name == "secondInteraction").get
       transition.nonProvidedIngredients.map(_.name) should contain("renamedStringOptionIngredient")
     }
 
@@ -278,11 +278,11 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
       compiledRecipe.validationErrors shouldBe List.empty
       compiledRecipe.interactionTransitions
         .map(it =>
-          if (it.interactionName.equals("OptionalIngredientInteraction")) {
-            it.predefinedParameters.size shouldBe 3
-            it.predefinedParameters("missingJavaOptional2") shouldBe NullValue
-            it.predefinedParameters("missingScalaOptional") shouldBe NullValue
-            it.predefinedParameters("missingScalaOptional2") shouldBe NullValue
+          if (it.name.equals("OptionalIngredientInteraction")) {
+            it.predefinedIngredients.size shouldBe 3
+            it.predefinedIngredients("missingJavaOptional2") shouldBe NullValue
+            it.predefinedIngredients("missingScalaOptional") shouldBe NullValue
+            it.predefinedIngredients("missingScalaOptional2") shouldBe NullValue
           })
     }
 
@@ -299,12 +299,12 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
       compiledRecipe.validationErrors shouldBe List.empty
       compiledRecipe.interactionTransitions
         .map(it =>
-          if (it.interactionName.equals("OptionalIngredientInteraction")) {
-            it.predefinedParameters.size shouldBe 4
-            it.predefinedParameters("missingJavaOptional") shouldBe PrimitiveValue("value")
-            it.predefinedParameters("missingJavaOptional2") shouldBe NullValue
-            it.predefinedParameters("missingScalaOptional") shouldBe NullValue
-            it.predefinedParameters("missingScalaOptional2") shouldBe NullValue
+          if (it.name.equals("OptionalIngredientInteraction")) {
+            it.predefinedIngredients.size shouldBe 4
+            it.predefinedIngredients("missingJavaOptional") shouldBe PrimitiveValue("value")
+            it.predefinedIngredients("missingJavaOptional2") shouldBe NullValue
+            it.predefinedIngredients("missingScalaOptional") shouldBe NullValue
+            it.predefinedIngredients("missingScalaOptional2") shouldBe NullValue
           })
     }
   }

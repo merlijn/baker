@@ -32,22 +32,22 @@ object Examples {
 
     val validateOrder = Interaction(
       name = "ValidateOrder",
-      inputIngredients = Seq(order),
+      input = Seq(order),
       output = Seq(valid, sorry))
 
     val manufactureGoods = Interaction(
       name = "ManufactureGoods",
-      inputIngredients = Seq(order),
+      input = Seq(order),
       output = Seq(goodsManufactured))
 
     val sendInvoice = Interaction(
       name = "SendInvoice",
-      inputIngredients = Seq(customerInfo),
+      input = Seq(customerInfo),
       output = Seq(invoiceWasSent))
 
     val shipGoods = Interaction(
       name = "ShipGoods",
-      inputIngredients = Seq(goods, customerInfo),
+      input = Seq(goods, customerInfo),
       output = Seq(goodsShipped)
     )
 
@@ -100,19 +100,19 @@ object Examples {
 
     val getAccount = Interaction(
       name = "GetAccount",
-      inputIngredients = Seq.empty,
+      input = Seq.empty,
       output = Seq(getAccountSuccessful, getAccountFailed)
     )
 
     val assignAccount = Interaction(
       name = "AssignAccount",
-      inputIngredients = Seq(customerId, iban),
+      input = Seq(customerId, iban),
       output = Seq(assignAccountSuccessful, assignAccountFailed)
     )
 
     val registerIndividual = Interaction(
       name = "RegisterIndividual",
-      inputIngredients = Seq(name, address),
+      input = Seq(name, address),
       output = Seq(registerIndividualSuccessful, registerIndividualFailed)
     )
 
@@ -149,13 +149,13 @@ object Examples {
     //Interactions
     val createCustomer = Interaction(
       name = "CreateCustomer",
-      inputIngredients = Seq(customerName),
+      input = Seq(customerName),
       output = Seq(createCustomerSuccessful)
     )
 
     val openAccount = Interaction(
       name = "OpenAccount",
-      inputIngredients =Seq(customerId),
+      input =Seq(customerId),
       output = Seq(accountOpenedEvent, accountOpenedFailedEvent))
 
     val onboardingRecipe: Recipe =

@@ -84,7 +84,7 @@ object BAASSpec {
   val interactionOne =
     Interaction(
       name = "InteractionOne",
-      inputIngredients = Seq(processId, initialIngredient),
+      input = Seq(processId, initialIngredient),
       output = Seq(Event[InteractionOneEvent]))
 
   case class InteractionOne() {

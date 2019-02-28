@@ -164,7 +164,7 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
     // we find which job correlates with the interaction
     for {
       recipe     <- OptionT.fromOption(getCompiledRecipe(index(processId).recipeId))
-      transition <- OptionT.fromOption(recipe.interactionTransitions.find(_.interactionName == interactionName))
+      transition <- OptionT.fromOption(recipe.interactionTransitions.find(_.name == interactionName))
       state      <- OptionT(processActor.ask(GetState)(processInquireTimeout).mapTo[InstanceState].map(Option(_)))
       jobId      <- OptionT.fromOption(state.jobs.collectFirst { case (jobId, job) if job.transitionId == transition.id => jobId }  )
     } yield (transition, jobId)

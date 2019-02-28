@@ -8,7 +8,7 @@ object InteractionDescriptorSpec {
   val customerId = Ingredient[String]("customerId")
   val createCustomer = Interaction(
     name = "CreateCustomer",
-    inputIngredients = Seq(customerName),
+    input = Seq(customerName),
     output = Seq()
   )
   val agreementsAcceptedEvent = Event("agreementsAccepted")

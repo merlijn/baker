@@ -22,7 +22,7 @@ object RecipeValidations {
     }
 
     // check if the predefined ingredient is of the expected type
-    interactionTransition.predefinedParameters.foreach {
+    interactionTransition.predefinedIngredients.foreach {
       case (name, value) =>
         interactionTransition.requiredIngredients.find(_.name == name) match {
           case None =>
@@ -51,7 +51,7 @@ object RecipeValidations {
           compiledRecipe.allIngredients.find(_.name == name) match {
             case None =>
               Some(
-                s"Ingredient '$name' for interaction '${t.interactionName}' is not provided by any event or interaction")
+                s"Ingredient '$name' for interaction '${t.name}' is not provided by any event or interaction")
             case Some(IngredientDescriptor(name, ingredientType)) if !expectedType.isAssignableFrom(ingredientType) =>
               Some(s"Interaction '$t' expects ingredient '$name:$expectedType', however incompatible type: '$ingredientType' was provided")
             case _ =>

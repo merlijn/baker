@@ -18,7 +18,7 @@ object ScalaDSLRuntime {
 
     override val name: String = i.name
 
-    override val inputTypes: Seq[Type] = i.inputIngredients.map(_.ingredientType)
+    override val inputTypes: Seq[Type] = i.input.map(_.ingredientType)
 
     override def execute(input: Seq[Value]): Option[ProcessEvent] = Some(fn(input))
   }

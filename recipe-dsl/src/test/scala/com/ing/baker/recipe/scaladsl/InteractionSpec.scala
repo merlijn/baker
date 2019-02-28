@@ -10,7 +10,7 @@ class InteractionSpec extends WordSpecLike with Matchers {
         val customerName = Ingredient[String]("customerName")
         val createCustomer = Interaction(
           name = "CreateCustomer",
-          inputIngredients = Seq(customerName),
+          input = Seq(customerName),
           output = Seq()
         )
         createCustomer.equals(createCustomer) shouldBe true
@@ -21,12 +21,12 @@ class InteractionSpec extends WordSpecLike with Matchers {
         val customerId = Ingredient[String]("customerId")
         val CreateCustomer = Interaction(
           name = "CreateCustomer",
-          inputIngredients = Seq(customerName),
+          input = Seq(customerName),
           output = Seq()
         )
         val CreateCustomer2 = Interaction(
           name = "CreateCustomer",
-          inputIngredients = Seq(customerName),
+          input = Seq(customerName),
           output = Seq()
         )
         CreateCustomer.equals(CreateCustomer2) shouldBe true
@@ -37,12 +37,12 @@ class InteractionSpec extends WordSpecLike with Matchers {
         val customerId = Ingredient[String]("customerId")
         val CreateCustomer = Interaction(
           name = "CreateCustomer",
-          inputIngredients = Seq(customerName),
+          input = Seq(customerName),
           output = Seq()
         )
         val CreateCustomer2 = Interaction(
           name = "CreateCustomer2",
-          inputIngredients = Seq(customerName),
+          input = Seq(customerName),
           output = Seq()
         )
         CreateCustomer.equals(CreateCustomer2) shouldBe false
@@ -53,7 +53,7 @@ class InteractionSpec extends WordSpecLike with Matchers {
         val customerId = Ingredient[String]("customerId")
         val CreateCustomer = Interaction(
           name = "CreateCustomer",
-          inputIngredients = Seq(customerName),
+          input = Seq(customerName),
           output = Seq()
         )
         val otherObject = ""

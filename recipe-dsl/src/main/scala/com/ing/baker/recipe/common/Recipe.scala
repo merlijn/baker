@@ -20,7 +20,7 @@ trait Recipe {
   /**
     * The set of events.
     */
-  val sensoryEvents: Set[Event]
+  val sensoryEvents: Seq[Event]
 
   /**
     * The default interaction failure strategy.

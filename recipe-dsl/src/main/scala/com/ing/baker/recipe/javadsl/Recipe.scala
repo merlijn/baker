@@ -1,6 +1,6 @@
 package com.ing.baker.recipe.javadsl
 
-import com.ing.baker.recipe.common
+import com.ing.baker.recipe.{common, javadsl}
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
@@ -10,12 +10,12 @@ import scala.concurrent.duration.{Duration, FiniteDuration}
 case class Recipe(
     override val name: String,
     override val interactions: Seq[common.InteractionDescriptor],
-    override val sensoryEvents: Set[common.Event],
+    override val sensoryEvents: Seq[common.Event],
     override val defaultFailureStrategy: common.InteractionFailureStrategy,
     override val eventReceivePeriod: Option[FiniteDuration],
     override val retentionPeriod: Option[FiniteDuration]) extends common.Recipe {
 
-  def this(name: String) = this(name, Seq.empty, Set.empty, InteractionFailureStrategy.BlockInteraction(), None, None)
+  def this(name: String) = this(name, Seq.empty, Seq.empty, InteractionFailureStrategy.BlockInteraction(), None, None)
 
   def getInteractions: java.util.List[common.InteractionDescriptor] = interactions.asJava
 
@@ -69,7 +69,7 @@ case class Recipe(
     * @return
     */
   def withSensoryEvent(newEvent: Class[_], maxFiringLimit: Int): Recipe =
-    copy(sensoryEvents = sensoryEvents + createEventFromClass(newEvent, Some(maxFiringLimit)))
+    copy(sensoryEvents = sensoryEvents :+ javadsl.Event(newEvent, Some(maxFiringLimit)))
 
   /**
     * Adds the sensory events to the recipe with the firing limit set to 1
@@ -80,7 +80,7 @@ case class Recipe(
   @SafeVarargs
   @varargs
   def withSensoryEvents(eventsToAdd: Class[_]*): Recipe =
-    copy(sensoryEvents = sensoryEvents ++ eventsToAdd.map(createEventFromClass(_, Some(1))))
+    copy(sensoryEvents = sensoryEvents ++ eventsToAdd.map(javadsl.Event(_, Some(1))))
 
   /**
     * Adds the sensory event to the recipe with firing limit set to unlimited
@@ -101,7 +101,7 @@ case class Recipe(
   @SafeVarargs
   @varargs
   def withSensoryEventsNoFiringLimit(eventsToAdd: Class[_]*): Recipe =
-    copy(sensoryEvents = sensoryEvents ++ eventsToAdd.map(createEventFromClass(_, None)))
+    copy(sensoryEvents = sensoryEvents ++ eventsToAdd.map(javadsl.Event(_, None)))
 
   /**
     * This set the failure strategy as default for this recipe.

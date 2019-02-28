@@ -14,13 +14,14 @@ object Event {
 
   def apply[T : TypeTag]: common.Event = {
     val runtimeClass = mirror.runtimeClass(mirror.typeOf[T])
-    javadsl.createEventFromClass(runtimeClass, None)
+    javadsl.Event(runtimeClass, None)
   }
 }
 
 case class Event (override val name: String,
                   override val providedIngredients: Seq[common.Ingredient],
                   override val maxFiringLimit: Option[Int]) extends common.Event {
+
   def withMaxFiringLimit(firingLimit: Int): Event = {
     Event(this.name, this.providedIngredients, Some(firingLimit))
   }

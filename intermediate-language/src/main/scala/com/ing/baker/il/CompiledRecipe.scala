@@ -113,7 +113,7 @@ case class CompiledRecipe(name: String,
     case t: InteractionTransition => t
   }
 
-  val interactionEvents: Set[EventDescriptor] = interactionTransitions flatMap (it => it.eventsToFire)
+  val interactionEvents: Set[EventDescriptor] = interactionTransitions flatMap (it => it.events)
 
   val allEvents: Set[EventDescriptor] = sensoryEvents ++ interactionEvents
 

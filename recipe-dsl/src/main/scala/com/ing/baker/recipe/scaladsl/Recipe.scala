@@ -10,7 +10,7 @@ object Recipe {
   def apply() : Recipe = macro CommonMacros.recipeImpl
 
   def apply(name: String): Recipe = {
-    Recipe(name, Seq.empty, Set.empty, new common.InteractionFailureStrategy.BlockInteraction, None, None)
+    Recipe(name, Seq.empty, Seq.empty, new common.InteractionFailureStrategy.BlockInteraction, None, None)
   }
 }
 
@@ -19,7 +19,7 @@ object Recipe {
   */
 case class Recipe private(override val name: String,
                           override val interactions: Seq[Interaction],
-                          override val sensoryEvents: Set[common.Event],
+                          override val sensoryEvents: Seq[common.Event],
                           override val defaultFailureStrategy: InteractionFailureStrategy,
                           override val eventReceivePeriod: Option[FiniteDuration],
                           override val retentionPeriod: Option[FiniteDuration])
@@ -29,7 +29,7 @@ case class Recipe private(override val name: String,
 
   def withInteractions(newInteractions: Interaction*): Recipe = copy(interactions = interactions ++ newInteractions)
 
-  def withSensoryEvent(newEvent: Event): Recipe = copy(sensoryEvents = sensoryEvents + newEvent)
+  def withSensoryEvent(newEvent: Event): Recipe = copy(sensoryEvents = sensoryEvents :+ newEvent)
 
   def withSensoryEvents(newEvents: Event*): Recipe = copy(sensoryEvents = sensoryEvents ++ newEvents)
 

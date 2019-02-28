@@ -116,17 +116,17 @@ public class InteractionDescriptorTest {
     @Test
     public void shouldUpdateTheMaximumInteractionCount() {
         InteractionDescriptor id = of(SimpleInteraction.class);
-        assertTrue(id.maximumInteractionCount().isEmpty());
+        assertTrue(id.maximumExecutionCount().isEmpty());
 
         InteractionDescriptor idWithMaximumInteractionCount =
                 id.withMaximumInteractionCount(1);
-        assertTrue(idWithMaximumInteractionCount.maximumInteractionCount().isDefined());
-        assertEquals(idWithMaximumInteractionCount.maximumInteractionCount().get(), 1);
+        assertTrue(idWithMaximumInteractionCount.maximumExecutionCount().isDefined());
+        assertEquals(idWithMaximumInteractionCount.maximumExecutionCount().get(), 1);
 
         idWithMaximumInteractionCount =
                 idWithMaximumInteractionCount.withMaximumInteractionCount(2);
-        assertTrue(idWithMaximumInteractionCount.maximumInteractionCount().isDefined());
-        assertEquals(idWithMaximumInteractionCount.maximumInteractionCount().get(), 2);
+        assertTrue(idWithMaximumInteractionCount.maximumExecutionCount().isDefined());
+        assertEquals(idWithMaximumInteractionCount.maximumExecutionCount().get(), 2);
     }
 
     @Test

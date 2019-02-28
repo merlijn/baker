@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation
 import java.lang.reflect.{Method, Type}
 
 import com.ing.baker.recipe.{annotations, common}
+import com.ing.baker.types.{Converters}
 import com.thoughtworks.paranamer.AnnotationParanamer
 
 object ReflectionHelpers {
@@ -34,5 +35,13 @@ object ReflectionHelpers {
     }
 
     override def isNamed(annotation: Annotation): Boolean = true
+  }
+
+  def parseType(javaType: java.lang.reflect.Type, errorMessage: String): com.ing.baker.types.Type = {
+    try {
+      Converters.readJavaType(javaType)
+    } catch {
+      case e: Exception => throw new IllegalArgumentException(errorMessage, e)
+    }
   }
 }
