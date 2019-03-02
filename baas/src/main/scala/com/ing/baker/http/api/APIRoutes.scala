@@ -1,15 +1,13 @@
-package com.ing.baker.baas.http
+package com.ing.baker.http.api
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.server.{Directives, Route}
-import com.ing.baker.baas.interaction.RemoteInteractionClient
 import com.ing.baker.compiler.RecipeCompiler
-import com.ing.baker.recipe.commonserialize
 import com.ing.baker.runtime.core.{Baker, ProcessEvent}
 
 import scala.concurrent.duration._
 
-object APIRoutes extends Directives with BaasMarshalling {
+object APIRoutes extends Directives with JsonMarshalling {
 
   implicit val timeout: FiniteDuration = 30 seconds
 
@@ -66,7 +64,16 @@ object APIRoutes extends Directives with BaasMarshalling {
 
     val baasRoutes = {
 
-      path("recipe") {
+      path("compile") {
+        post {
+          entity(as[com.ing.baker.recipe.json.Recipe]) { recipe =>
+
+            val compiledRecipe = RecipeCompiler.compileRecipe(recipe)
+
+            complete("compilation errors: " + compiledRecipe.validationErrors.mkString(","))
+          }
+        }
+      } ~ path("recipe") {
         post {
           entity(as[com.ing.baker.recipe.json.Recipe]) { recipe =>
 
@@ -82,22 +89,6 @@ object APIRoutes extends Directives with BaasMarshalling {
                 throw e
               }
             }
-          }
-        }
-      } ~
-      path("implementation") {
-        post {
-          entity(as[AddInteractionHTTPRequest]) { request =>
-
-            //Create a RemoteInteractionImplementation
-            val interactionImplementation = RemoteInteractionClient(request.name, request.uri, request.inputTypes)
-            println(s"Adding interaction called: ${request.name}")
-
-            //Register it to BAAS
-            baker.addImplementation(interactionImplementation)
-
-            //return response
-            complete(s"Interaction: ${interactionImplementation.name} added")
           }
         }
       } ~ pathPrefix(Segment) { recipeRoutes _ }

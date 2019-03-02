@@ -35,7 +35,6 @@ class ParseJsonSpec extends WordSpecLike with Matchers {
       |         ]
       |      }
       |   ],
-      |
       |   "interactions" : [
       |     {
       |       "name" : "ValidateOrder",
@@ -73,7 +72,7 @@ class ParseJsonSpec extends WordSpecLike with Matchers {
 
       val recipe = json.extract[Recipe]
 
-//      println(prettyRender(json))
+      println(prettyRender(json))
     }
   }
 

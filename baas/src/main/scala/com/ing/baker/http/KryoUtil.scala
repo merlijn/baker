@@ -1,6 +1,5 @@
-package com.ing.baker.baas
+package com.ing.baker.http
 
-import com.ing.baker.runtime.actor.serialization.ExtraKryoSerializersRegistrar
 import com.twitter.chill.{KryoPool, ScalaKryoInstantiator}
 
 object KryoUtil {
@@ -8,8 +7,7 @@ object KryoUtil {
     new ScalaKryoInstantiator()
   )
 
-  def deserialize[T](bytes: Array[Byte]) =
-    defaultKryoPool.fromBytes(bytes).asInstanceOf[T]
+  def deserialize[T](bytes: Array[Byte]): T = defaultKryoPool.fromBytes(bytes).asInstanceOf[T]
 
   def serialize[T](obj: T): Array[Byte] = defaultKryoPool.toBytesWithClass(obj)
 }

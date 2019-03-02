@@ -1,16 +1,16 @@
-package com.ing.baker.baas
+package com.ing.baker.http.client
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.HttpMethods._
 import akka.http.scaladsl.model._
 import akka.stream.ActorMaterializer
 import akka.util.ByteString
-import com.ing.baker.baas.KryoUtil.defaultKryoPool
-import com.ing.baker.baas.ClientUtils._
-import com.ing.baker.baas.http.AddInteractionHTTPRequest
+import com.ing.baker.http.KryoUtil
+import com.ing.baker.http.client.ClientUtils._
+import com.ing.baker.http.KryoUtil.defaultKryoPool
 import com.ing.baker.recipe.common
-import com.ing.baker.runtime.core.{Baker, ProcessState, ProcessEvent, SensoryEventStatus}
-import com.ing.baker.types.{Type, Value}
+import com.ing.baker.runtime.core.{ProcessEvent, ProcessState, SensoryEventStatus}
+import com.ing.baker.types.Value
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -42,28 +42,14 @@ class RemoteBaker(val host: String, val port: Int)(implicit val actorSystem: Act
     doRequestAndParseResponse[String](httpRequest)
   }
 
-  def addRemoteImplementation(interactionName: String, uri: String, inputTypes: Seq[Type]) = {
-
-    //Create the request to Add the interaction implmentation to Baas
-    log.info("Registering remote implementation client")
-    val addInteractionHTTPRequest = AddInteractionHTTPRequest(interactionName, uri, inputTypes)
-
-    val request = HttpRequest(
-      uri = s"$baseUri/implementation",
-      method = POST,
-      entity = ByteString.fromArray(defaultKryoPool.toBytesWithClass(addInteractionHTTPRequest)))
-
-    doRequest(request, logEntity)
-  }
-
-  def fireEvent(requestId: String, event: Any, confirmation: EventConfirmation): SensoryEventStatus = {
+  def fireEvent(requestId: String, event: Any): SensoryEventStatus = {
 
     //Create request to give to Baker
     log.info("Creating runtime event to fire")
     val processEvent = ProcessEvent.of(event)
 
     val request = HttpRequest(
-        uri =  s"$baseUri/$requestId/fire-event?confirm=${confirmation.name}",
+        uri =  s"$baseUri/$requestId/fire-event?confirm=completed",
         method = POST,
         entity = ByteString.fromArray(defaultKryoPool.toBytesWithClass(processEvent)))
 

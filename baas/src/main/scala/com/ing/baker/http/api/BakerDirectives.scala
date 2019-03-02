@@ -1,4 +1,4 @@
-package com.ing.baker.baas.http
+package com.ing.baker.http.api
 
 import java.util.concurrent.atomic.AtomicReference
 
@@ -11,9 +11,9 @@ import com.ing.baker.runtime.core.Baker
 
 import scala.concurrent.{Future, Promise}
 
-class BAASAPI(baker: Baker,
-              host: String,
-              port: Int)(implicit actorSystem: ActorSystem) extends Directives {
+class BakerDirectives(baker: Baker,
+                      host: String,
+                      port: Int)(implicit actorSystem: ActorSystem) extends Directives {
 
   private implicit val materializer = ActorMaterializer()
 
