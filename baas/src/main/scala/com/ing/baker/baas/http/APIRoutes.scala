@@ -39,7 +39,7 @@ object APIRoutes extends Directives with BaasMarshalling {
           complete(events)
         }
       } ~
-      path(Segment / "bake")  { recipeId =>
+      path(Segment / "create-process")  { recipeId =>
         post {
           val processState = baker.createProcess(recipeId, requestId)
           complete(processState.processId)
@@ -68,7 +68,7 @@ object APIRoutes extends Directives with BaasMarshalling {
 
       path("recipe") {
         post {
-          entity(as[commonserialize.Recipe]) { recipe =>
+          entity(as[com.ing.baker.recipe.json.Recipe]) { recipe =>
 
             val compiledRecipe = RecipeCompiler.compileRecipe(recipe)
 

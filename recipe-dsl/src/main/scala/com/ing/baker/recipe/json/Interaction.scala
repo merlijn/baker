@@ -8,11 +8,7 @@ case class Interaction private(override val name: String,
                                override val originalName: Option[String],
                                override val input: Seq[Ingredient],
                                override val output: Seq[Event],
-                               override val requiredEvents: Set[String] = Set.empty,
-                               override val requiredOneOfEvents: Set[Set[String]] = Set.empty,
-                               override val renamedInputIngredients: Map[String, String] = Map.empty,
-                               override val maximumExecutionCount: Option[Int] = None,
-                               oldName: Option[String] = None)
+                               override val maximumExecutionCount: Option[Int] = None)
 
   extends common.InteractionDescriptor {
 
@@ -20,5 +16,11 @@ case class Interaction private(override val name: String,
 
   override val eventOutputTransformers: Map[common.Event, common.EventOutputTransformer] = Map.empty
 
+  override val renamedInputIngredients: Map[String, String] = Map.empty
+
   override val failureStrategy: Option[InteractionFailureStrategy] = None
+
+  override val requiredEvents: Set[String] = Set.empty
+
+  override val requiredOneOfEvents: Set[Set[String]] = Set.empty
 }

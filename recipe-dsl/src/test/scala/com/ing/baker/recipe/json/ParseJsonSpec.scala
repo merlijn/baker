@@ -12,13 +12,50 @@ class ParseJsonSpec extends WordSpecLike with Matchers {
       |      {
       |        "name" : "com.example.webhop.OrderPlaced",
       |        "providedIngredients" : [
-      |            { "name" : "orderId" },
-      |            { "name" : "date" },
+      |            {
+      |              "name"   : "order",
+      |              "schema" : { "type" : "string" },
+      |            }
+      |         ]
+      |      }
+      |      {
+      |         "name" : "com.example.webhop.CustomerInfoReceived",
+      |         "providedIngredients" : [
+      |           {
+      |             "name" : "customerInfo",
+      |             "schema" : {
+      |               "type" : "object",
+      |               "properties" : {
+      |                 "name" : { "type" : "string" },
+      |                 "address" : { "type" : "string" },
+      |                 "email" : { "type" : "string" }
+      |               }
+      |             }
+      |           }
       |         ]
       |      }
       |   ],
-      |   "interactions" : [
       |
+      |   "interactions" : [
+      |     {
+      |       "name" : "ValidateOrder",
+      |       "input" : [
+      |         {
+      |           "name" : "order",
+      |           "schema" : { "type" : "string" }
+      |         }
+      |       ],
+      |       "output" : [
+      |         {
+      |            "name" : "Valid",
+      |            "providedIngredients" : [ ]
+      |         },
+      |         {
+      |            "name" : "Sorry",
+      |            "providedIngredients" : [ ]
+      |         }
+      |       ]
+      |     }
       |   ]
       |}
     """.stripMargin
@@ -36,7 +73,7 @@ class ParseJsonSpec extends WordSpecLike with Matchers {
 
       val recipe = json.extract[Recipe]
 
-      println(recipe)
+//      println(prettyRender(json))
     }
   }
 

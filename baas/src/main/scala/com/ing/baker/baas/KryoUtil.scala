@@ -6,7 +6,6 @@ import com.twitter.chill.{KryoPool, ScalaKryoInstantiator}
 object KryoUtil {
   val defaultKryoPool: KryoPool = KryoPool.withByteArrayOutputStream(1,
     new ScalaKryoInstantiator()
-         .withRegistrar(new ExtraKryoSerializersRegistrar())
   )
 
   def deserialize[T](bytes: Array[Byte]) =

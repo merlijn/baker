@@ -30,7 +30,7 @@ class BAASSpec extends TestKit(ActorSystem("BAASSpec")) with WordSpecLike with M
   Await.result(baasAPI.start(), 10 seconds)
 
   //Start a BAAS API
-  val baasClient: BAASClient = new BAASClient(host, port)
+  val baasClient: RemoteBaker = new RemoteBaker(host, port)
 
   // implementations
   val localImplementations = Seq(InteractionOne(), InteractionTwo())
@@ -50,10 +50,10 @@ class BAASSpec extends TestKit(ActorSystem("BAASSpec")) with WordSpecLike with M
 
     val requestId = UUID.randomUUID().toString
 
-    baasClient.bake(recipeId, requestId)
+    baasClient.createProcessInstance(recipeId, requestId)
 
     val sensoryEventStatusResponse: SensoryEventStatus =
-      baasClient.processEvent(requestId, InitialEvent("initialIngredient"), EventConfirmation.COMPLETED)
+      baasClient.fireEvent(requestId, InitialEvent("initialIngredient"), EventConfirmation.COMPLETED)
     sensoryEventStatusResponse shouldBe SensoryEventStatus.OK
 
     val processState: ProcessState = baasClient.getState(requestId)

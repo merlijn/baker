@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
-class BAASClient(val host: String, val port: Int)(implicit val actorSystem: ActorSystem) {
+class RemoteBaker(val host: String, val port: Int)(implicit val actorSystem: ActorSystem) {
 
   val baseUri = s"http://$host:$port"
 
@@ -27,7 +27,7 @@ class BAASClient(val host: String, val port: Int)(implicit val actorSystem: Acto
       log.info("Got response body: " + body.utf8String)
     }
 
-  val log = LoggerFactory.getLogger(classOf[BAASClient])
+  val log = LoggerFactory.getLogger(classOf[RemoteBaker])
   implicit val requestTimeout: FiniteDuration = 30 seconds
 
   def addRecipe(recipe: common.Recipe) : String = {
@@ -56,24 +56,24 @@ class BAASClient(val host: String, val port: Int)(implicit val actorSystem: Acto
     doRequest(request, logEntity)
   }
 
-  def processEvent(requestId: String, event: Any, confirmation: EventConfirmation): SensoryEventStatus = {
+  def fireEvent(requestId: String, event: Any, confirmation: EventConfirmation): SensoryEventStatus = {
 
     //Create request to give to Baker
     log.info("Creating runtime event to fire")
     val processEvent = ProcessEvent.of(event)
 
     val request = HttpRequest(
-        uri =  s"$baseUri/$requestId/event?confirm=${confirmation.name}",
+        uri =  s"$baseUri/$requestId/fire-event?confirm=${confirmation.name}",
         method = POST,
         entity = ByteString.fromArray(defaultKryoPool.toBytesWithClass(processEvent)))
 
     doRequestAndParseResponse[SensoryEventStatus](request)
   }
 
-  def bake(recipeId: String, requestId: String): Unit = {
+  def createProcessInstance(recipeId: String, requestId: String): Unit = {
 
     val request = HttpRequest(
-        uri = s"$baseUri/$requestId/$recipeId/bake",
+        uri = s"$baseUri/$requestId/$recipeId/create-process",
         method = POST)
 
     doRequestAndParseResponse[String](request)
