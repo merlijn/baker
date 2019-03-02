@@ -67,10 +67,9 @@ class Baker()(implicit val actorSystem: ActorSystem) {
 
   private val interactionManager: InteractionManager = new InteractionManager()
 
-  private val defaultBakeTimeout = config.as[FiniteDuration]("baker.bake-timeout")
+  private val defaultCreateProcessTimeout = config.as[FiniteDuration]("baker.create-process-timeout")
   private val defaultProcessEventTimeout = config.as[FiniteDuration]("baker.process-event-timeout")
   private val defaultInquireTimeout = config.as[FiniteDuration]("baker.process-inquire-timeout")
-  private val defaultShutdownTimeout = config.as[FiniteDuration]("baker.shutdown-timeout")
   private val defaultAddRecipeTimeout = config.as[FiniteDuration]("baker.add-recipe-timeout")
   private val readJournalIdentifier = config.as[String]("baker.actor.read-journal-plugin")
 
@@ -183,7 +182,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     * @return
     */
   @throws[TimeoutException]("When the request does not receive a reply within the given deadline")
-  def createProcess(recipeId: String, processId: String, timeout: FiniteDuration = defaultBakeTimeout): ProcessState =
+  def createProcess(recipeId: String, processId: String, timeout: FiniteDuration = defaultCreateProcessTimeout): ProcessState =
     Await.result(createProcessAsync(recipeId, processId), timeout)
 
   /**
@@ -194,7 +193,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     * @param timeout
     * @return
     */
-  def createProcessAsync(recipeId: String, processId: String, timeout: FiniteDuration = defaultBakeTimeout): Future[ProcessState] = {
+  def createProcessAsync(recipeId: String, processId: String, timeout: FiniteDuration = defaultCreateProcessTimeout): Future[ProcessState] = {
 
     val initializeFuture = processIndexActor.ask(CreateProcess(recipeId, processId))(timeout)
 
@@ -487,10 +486,4 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     */
   def addImplementations(implementations: Seq[InteractionImplementation]): Unit =
     implementations.foreach(interactionManager.addImplementation)
-
-  /**
-    * Attempts to gracefully shutdown the baker system.
-    */
-  def gracefulShutdown(timeout: FiniteDuration = defaultShutdownTimeout): Unit =
-    GracefulShutdown.gracefulShutdownActorSystem(actorSystem, timeout)
 }

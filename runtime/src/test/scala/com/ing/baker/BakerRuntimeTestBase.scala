@@ -175,11 +175,12 @@ trait BakerRuntimeTestBase
        |      port = $port
        |    }
        |  }
+       |
+       |  cluster.seed-nodes = ["akka.tcp://$actorSystemName@localhost:$port"]
        |}
        |
        |baker {
        |  actor.provider = "cluster-sharded"
-       |  cluster.seed-nodes = ["akka.tcp://$actorSystemName@localhost:$port"]
        |}
     """.stripMargin).withFallback(localLevelDBConfig(actorSystemName, journalInitializeTimeout, journalPath, snapshotsPath))
 

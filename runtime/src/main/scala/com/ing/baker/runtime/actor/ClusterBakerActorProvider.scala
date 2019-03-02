@@ -56,37 +56,9 @@ object ClusterBakerActorProvider {
 
 class ClusterBakerActorProvider(config: Config, configuredEncryption: Encryption) extends BakerActorProvider {
 
-  private val log = LoggerFactory.getLogger(classOf[ClusterBakerActorProvider])
-
   private val nrOfShards = config.as[Int]("baker.actor.cluster.nr-of-shards")
   private val retentionCheckInterval = config.as[FiniteDuration]("baker.actor.retention-check-interval")
   private val actorIdleTimeout: Option[FiniteDuration] = config.as[Option[FiniteDuration]]("baker.actor.idle-timeout")
-
-  private val journalInitializeTimeout = config.as[FiniteDuration]("baker.journal-initialize-timeout")
-
-  private def initializeCluster()(implicit actorSystem: ActorSystem) = {
-
-    val seedNodes: List[Address] = config.as[Option[List[String]]]("baker.cluster.seed-nodes") match {
-      case Some(_seedNodes) if _seedNodes.nonEmpty =>
-        _seedNodes map AddressFromURIString.parse
-      case None =>
-        throw new IllegalStateException("Baker cluster configuration without baker.cluster.seed-nodes")
-    }
-
-    /**
-      * Join cluster after waiting for the persistenceInit actor, otherwise terminate here.
-      */
-    try {
-      Await.result(Util.persistenceInit(journalInitializeTimeout), journalInitializeTimeout)
-    } catch {
-      case _: TimeoutException => throw new IllegalStateException(s"Timeout when trying to initialize the akka journal, waited $journalInitializeTimeout")
-    }
-
-    // join the cluster
-    log.info("PersistenceInit actor started successfully, joining cluster seed nodes {}", seedNodes)
-    Cluster.get(actorSystem).joinSeedNodes(seedNodes)
-  }
-
 
   override def createProcessIndexActor(interactionManager: InteractionManager, recipeManager: ActorRef)(implicit actorSystem: ActorSystem, materializer: Materializer): ActorRef = {
 
@@ -100,8 +72,6 @@ class ClusterBakerActorProvider(config: Config, configuredEncryption: Encryption
   }
 
   override def createRecipeManagerActor()(implicit actorSystem: ActorSystem, materializer: Materializer): ActorRef = {
-
-    initializeCluster()
 
     val singletonManagerProps = ClusterSingletonManager.props(
       RecipeManager.props(),
