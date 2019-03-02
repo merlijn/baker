@@ -1,7 +1,8 @@
-package com.ing.baker.recipe.scaladsl
+package com.ing.baker.recipe.javadsl
 
-import com.ing.baker.recipe.scaladsl.InteractionDescriptorSpec._
 import org.scalatest.{Matchers, WordSpecLike}
+
+import InteractionDescriptorSpec._
 
 object InteractionDescriptorSpec {
   val customerName = Ingredient[String]("customerName")
@@ -27,13 +28,13 @@ class InteractionDescriptorSpec extends WordSpecLike with Matchers {
 
     "requiredOneOfEvents called" should {
       "updates the requiredOneOfEventsList" in {
-        val updated = createCustomer.withRequiredOneOfEvents(agreementsAcceptedEvent, anOtherEvent)
+        val updated = createCustomer.withRequiredOneOfEvents(Set(agreementsAcceptedEvent, anOtherEvent))
         updated.requiredOneOfEvents.head shouldBe Set(agreementsAcceptedEvent.name, anOtherEvent.name)
       }
 
       "throws IllegalArgumentException if nr of events is less than 2" in {
         intercept[IllegalArgumentException] {
-          createCustomer.withRequiredOneOfEvents(agreementsAcceptedEvent)
+          createCustomer.withRequiredOneOfEvents(Set(agreementsAcceptedEvent))
         }
       }
     }

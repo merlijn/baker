@@ -38,8 +38,7 @@ class FireEventActorSpec extends TestKit(ActorSystem("ProcessApiSpec", FireEvent
 
   "The ProcessApi" should {
 
-    import com.ing.baker.recipe.scaladsl._
-    import Examples.webshop
+    import com.ing.baker.recipe.javadsl.Examples.webshop
 
     val webShopRecipe = RecipeCompiler.compileRecipe(webshop.webShopRecipe)
 

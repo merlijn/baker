@@ -6,9 +6,9 @@ import akka.http.scaladsl.model._
 import akka.stream.ActorMaterializer
 import akka.util.ByteString
 import com.ing.baker.http.KryoUtil
-import com.ing.baker.http.client.ClientUtils._
 import com.ing.baker.http.KryoUtil.defaultKryoPool
-import com.ing.baker.recipe.common
+import com.ing.baker.http.client.ClientUtils._
+import com.ing.baker.recipe.javadsl.Recipe
 import com.ing.baker.runtime.core.{ProcessEvent, ProcessState, SensoryEventStatus}
 import com.ing.baker.types.Value
 import org.slf4j.LoggerFactory
@@ -30,7 +30,7 @@ class RemoteBaker(val host: String, val port: Int)(implicit val actorSystem: Act
   val log = LoggerFactory.getLogger(classOf[RemoteBaker])
   implicit val requestTimeout: FiniteDuration = 30 seconds
 
-  def addRecipe(recipe: common.Recipe) : String = {
+  def addRecipe(recipe: Recipe) : String = {
 
     val serializedRecipe = KryoUtil.serialize(recipe)
 

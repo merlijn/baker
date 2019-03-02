@@ -3,6 +3,7 @@ package com.ing.baker.http.api
 import akka.actor.ActorSystem
 import akka.http.scaladsl.server.{Directives, Route}
 import com.ing.baker.compiler.RecipeCompiler
+import com.ing.baker.http.model.Recipe
 import com.ing.baker.runtime.core.{Baker, ProcessEvent}
 
 import scala.concurrent.duration._
@@ -66,18 +67,18 @@ object APIRoutes extends Directives with JsonMarshalling {
 
       path("compile") {
         post {
-          entity(as[com.ing.baker.recipe.json.Recipe]) { recipe =>
+          entity(as[Recipe]) { recipe =>
 
-            val compiledRecipe = RecipeCompiler.compileRecipe(recipe)
+            val compiledRecipe = RecipeCompiler.compileRecipe(recipe.toDSL)
 
             complete("compilation errors: " + compiledRecipe.validationErrors.mkString(","))
           }
         }
       } ~ path("recipe") {
         post {
-          entity(as[com.ing.baker.recipe.json.Recipe]) { recipe =>
+          entity(as[Recipe]) { recipe =>
 
-            val compiledRecipe = RecipeCompiler.compileRecipe(recipe)
+            val compiledRecipe = RecipeCompiler.compileRecipe(recipe.toDSL)
 
             try {
               println(s"Adding recipe called: ${compiledRecipe.name}")

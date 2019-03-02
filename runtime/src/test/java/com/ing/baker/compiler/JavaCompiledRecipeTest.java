@@ -12,7 +12,7 @@ import org.junit.rules.ExpectedException;
 import javax.inject.Named;
 import java.util.ArrayList;
 
-import static com.ing.baker.recipe.javadsl.InteractionDescriptor.of;
+import static com.ing.baker.recipe.javadsl.Interaction.of;
 import static org.junit.Assert.assertEquals;
 
 public class JavaCompiledRecipeTest {

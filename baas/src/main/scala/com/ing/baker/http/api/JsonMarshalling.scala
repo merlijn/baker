@@ -4,6 +4,7 @@ import akka.http.scaladsl.marshalling.PredefinedToEntityMarshallers
 import akka.http.scaladsl.model.HttpEntity
 import akka.http.scaladsl.unmarshalling.{PredefinedFromEntityUnmarshallers, Unmarshaller}
 import com.ing.baker.http.KryoUtil
+import com.ing.baker.http.model.Recipe
 import com.ing.baker.runtime.core.{ProcessEvent, SensoryEventStatus}
 
 import scala.reflect.ClassTag
@@ -37,5 +38,5 @@ trait JsonMarshalling {
   implicit val eventListMarshaller = kryoMarhaller[List[ProcessEvent]]
   implicit val stringMarshaller = kryoMarhaller[String]
 
-  implicit val recipeUnmarshaller = jsonLiftUnMarshaller[com.ing.baker.recipe.json.Recipe]
+  implicit val recipeUnmarshaller = jsonLiftUnMarshaller[Recipe]
 }

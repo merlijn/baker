@@ -4,7 +4,6 @@ import com.ing.baker.compiler.RecipeCompiler;
 import com.ing.baker.il.CompiledRecipe;
 import com.ing.baker.recipe.annotations.FiresEvent;
 import com.ing.baker.recipe.annotations.ProcessId;
-import com.ing.baker.recipe.javadsl.Interaction;
 import com.ing.baker.recipe.javadsl.InteractionFailureStrategy;
 import com.ing.baker.recipe.javadsl.Recipe;
 import com.typesafe.config.Config;
@@ -14,7 +13,7 @@ import javax.inject.Named;
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
-import static com.ing.baker.recipe.javadsl.InteractionDescriptor.of;
+import static com.ing.baker.recipe.javadsl.Interaction.of;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -50,7 +49,7 @@ public class Webshop {
         }
     }
 
-    public interface ValidateOrder extends Interaction {
+    public interface ValidateOrder {
 
         interface Outcome { }
 
@@ -62,7 +61,7 @@ public class Webshop {
         Outcome apply(@ProcessId String processId, @Named("order") String key);
     }
 
-    public interface ManufactureGoods extends Interaction {
+    public interface ManufactureGoods {
         class GoodsManufactured {
             public final String goods;
             public GoodsManufactured(String goods) {
@@ -74,7 +73,7 @@ public class Webshop {
         GoodsManufactured apply(@Named("order") String order);
     }
 
-    public interface SendInvoice extends Interaction {
+    public interface SendInvoice {
 
         class InvoiceWasSent { }
 
@@ -82,7 +81,7 @@ public class Webshop {
         InvoiceWasSent apply(@Named("customerInfo") CustomerInfo customerInfo);
     }
 
-    public interface ShipGoods extends Interaction {
+    public interface ShipGoods {
 
         class GoodsShipped {
             public final String trackingId;

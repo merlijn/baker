@@ -1,4 +1,4 @@
-package com.ing.baker.recipe.scaladsl
+package com.ing.baker.recipe.javadsl
 
 import org.scalatest.{Matchers, WordSpecLike}
 

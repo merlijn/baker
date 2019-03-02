@@ -11,7 +11,7 @@ import org.junit.rules.ExpectedException;
 
 import java.time.Duration;
 
-import static com.ing.baker.recipe.javadsl.InteractionDescriptor.of;
+import static com.ing.baker.recipe.javadsl.Interaction.of;
 import static com.ing.baker.recipe.javadsl.JavadslTestHelper.*;
 import static org.junit.Assert.assertEquals;
 
@@ -70,7 +70,7 @@ public class RecipeTest {
         assertEquals(recipe.getEvents().size(), 2);
         assertEquals(recipe.getInteractions().size(), 0);
         assertEquals(recipe.getEvents().get(0), sensoryEventWithIngredientCheck());
-        assertEquals(recipe.getEvents().get(1), sensoryEventWithoutIngredientCheck());
+        assertEquals(recipe.getEvents().get(1), sensoryEventWithoutIngredientCheck().withMaxFiringLimit(2));
         assertEquals(recipe.getEvents().get(0).maxFiringLimit().get(), new Integer(1));
         assertEquals(recipe.getEvents().get(1).maxFiringLimit().get(), new Integer(2));
     }
@@ -84,8 +84,8 @@ public class RecipeTest {
 
         assertEquals(recipe.getEvents().size(), 2);
         assertEquals(recipe.getInteractions().size(), 0);
-        assertEquals(recipe.getEvents().get(0), sensoryEventWithIngredientCheck());
-        assertEquals(recipe.getEvents().get(1), sensoryEventWithoutIngredientCheck());
+        assertEquals(recipe.getEvents().get(0), sensoryEventWithIngredientCheck().withoutFiringLimit());
+        assertEquals(recipe.getEvents().get(1), sensoryEventWithoutIngredientCheck().withoutFiringLimit());
         assertEquals(recipe.getEvents().get(0).maxFiringLimit(), scala.Option.empty());
         assertEquals(recipe.getEvents().get(1).maxFiringLimit(), scala.Option.empty());
     }
@@ -107,7 +107,7 @@ public class RecipeTest {
     public void shouldSetupRecipeWithDefaultBlockedFailureStrategy() {
         Recipe recipe = new Recipe("defaultBlockedFailureStrategyRecipe");
         assertEquals(
-                com.ing.baker.recipe.common.InteractionFailureStrategy.BlockInteraction.class,
+                InteractionFailureStrategy.BlockInteraction.class,
                 recipe.defaultFailureStrategy().getClass());
     }
 
@@ -120,7 +120,7 @@ public class RecipeTest {
                                 .withDeadline(Duration.ofHours(24))
                                 .build());
         assertEquals(
-                com.ing.baker.recipe.common.InteractionFailureStrategy.RetryWithIncrementalBackoff.class,
+                InteractionFailureStrategy.RetryWithIncrementalBackoff.class,
                 recipe.defaultFailureStrategy().getClass());
 
         Recipe recipe2 = new Recipe("retryWithIncrementalBackoffFailureStrategyRecipe2")
@@ -131,14 +131,14 @@ public class RecipeTest {
                                 .build()
                 );
         assertEquals(
-                com.ing.baker.recipe.common.InteractionFailureStrategy.RetryWithIncrementalBackoff.class,
+                InteractionFailureStrategy.RetryWithIncrementalBackoff.class,
                 recipe2.defaultFailureStrategy().getClass());
 
         Recipe recipe3 = new Recipe("retryWithIncrementalBackoffFailureStrategyRecipe3")
                 .withDefaultFailureStrategy(
-                        InteractionFailureStrategy.BlockInteraction());
+                        new InteractionFailureStrategy.BlockInteraction());
         assertEquals(
-                com.ing.baker.recipe.common.InteractionFailureStrategy.BlockInteraction.class,
+                InteractionFailureStrategy.BlockInteraction.class,
                 recipe3.defaultFailureStrategy().getClass());
     }
 }

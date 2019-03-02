@@ -4,10 +4,8 @@ import java.util.Optional
 
 import com.ing.baker.il.{CompiledRecipe, ValidationSettings}
 import com.ing.baker.recipe.TestRecipe._
-import com.ing.baker.recipe.common
-import com.ing.baker.recipe.common.InteractionFailureStrategy
-import com.ing.baker.recipe.common.InteractionFailureStrategy.RetryWithIncrementalBackoff.UntilDeadline
-import com.ing.baker.recipe.scaladsl.{Event, Ingredient, Interaction, Recipe, processId}
+import com.ing.baker.recipe.javadsl
+import com.ing.baker.recipe.javadsl._
 import com.ing.baker.types.{NullValue, PrimitiveValue}
 import org.scalatest.{Matchers, WordSpecLike}
 
@@ -33,8 +31,8 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
         .withInteractions(interactionOne.withFailureStrategy(
           InteractionFailureStrategy.RetryWithIncrementalBackoff.builder()
               .withInitialDelay(10 milliseconds)
-              .withUntil(Some(UntilDeadline(10 seconds)))
-              .withFireRetryExhaustedEvent(exhaustedEvent)
+              .withDeadline(10 seconds)
+              .withFireRetryExhaustedEvent(exhaustedEvent.name)
               .build()))
 
       val compiledRecipe: CompiledRecipe = RecipeCompiler.compileRecipe(recipe)
@@ -63,7 +61,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
       val wrongProcessIdInteraction =
         Interaction(
           name = "wrongProcessIdInteraction",
-          input = Seq(new Ingredient[Int](common.processIdName), initialIngredient),
+          input = Seq(Ingredient[Int](javadsl.processIdName), initialIngredient),
           output = Seq.empty)
 
       val recipe = Recipe("NonProvidedIngredient")
@@ -103,7 +101,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
       val recipe = Recipe("WrongTypedOptionalIngredient")
         .withInteractions(
           interactionOptional)
-        .withSensoryEvents(initialEventIntOptional, initialEventIntOption)
+        .withSensoryEvents(Set(initialEventIntOptional, initialEventIntOption))
 
       val compiledRecipe: CompiledRecipe = RecipeCompiler.compileRecipe(recipe)
       compiledRecipe.validationErrors should contain("Interaction 'InteractionWithOptional' expects ingredient 'initialIngredientOptionalInt:OptionType(Int32)', however incompatible type: 'OptionType(CharArray)' was provided")
@@ -228,7 +226,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
 
       val recipe: Recipe = Recipe("MissingOptionalRecipe")
         .withInteraction(optionalIngredientInteraction)
-        .withSensoryEvents(initialEvent, optionalProviderEvent)
+        .withSensoryEvents(Set(initialEvent, optionalProviderEvent))
 
       val compiledRecipe: CompiledRecipe = RecipeCompiler.compileRecipe(recipe)
       compiledRecipe.validationErrors shouldBe List.empty
@@ -272,7 +270,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
 
       val recipe: Recipe = Recipe("MissingOptionalRecipe")
         .withInteraction(optionalIngredientInteraction)
-        .withSensoryEvents(initialEvent, optionalProviderEvent)
+        .withSensoryEvents(Set(initialEvent, optionalProviderEvent))
 
       val compiledRecipe: CompiledRecipe = RecipeCompiler.compileRecipe(recipe)
       compiledRecipe.validationErrors shouldBe List.empty
@@ -293,7 +291,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
           optionalIngredientInteraction
             .withPredefinedIngredients(("missingJavaOptional", ingredientValue))
         )
-        .withSensoryEvents(initialEvent)
+        .withSensoryEvents(Set(initialEvent))
 
       val compiledRecipe: CompiledRecipe = RecipeCompiler.compileRecipe(recipe)
       compiledRecipe.validationErrors shouldBe List.empty

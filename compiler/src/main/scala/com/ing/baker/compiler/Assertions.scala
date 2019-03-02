@@ -1,7 +1,7 @@
 package com.ing.baker.compiler
 
 import com.ing.baker.petrinet.api.MultiSet
-import com.ing.baker.recipe.common.{Event, Ingredient, InteractionDescriptor, Recipe}
+import com.ing.baker.recipe.javadsl.{Event, Ingredient, Interaction, Recipe}
 
 import scala.collection.mutable
 
@@ -31,11 +31,11 @@ object Assertions {
 
   def preCompileAssertions(recipe: Recipe): Seq[String] = {
     assertValidNames[Recipe](_.name, Seq(recipe), "Recipe")
-    assertValidNames[InteractionDescriptor](_.name, recipe.interactions, "Interaction")
+    assertValidNames[Interaction](_.name, recipe.interactions, "Interaction")
     assertValidNames[Event](_.name, recipe.sensoryEvents, "Event")
     val allIngredients = recipe.sensoryEvents.flatMap(_.providedIngredients) ++ recipe.interactions.flatMap(_.input)
     assertValidNames[Ingredient](_.name, allIngredients, "Ingredient")
-    assertNoDuplicateElementsExist[InteractionDescriptor](_.name, recipe.interactions)
+    assertNoDuplicateElementsExist[Interaction](_.name, recipe.interactions)
     assertNoDuplicateElementsExist[Event](_.name, recipe.sensoryEvents)
     assertNonEmptyRecipe(recipe)
   }

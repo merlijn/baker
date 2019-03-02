@@ -1,6 +1,5 @@
-package com.ing.baker.recipe.scaladsl
+package com.ing.baker.recipe.javadsl
 
-import scala.language.experimental.macros
 import scala.reflect.NameTransformer.LOCAL_SUFFIX_STRING
 import scala.reflect.macros.blackbox
 

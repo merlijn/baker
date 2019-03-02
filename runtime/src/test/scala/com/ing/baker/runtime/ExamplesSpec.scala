@@ -2,12 +2,11 @@ package com.ing.baker.runtime
 
 import java.util.UUID
 
-import com.ing.baker.BakerRuntimeTestBase
 import akka.testkit.{TestDuration, TestKit}
+import com.ing.baker.BakerRuntimeTestBase
 import com.ing.baker.compiler.RecipeCompiler
-import com.ing.baker.recipe.scaladsl._
-import com.ing.baker.runtime.core.{Baker, ProcessEvent}
-import ScalaDSLRuntime._
+import com.ing.baker.runtime.ScalaDSLRuntime._
+import com.ing.baker.runtime.core.Baker
 
 import scala.concurrent.duration._
 
@@ -16,7 +15,7 @@ class ExamplesSpec extends BakerRuntimeTestBase  {
 
   "The WebShop recipe" should {
 
-    import Examples.webshop._
+    import com.ing.baker.recipe.javadsl.Examples.webshop._
 
     "compile without validation errors" in {
 
@@ -110,7 +109,7 @@ class ExamplesSpec extends BakerRuntimeTestBase  {
 
   "The open account recipe" should {
 
-    import Examples.open_account._
+    import com.ing.baker.recipe.javadsl.Examples.open_account._
 
     "compile without validation errors" in {
 

@@ -1,58 +1,123 @@
 package com.ing.baker.recipe.javadsl
 
-import com.ing.baker.recipe.common
-import com.ing.baker.recipe.common.InteractionFailureStrategy.RetryWithIncrementalBackoff.{UntilDeadline, UntilMaximumRetries, Until}
-import com.ing.baker.recipe.common.InteractionFailureStrategy.{BlockInteraction, RetryWithIncrementalBackoff}
+import java.util.concurrent.TimeUnit
 
-import scala.concurrent.duration.{Duration, MILLISECONDS}
+import scala.annotation.tailrec
+import scala.concurrent.duration.{Duration, FiniteDuration, MILLISECONDS}
+
+sealed trait InteractionFailureStrategy
 
 object InteractionFailureStrategy {
 
-  case class RetryWithIncrementalBackoffBuilder private(private val initialDelay: Option[java.time.Duration],
+  case class BlockInteraction() extends InteractionFailureStrategy
+
+  case class FireEventAfterFailure(eventName: Option[String] = None) extends InteractionFailureStrategy
+
+  object RetryWithIncrementalBackoff {
+
+    def builder() = new RetryWithIncrementalBackoffBuilder()
+  }
+
+  case class RetryWithIncrementalBackoff(initialDelay: Duration,
+                                         backoffFactor: Double = 2,
+                                         maximumRetries: Int,
+                                         maxTimeBetweenRetries: Option[Duration] = None,
+                                         fireRetryExhaustedEvent: Option[Option[String]] = None) extends InteractionFailureStrategy {
+
+    require(backoffFactor >= 1.0, "backoff factor must be greater or equal to 1.0")
+    require(maximumRetries >= 1, "maximum retries must be greater or equal to 1")
+  }
+
+
+  sealed trait Until
+
+  case class UntilDeadline(duration: Duration) extends Until
+
+  case class UntilMaximumRetries(count: Int) extends Until
+
+  case class RetryWithIncrementalBackoffBuilder private(private val initialDelay: Option[Duration],
                                                         private val backoffFactor: Double,
                                                         private val until: Option[Until],
-                                                        private val maxTimeBetweenRetries: Option[java.time.Duration],
+                                                        private val maxTimeBetweenRetries: Option[Duration],
                                                         private val fireRetryExhaustedEvent: Option[Option[String]]) {
     // initialize with defaults
     def this() = this(initialDelay = None, backoffFactor = 2, until = None, maxTimeBetweenRetries = None, fireRetryExhaustedEvent = None)
 
-    def withInitialDelay(initialDelay: java.time.Duration) = this.copy(initialDelay = Some(initialDelay))
+    def withInitialDelay(initialDelay: FiniteDuration) = copy(initialDelay = Some(initialDelay))
 
-    def withBackoffFactor(backoffFactor: Double) = this.copy(backoffFactor = backoffFactor)
+    def withInitialDelay(initialDelay: java.time.Duration) = copy(initialDelay = Some(FiniteDuration(initialDelay.toMillis, TimeUnit.MILLISECONDS)))
 
-    def withMaximumRetries(count: Int) = this.copy(until = Some(UntilMaximumRetries(count)))
+    def withBackoffFactor(backoffFactor: Double) = copy(backoffFactor = backoffFactor)
 
-    def withMaxTimeBetweenRetries(maxTimeBetweenRetries: java.time.Duration) = this.copy(maxTimeBetweenRetries = Some(maxTimeBetweenRetries))
+    def withMaximumRetries(count: Int) = copy(until = Some(UntilMaximumRetries(count)))
 
-    def withFireRetryExhaustedEvent(fireRetryExhaustedEvent: String) = this.copy(fireRetryExhaustedEvent = Some(Some(fireRetryExhaustedEvent)))
+    def withMaxTimeBetweenRetries(maxTimeBetweenRetries: FiniteDuration) = copy(maxTimeBetweenRetries = Some(maxTimeBetweenRetries))
 
-    def withFireRetryExhaustedEvent() = this.copy(fireRetryExhaustedEvent = Some(None))
+    def withMaxTimeBetweenRetries(maxTimeBetweenRetries: java.time.Duration) = copy(maxTimeBetweenRetries = Some(FiniteDuration(maxTimeBetweenRetries.toMillis, TimeUnit.MILLISECONDS)))
 
-    def withFireRetryExhaustedEvent(fireRetryExhaustedEvent: Class[_]) = this.copy(fireRetryExhaustedEvent = Some(Some(fireRetryExhaustedEvent.getSimpleName)))
+    def withFireRetryExhaustedEvent(fireRetryExhaustedEvent: String) = copy(fireRetryExhaustedEvent = Some(Some(fireRetryExhaustedEvent)))
 
-    def withDeadline(duration: java.time.Duration) = this.copy(until = Some(UntilDeadline(Duration(duration.toMillis, MILLISECONDS))))
+    def withFireRetryExhaustedEvent() = copy(fireRetryExhaustedEvent = Some(None))
+
+    def withFireRetryExhaustedEvent(fireRetryExhaustedEvent: Class[_]) = copy(fireRetryExhaustedEvent = Some(Some(fireRetryExhaustedEvent.getSimpleName)))
+
+    def withDeadline(duration: FiniteDuration) = copy(until = Some(UntilDeadline(duration)))
+
+    def withDeadline(duration: java.time.Duration) = copy(until = Some(UntilDeadline(Duration(duration.toMillis, MILLISECONDS))))
 
     def build(): RetryWithIncrementalBackoff = {
-      require(initialDelay.isDefined, "InitialDelay must be defined")
 
-      var builder = common.InteractionFailureStrategy.RetryWithIncrementalBackoff.builder()
-        .withUntil(until)
-        .withMaxTimeBetweenRetries(maxTimeBetweenRetries.map(d => Duration(d.toMillis, MILLISECONDS)))
-        .withInitialDelay(Duration(initialDelay.get.toMillis, MILLISECONDS))
-        .withBackoffFactor(backoffFactor)
-      if(fireRetryExhaustedEvent.isDefined)
-        builder = builder.withFireRetryExhaustedEvent(fireRetryExhaustedEvent.get)
-      builder.build()
+      require(initialDelay.isDefined, "initial delay should be defined")
+
+      val initialDelayValue = initialDelay.get
+
+      until match {
+        case Some(UntilDeadline(duration)) =>
+          require(duration > initialDelayValue, "deadline should be greater then initialDelay")
+
+          RetryWithIncrementalBackoff(
+            initialDelay = initialDelayValue,
+            backoffFactor,
+            maximumRetries = calculateMaxRetries(
+              lastDelay = initialDelayValue,
+              backoffFactor,
+              deadline = duration,
+              totalDelay = initialDelayValue,
+              timesCounter = 1),
+            maxTimeBetweenRetries,
+            fireRetryExhaustedEvent)
+
+        case Some(UntilMaximumRetries(count)) =>
+          RetryWithIncrementalBackoff(
+            initialDelayValue,
+            backoffFactor,
+            maximumRetries = count,
+            maxTimeBetweenRetries,
+            fireRetryExhaustedEvent)
+
+        case None => throw new IllegalArgumentException("Either deadline of maximum retries need to be set")
+      }
+    }
+
+    @tailrec
+    private def calculateMaxRetries(lastDelay: Duration,
+                                    backoffFactor: Double,
+                                    deadline: Duration,
+                                    totalDelay: Duration,
+                                    timesCounter: Int): Int = {
+
+      val newDelay = lastDelay * backoffFactor
+      val nextDelay = maxTimeBetweenRetries.getOrElse(newDelay).min(newDelay) // get the minimum of two
+
+      if ((totalDelay + nextDelay) > deadline) timesCounter
+      else calculateMaxRetries(nextDelay, backoffFactor, deadline, totalDelay + nextDelay, timesCounter + 1)
     }
   }
 
-  def FireEvent(): common.InteractionFailureStrategy.FireEventAfterFailure = common.InteractionFailureStrategy.FireEventAfterFailure(None)
+  def FireEvent(): FireEventAfterFailure = FireEventAfterFailure(None)
 
-  def FireEvent(eventClass: Class[_]): common.InteractionFailureStrategy.FireEventAfterFailure = FireEvent(eventClass.getSimpleName)
+  def FireEvent(eventClass: Class[_]): FireEventAfterFailure = FireEvent(eventClass.getSimpleName)
 
-  def FireEvent(eventName: String): common.InteractionFailureStrategy.FireEventAfterFailure =
-    common.InteractionFailureStrategy.FireEventAfterFailure(Some(eventName))
-
-  def BlockInteraction(): BlockInteraction =
-    common.InteractionFailureStrategy.BlockInteraction()
+  def FireEvent(eventName: String): FireEventAfterFailure =
+    FireEventAfterFailure(Some(eventName))
 }

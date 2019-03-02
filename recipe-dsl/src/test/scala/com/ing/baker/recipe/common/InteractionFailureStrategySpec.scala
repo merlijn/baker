@@ -1,7 +1,6 @@
 package com.ing.baker.recipe.common
 
-import com.ing.baker.recipe.common.InteractionFailureStrategy.RetryWithIncrementalBackoff.{UntilDeadline, UntilMaximumRetries}
-import com.ing.baker.recipe.common.InteractionFailureStrategy._
+import com.ing.baker.recipe.javadsl.InteractionFailureStrategy.{RetryWithIncrementalBackoff, UntilDeadline}
 import org.scalatest.{Matchers, WordSpecLike}
 
 import scala.concurrent.duration._
@@ -20,12 +19,12 @@ class InteractionFailureStrategySpec extends WordSpecLike with Matchers {
       val actual = RetryWithIncrementalBackoff.builder()
         .withInitialDelay(initialDelay)
         .withBackoffFactor(backoffFactor)
-        .withUntil(Some(UntilDeadline(deadline)))
+        .withDeadline(deadline)
         .build()
       val expected = RetryWithIncrementalBackoff.builder()
         .withInitialDelay(initialDelay)
         .withBackoffFactor(backoffFactor)
-        .withUntil(Some(UntilMaximumRetries(15)))
+        .withMaximumRetries(15)
         .build()
 
       actual shouldEqual expected
@@ -40,13 +39,13 @@ class InteractionFailureStrategySpec extends WordSpecLike with Matchers {
       val actual = RetryWithIncrementalBackoff.builder()
         .withInitialDelay(initialDelay)
         .withBackoffFactor(backoffFactor)
-        .withUntil(Some(UntilDeadline(deadline)))
+        .withDeadline(deadline)
         .build()
 
       val expected = RetryWithIncrementalBackoff.builder()
         .withInitialDelay(initialDelay)
         .withBackoffFactor(backoffFactor)
-        .withUntil(Some(UntilMaximumRetries(4)))
+        .withMaximumRetries(4)
         .build()
 
       actual shouldEqual expected
@@ -62,15 +61,15 @@ class InteractionFailureStrategySpec extends WordSpecLike with Matchers {
       val actual = RetryWithIncrementalBackoff.builder()
         .withInitialDelay(initialDelay)
         .withBackoffFactor(backoffFactor)
-        .withMaxTimeBetweenRetries(Some(maxDurationBetweenRetries))
-        .withUntil(Some(UntilDeadline(deadline)))
+        .withMaxTimeBetweenRetries(maxDurationBetweenRetries)
+        .withDeadline(deadline)
         .build()
 
       val expected = RetryWithIncrementalBackoff.builder()
         .withInitialDelay(initialDelay)
         .withBackoffFactor(backoffFactor)
-        .withMaxTimeBetweenRetries(Some(maxDurationBetweenRetries))
-        .withUntil(Some(UntilMaximumRetries(6)))
+        .withMaxTimeBetweenRetries(maxDurationBetweenRetries)
+        .withMaximumRetries(6)
         .build()
 
       actual shouldEqual expected
@@ -84,7 +83,7 @@ class InteractionFailureStrategySpec extends WordSpecLike with Matchers {
       intercept[IllegalArgumentException] {
         RetryWithIncrementalBackoff.builder()
           .withInitialDelay(initialDelay)
-          .withUntil(Some(UntilDeadline(deadline)))
+          .withDeadline(deadline)
           .build()
       }
     }
@@ -97,12 +96,12 @@ class InteractionFailureStrategySpec extends WordSpecLike with Matchers {
 
       val actual = RetryWithIncrementalBackoff.builder()
         .withInitialDelay(initialDelay)
-        .withUntil(Some(UntilDeadline(deadline)))
+        .withDeadline(deadline)
         .build()
       val expected = RetryWithIncrementalBackoff.builder()
         .withInitialDelay(initialDelay)
         .withBackoffFactor(backoffFactor)
-        .withUntil(Some(UntilMaximumRetries(1)))
+        .withMaximumRetries(1)
         .build()
 
       actual shouldEqual expected
@@ -117,12 +116,12 @@ class InteractionFailureStrategySpec extends WordSpecLike with Matchers {
       val actual = RetryWithIncrementalBackoff.builder()
         .withInitialDelay(initialDelay)
         .withBackoffFactor(backoffFactor)
-        .withUntil(Some(UntilDeadline(deadline)))
+        .withDeadline(deadline)
         .build()
       val expected = RetryWithIncrementalBackoff.builder()
         .withInitialDelay(initialDelay)
         .withBackoffFactor(backoffFactor)
-        .withUntil(Some(UntilMaximumRetries(3)))
+        .withMaximumRetries(3)
         .build()
 
       actual shouldEqual expected

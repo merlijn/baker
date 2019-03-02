@@ -2,8 +2,7 @@ package com.ing.baker.recipe
 
 import java.util.Optional
 
-import com.ing.baker.recipe.common.InteractionFailureStrategy
-import com.ing.baker.recipe.scaladsl._
+import com.ing.baker.recipe.javadsl._
 
 import scala.concurrent.duration._
 
@@ -30,12 +29,12 @@ object TestRecipe {
   val interactionNineIngredient = Ingredient[String]("interactionNineIngredient")
   val complexObjectIngredient = Ingredient[ComplexObjectIngredient]("complexOjectIngredient")
   val caseClassIngredient = Ingredient[CaseClassIngredient]("caseClassIngredient")
-  val missingJavaOptional: Ingredient[Optional[String]] = Ingredient[Optional[String]]("missingJavaOptional")
-  val missingJavaOptionalDirectString: Ingredient[String] = Ingredient[String]("missingJavaOptional")
-  val missingJavaOptional2: Ingredient[Optional[Int]] = Ingredient[Optional[Int]]("missingJavaOptional2")
-  val missingScalaOptional: Ingredient[Option[String]] = Ingredient[Option[String]]("missingScalaOptional")
-  val missingScalaOptionalDirectString: Ingredient[String] = Ingredient[String]("missingScalaOptional")
-  val missingScalaOptional2: Ingredient[Option[Int]] = Ingredient[Option[Int]]("missingScalaOptional2")
+  val missingJavaOptional = Ingredient[Optional[String]]("missingJavaOptional")
+  val missingJavaOptionalDirectString  = Ingredient[String]("missingJavaOptional")
+  val missingJavaOptional2  = Ingredient[Optional[Int]]("missingJavaOptional2")
+  val missingScalaOptional  = Ingredient[Option[String]]("missingScalaOptional")
+  val missingScalaOptionalDirectString  = Ingredient[String]("missingScalaOptional")
+  val missingScalaOptional2 = Ingredient[Option[Int]]("missingScalaOptional2")
 
   //Events as used in the recipe & objects used in runtime
   val initialEvent = Event("InitialEvent", Seq(initialIngredient), maxFiringLimit = None)
@@ -86,7 +85,7 @@ object TestRecipe {
 
   case class InteractionOneSuccessful(interactionOneOriginalIngredient: String)
 
-  val interactionOneSuccessful: common.Event = Event[InteractionOneSuccessful]
+  val interactionOneSuccessful: javadsl.Event = Event[InteractionOneSuccessful]
 
   //Interactions used in the recipe & implementations (we use traits instead of case classes since we use mocks for the real implementations
   val interactionOne =
@@ -315,15 +314,15 @@ object TestRecipe {
         interactionThree
           .withMaximumInteractionCount(1),
         interactionFour
-          .withRequiredEvents(secondEvent, eventFromInteractionTwo),
+          .copy(requiredEvents = Set(secondEvent.name, eventFromInteractionTwo.name)),
         interactionFive,
         interactionSix,
         providesNothingInteraction,
         interactionNine
       )
-      .withSensoryEvents(
+      .withSensoryEvents(Set(
         initialEvent,
         initialEventExtendedName,
         secondEvent,
-        notUsedSensoryEvent)
+        notUsedSensoryEvent))
 }

@@ -1,4 +1,4 @@
-package com.ing.baker.recipe.json
+package com.ing.baker.http.model
 
 import com.ing.baker.types
 import com.ing.baker.types._

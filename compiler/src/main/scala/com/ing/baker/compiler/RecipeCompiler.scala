@@ -6,8 +6,7 @@ import com.ing.baker.il.petrinet.Place._
 import com.ing.baker.il.petrinet._
 import com.ing.baker.il.{CompiledRecipe, EventDescriptor, ValidationSettings}
 import com.ing.baker.petrinet.api._
-import com.ing.baker.recipe.common
-import com.ing.baker.recipe.common._
+import com.ing.baker.recipe.javadsl.{Interaction, Recipe}
 import scalax.collection.edge.WLDiEdge
 import scalax.collection.immutable.Graph
 
@@ -62,7 +61,7 @@ object RecipeCompiler {
     */
   private def missingEventTransition[E](eventName: String): MissingEventTransition = MissingEventTransition(eventName)
 
-  private def buildEventAndPreconditionArcs(interaction: InteractionDescriptor,
+  private def buildEventAndPreconditionArcs(interaction: Interaction,
                                             preconditionTransition: String => Option[Transition],
                                             interactionTransition: String => Option[Transition]): (Seq[Arc], Seq[String]) = {
 
@@ -79,7 +78,7 @@ object RecipeCompiler {
     }.unzipFlatten
   }
 
-  private def buildEventORPreconditionArcs(interaction: InteractionDescriptor,
+  private def buildEventORPreconditionArcs(interaction: Interaction,
                                            preconditionTransition: String => Option[Transition],
                                            interactionTransition: String => Option[Transition]): (Seq[Arc], Seq[String]) = {
 
@@ -219,7 +218,7 @@ object RecipeCompiler {
     //All ingredient names provided by sensory events or by interactions
     val allIngredientNames: Set[String] = (sensoryEventIngredients ++ interactionIngredients).toSet
 
-    val actionDescriptors: Seq[InteractionDescriptor] = recipe.interactions
+    val actionDescriptors: Seq[Interaction] = recipe.interactions
 
     // For inputs for which no matching output cannot be found, we do not want to generate a place.
     // It should be provided at runtime from outside the active petri net (marking)

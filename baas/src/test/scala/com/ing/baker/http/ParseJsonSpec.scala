@@ -1,5 +1,6 @@
-package com.ing.baker.recipe.json
+package com.ing.baker.http
 
+import com.ing.baker.http.model.Recipe
 import org.scalatest.{Matchers, WordSpecLike}
 
 class ParseJsonSpec extends WordSpecLike with Matchers {

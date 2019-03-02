@@ -2,7 +2,7 @@ package com.ing.baker.il
 
 import com.ing.baker.compiler.RecipeCompiler
 import com.ing.baker.recipe.TestRecipe._
-import com.ing.baker.recipe.scaladsl.{Recipe, _}
+import com.ing.baker.recipe.javadsl.Recipe
 import org.scalatest.{Matchers, WordSpecLike}
 
 import scala.language.postfixOps

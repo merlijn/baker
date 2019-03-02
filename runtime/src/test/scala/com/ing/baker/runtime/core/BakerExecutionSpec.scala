@@ -9,10 +9,9 @@ import akka.testkit.{TestDuration, TestKit, TestProbe}
 import com.ing.baker._
 import com.ing.baker.compiler.RecipeCompiler
 import com.ing.baker.recipe.TestRecipe._
-import com.ing.baker.recipe.common.InteractionFailureStrategy
-import com.ing.baker.recipe.common.InteractionFailureStrategy.FireEventAfterFailure
-import com.ing.baker.recipe.scaladsl.Recipe
-import com.ing.baker.runtime.core.events.{BakerEvent, EventReceived}
+import com.ing.baker.recipe.javadsl.InteractionFailureStrategy.FireEventAfterFailure
+import com.ing.baker.recipe.javadsl.{InteractionFailureStrategy, Recipe}
+import com.ing.baker.runtime.core.events.BakerEvent
 import com.ing.baker.types.Converters
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -133,8 +132,8 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
               .withOverriddenIngredientName("initialIngredientOld", "initialIngredient"),
             fireTwoEventsInteraction,
             interactionOne
-              .withRequiredEvents(eventFromInteractionTwo))
-          .withSensoryEvents(initialEvent)
+              .withRequiredEvents(Set(eventFromInteractionTwo)))
+          .withSensoryEvents(Set(initialEvent))
 
       val (baker, recipeId) = setupBakerWithRecipe(recipe, mockImplementations)
 
@@ -484,8 +483,8 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
     "execute an interaction when one of the two events occur (OR situation)" in {
       val recipe = Recipe("ORPreconditionedRecipeForEvents")
         .withInteractions(interactionFour
-          .withRequiredOneOfEvents(initialEvent, secondEvent))
-        .withSensoryEvents(initialEvent, secondEvent)
+          .withRequiredOneOfEvents(Set(initialEvent, secondEvent)))
+        .withSensoryEvents(Set(initialEvent, secondEvent))
 
       val (baker, recipeId) = setupBakerWithRecipe(recipe, mockImplementations)
 
@@ -509,9 +508,9 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
     "execute an interaction when one of the two events occur with two or conditions (OR situation 2)" in {
       val recipe = Recipe("ORPreconditionedRecipeForEvents2")
         .withInteractions(interactionFour
-          .withRequiredOneOfEvents(initialEvent, secondEvent)
-          .withRequiredOneOfEvents(thirdEvent, fourthEvent))
-        .withSensoryEvents(initialEvent, secondEvent, thirdEvent, fourthEvent)
+          .withRequiredOneOfEvents(Set(initialEvent, secondEvent))
+          .withRequiredOneOfEvents(Set(thirdEvent, fourthEvent)))
+        .withSensoryEvents(Set(initialEvent, secondEvent, thirdEvent, fourthEvent))
 
       val (baker, recipeId) = setupBakerWithRecipe(recipe, mockImplementations)
 
@@ -1091,7 +1090,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
             interactionThree
               .withOverriddenIngredientName("interactionOneIngredient", "interactionOneOriginalIngredient")
               .withOverriddenIngredientName("interactionTwoIngredient", "interactionOneOriginalIngredient"))
-          .withSensoryEvents(initialEvent)
+          .withSensoryEvents(Set(initialEvent))
 
       val (baker, recipeId) = setupBakerWithRecipe(recipe, mockImplementations)
       val processId = UUID.randomUUID().toString
@@ -1109,7 +1108,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val recipe: Recipe =
         Recipe("eventReceiveExpirationRecipe")
-          .withSensoryEvents(initialEvent)
+          .withSensoryEvents(Set(initialEvent))
           .withInteractions(interactionOne)
           .withEventReceivePeriod(receivePeriod)
 
@@ -1130,7 +1129,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val recipe: Recipe =
         Recipe("eventReceiveInTimeRecipe")
-          .withSensoryEvents(initialEvent)
+          .withSensoryEvents(Set(initialEvent))
           .withInteractions(interactionOne)
           .withEventReceivePeriod(receivePeriod)
 
@@ -1173,7 +1172,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val recipe: Recipe =
         Recipe("RetentionPeriodRecipe")
-          .withSensoryEvents(initialEvent)
+          .withSensoryEvents(Set(initialEvent))
           .withInteractions(interactionOne)
           .withRetentionPeriod(retentionPeriod)
 

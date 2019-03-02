@@ -1,8 +1,6 @@
 package com.ing.baker
 
-import com.ing.baker.recipe.common.InteractionFailureStrategy
-import com.ing.baker.recipe.common.InteractionFailureStrategy.RetryWithIncrementalBackoff.{UntilDeadline, UntilMaximumRetries}
-import com.ing.baker.recipe.scaladsl._
+import com.ing.baker.recipe.javadsl._
 import org.joda.time.{DateTime, LocalDate, LocalDateTime}
 
 import scala.concurrent.duration.DurationInt
@@ -156,20 +154,20 @@ object AllTypeRecipe {
           .withFailureStrategy(InteractionFailureStrategy.RetryWithIncrementalBackoff.builder()
             .withInitialDelay(5.seconds)
             .withBackoffFactor(2.0)
-            .withUntil(Some(UntilMaximumRetries(10)))
-            .withMaxTimeBetweenRetries(Some(100.milliseconds))
-            .withFireRetryExhaustedEvent(mapEvent)
+            .withMaximumRetries(10)
+            .withMaxTimeBetweenRetries(100.milliseconds)
+            .withFireRetryExhaustedEvent(mapEvent.name)
             .build()
           )
           .withMaximumInteractionCount(5)
           .withOverriddenIngredientName("longIngredient", "renamedLongIngredient")
-          .withRequiredOneOfEvents(mapEvent, otherEvent),
+          .withRequiredOneOfEvents(Set(mapEvent, otherEvent)),
         interactionFour.withFailureStrategy(InteractionFailureStrategy.RetryWithIncrementalBackoff.builder()
           .withInitialDelay(5.seconds)
           .withBackoffFactor(2.0)
-          .withUntil(Some(UntilDeadline(10.minutes)))
-          .withMaxTimeBetweenRetries(Some(100.milliseconds))
-          .withFireRetryExhaustedEvent(Some("someEventName"))
+          .withDeadline(10.minutes)
+          .withMaxTimeBetweenRetries(100.milliseconds)
+          .withFireRetryExhaustedEvent("someEventName")
           .build()
         ),
         interactionFive
@@ -214,7 +212,7 @@ object AllTypeRecipe {
           mapIngredientWithBoxedTypes(Map("key1" -> Int.box(42)))
         )
       )
-      .withSensoryEvents(bigPayloadEvent, mapEvent)
+      .withSensoryEvents(Set(bigPayloadEvent, mapEvent))
       .withEventReceivePeriod(1 minute)
       .withRetentionPeriod(5 minutes)
 }

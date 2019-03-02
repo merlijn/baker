@@ -1,4 +1,4 @@
-package com.ing.baker.recipe.scaladsl
+package com.ing.baker.recipe.javadsl
 
 object Examples {
 
@@ -58,15 +58,15 @@ object Examples {
         .withInteractions(
           validateOrder,
           manufactureGoods
-            .withRequiredEvents(valid, paymentMade),
+            .copy(requiredEvents = Set(valid.name, paymentMade.name)),
           shipGoods,
           sendInvoice
             .withRequiredEvent(goodsShipped)
         )
-        .withSensoryEvents(
+        .withSensoryEvents(Set(
           customerInfoReceived,
           orderPlaced,
-          paymentMade)
+          paymentMade))
   }
 
   object open_account {
@@ -123,9 +123,9 @@ object Examples {
         assignAccount,
         getAccount.withRequiredEvent(termsAndConditionsAccepted),
         registerIndividual)
-      .withSensoryEvents(
+      .withSensoryEvents(Set(
         termsAndConditionsAccepted,
-        individualInformationSubmitted)
+        individualInformationSubmitted))
   }
 
   object onboarding {
@@ -164,21 +164,20 @@ object Examples {
           createCustomer
             .withRequiredEvent(
               agreementsAcceptedEvent)
-            .withRequiredOneOfEvents(
+            .withRequiredOneOfEvents(Set(
               automaticApprovedEvent,
-              manualApprovedEvent),
+              manualApprovedEvent)),
           openAccount
             .withEventOutputTransformer(
               accountOpenedEvent,
               "newAccountOpenedEvent",
               Map.empty)
         )
-        .withSensoryEvents(
+        .withSensoryEvents(Set(
           agreementsAcceptedEvent,
           NameProvidedEvent,
           manualApprovedEvent,
           automaticApprovedEvent
-        )
+        ))
   }
 }
-

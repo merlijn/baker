@@ -1,25 +1,34 @@
 package com.ing.baker.recipe.javadsl
 
-import com.ing.baker.recipe.{common, javadsl}
+import com.ing.baker.recipe.javadsl
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
 import scala.concurrent.duration
 import scala.concurrent.duration.{Duration, FiniteDuration}
+import scala.language.experimental.macros
+
+object Recipe {
+  def apply() : Recipe = macro CommonMacros.recipeImpl
+
+  def apply(name: String): Recipe = {
+    Recipe(name, Seq.empty, Seq.empty, InteractionFailureStrategy.BlockInteraction(), None, None)
+  }
+}
 
 case class Recipe(
-    override val name: String,
-    override val interactions: Seq[common.InteractionDescriptor],
-    override val sensoryEvents: Seq[common.Event],
-    override val defaultFailureStrategy: common.InteractionFailureStrategy,
-    override val eventReceivePeriod: Option[FiniteDuration],
-    override val retentionPeriod: Option[FiniteDuration]) extends common.Recipe {
+    name: String,
+    interactions: Seq[Interaction],
+    sensoryEvents: Seq[Event],
+    defaultFailureStrategy: InteractionFailureStrategy = InteractionFailureStrategy.BlockInteraction(),
+    eventReceivePeriod: Option[FiniteDuration] = None,
+    retentionPeriod: Option[FiniteDuration] = None) {
 
   def this(name: String) = this(name, Seq.empty, Seq.empty, InteractionFailureStrategy.BlockInteraction(), None, None)
 
-  def getInteractions: java.util.List[common.InteractionDescriptor] = interactions.asJava
+  def getInteractions: java.util.List[Interaction] = interactions.asJava
 
-  def getEvents: java.util.List[common.Event] = sensoryEvents.toList.asJava
+  def getEvents: java.util.List[Event] = sensoryEvents.toList.asJava
 
   /**
     * This adds all interactions of the recipe to this recipe
@@ -28,7 +37,7 @@ case class Recipe(
     * @param recipe
     * @return
     */
-  def withRecipe(recipe: common.Recipe) = {
+  def withRecipe(recipe: Recipe) = {
     copy(interactions = interactions ++ recipe.interactions)
   }
 
@@ -38,7 +47,7 @@ case class Recipe(
     * @param newInteraction the interaction to add
     * @return
     */
-  def withInteraction(newInteraction: common.InteractionDescriptor): Recipe =
+  def withInteraction(newInteraction: Interaction): Recipe =
     withInteractions(Seq(newInteraction): _*)
 
   /**
@@ -49,7 +58,7 @@ case class Recipe(
     */
   @SafeVarargs
   @varargs
-  def withInteractions(newInteractions: common.InteractionDescriptor*): Recipe =
+  def withInteractions(newInteractions: Interaction*): Recipe =
     copy(interactions = interactions ++ newInteractions)
 
   /**
@@ -69,7 +78,7 @@ case class Recipe(
     * @return
     */
   def withSensoryEvent(newEvent: Class[_], maxFiringLimit: Int): Recipe =
-    copy(sensoryEvents = sensoryEvents :+ javadsl.Event(newEvent, Some(maxFiringLimit)))
+    copy(sensoryEvents = sensoryEvents :+ javadsl.Event.fromClass(newEvent, Some(maxFiringLimit)))
 
   /**
     * Adds the sensory events to the recipe with the firing limit set to 1
@@ -80,7 +89,7 @@ case class Recipe(
   @SafeVarargs
   @varargs
   def withSensoryEvents(eventsToAdd: Class[_]*): Recipe =
-    copy(sensoryEvents = sensoryEvents ++ eventsToAdd.map(javadsl.Event(_, Some(1))))
+    copy(sensoryEvents = sensoryEvents ++ eventsToAdd.map(javadsl.Event.fromClass(_, Some(1))))
 
   /**
     * Adds the sensory event to the recipe with firing limit set to unlimited
@@ -101,7 +110,7 @@ case class Recipe(
   @SafeVarargs
   @varargs
   def withSensoryEventsNoFiringLimit(eventsToAdd: Class[_]*): Recipe =
-    copy(sensoryEvents = sensoryEvents ++ eventsToAdd.map(javadsl.Event(_, None)))
+    copy(sensoryEvents = sensoryEvents ++ eventsToAdd.map(javadsl.Event.fromClass(_, None)))
 
   /**
     * This set the failure strategy as default for this recipe.
@@ -110,7 +119,7 @@ case class Recipe(
     * @param interactionFailureStrategy The failure strategy to follow
     * @return
     */
-  def withDefaultFailureStrategy(interactionFailureStrategy: common.InteractionFailureStrategy): Recipe =
+  def withDefaultFailureStrategy(interactionFailureStrategy: InteractionFailureStrategy): Recipe =
     copy(defaultFailureStrategy = interactionFailureStrategy)
 
   /**
@@ -130,5 +139,14 @@ case class Recipe(
     */
   def withRetentionPeriod(retentionPeriod: java.time.Duration) =
     copy(retentionPeriod = Some(Duration(retentionPeriod.toMillis, duration.MILLISECONDS)))
+
+
+  def withEventReceivePeriod(duration: FiniteDuration): Recipe = copy(eventReceivePeriod = Some(duration))
+
+  def withRetentionPeriod(duration: FiniteDuration): Recipe = copy(retentionPeriod = Some(duration))
+
+  def withSensoryEvent(newEvent: Event): Recipe = copy(sensoryEvents = sensoryEvents :+ newEvent)
+
+  def withSensoryEvents(newEvents: Set[Event]): Recipe = copy(sensoryEvents = sensoryEvents ++ newEvents)
 
 }

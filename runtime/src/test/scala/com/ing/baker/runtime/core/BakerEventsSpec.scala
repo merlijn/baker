@@ -7,8 +7,7 @@ import akka.persistence.inmemory.extension.{InMemoryJournalStorage, StorageExten
 import akka.testkit.TestProbe
 import com.ing.baker._
 import com.ing.baker.recipe.TestRecipe._
-import com.ing.baker.recipe.common.InteractionFailureStrategy
-import com.ing.baker.recipe.scaladsl.Recipe
+import com.ing.baker.recipe.javadsl.{InteractionFailureStrategy, Recipe}
 import com.ing.baker.runtime.core.events.RejectReason._
 import com.ing.baker.runtime.core.events._
 import com.ing.baker.types.PrimitiveValue
@@ -55,17 +54,17 @@ object BakerEventsSpec {
         interactionThree
           .withMaximumInteractionCount(1),
         interactionFour
-          .withRequiredEvents(secondEvent, eventFromInteractionTwo),
+          .withRequiredEvents(Set(secondEvent, eventFromInteractionTwo)),
         interactionFive,
         interactionSix,
         providesNothingInteraction,
         interactionNine
       )
-      .withSensoryEvents(
+      .withSensoryEvents(Set(
         initialEvent.withMaxFiringLimit(1),
         initialEventExtendedName,
         secondEvent,
-        notUsedSensoryEvent)
+        notUsedSensoryEvent))
 
 }
 
