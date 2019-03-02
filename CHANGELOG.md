@@ -1,5 +1,23 @@
 # Changelog
 
+- Removed sieve reference from dsl
+- Removed unused RecipeValidationExceptions
+- Removed BakerException
+- Removed EventListener interface, use annotated event listener instead
+- Removed custom graceful shutdown since it duplicates akka's coordinated shutdown
+- Decide cluster or local setup based on the akka.actor.provider configuration
+- Removed seperate java api (JBaker)
+
+- Renames:
+   RuntimeEvent                -> ProcessEvent
+   BakerResponse               -> SensoryEventResponse
+   SensoryEventStatus.Received -> SensoryEventStatus.OK
+   Baker.processEvent          -> Baker.fireEvent
+
+- Auto detect interaction output (no more @FiresEvent(oneOf = ... )
+- Lots of code cleanups
+
+
 # 2.0.4
 
 - Fixed an issue that Map types would be translated to List types in the Java and Scala dsl
