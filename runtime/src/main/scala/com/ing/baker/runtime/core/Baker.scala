@@ -69,10 +69,10 @@ class Baker()(implicit val actorSystem: ActorSystem) {
   }
 
   private val bakerActorProvider =
-    config.as[Option[String]]("baker.actor.provider") match {
-      case None | Some("local")    => new LocalBakerActorProvider(config, configuredEncryption)
-      case Some("cluster-sharded") => new ClusterBakerActorProvider(config, configuredEncryption)
-      case Some(other)             => throw new IllegalArgumentException(s"Unsupported actor provider: $other")
+    config.as[Option[String]]("akka.actor.provider") match {
+      case Some("local" | "akka.actor.LocalActorRefProvider")       => new LocalBakerActorProvider(config, configuredEncryption)
+      case Some("cluster" | "akka.cluster.ClusterActorRefProvider") => new ClusterBakerActorProvider(config, configuredEncryption)
+      case other                                                    => throw new IllegalArgumentException(s"Unsupported actor provider: $other")
     }
 
   val recipeManager: ActorRef = bakerActorProvider.createRecipeManagerActor()

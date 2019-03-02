@@ -149,7 +149,6 @@ trait BakerRuntimeTestBase
          |}
          |
          |baker {
-         |  actor.provider = "local"
          |  actor.read-journal-plugin = "akka.persistence.query.journal.leveldb"
          |  journal-initialize-timeout = $journalInitializeTimeout
          |}
@@ -177,10 +176,6 @@ trait BakerRuntimeTestBase
        |  }
        |
        |  cluster.seed-nodes = ["akka.tcp://$actorSystemName@localhost:$port"]
-       |}
-       |
-       |baker {
-       |  actor.provider = "cluster-sharded"
        |}
     """.stripMargin).withFallback(localLevelDBConfig(actorSystemName, journalInitializeTimeout, journalPath, snapshotsPath))
 
