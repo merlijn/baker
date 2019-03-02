@@ -911,11 +911,11 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       //Check if both the new event and the events occurred in the past are in the eventsList
       baker.getEvents(processId) should contain only(
-        Baker.extractEvent(InitialEvent(initialIngredientValue)),
-        Baker.extractEvent(InteractionNineSuccessful(interactionNineIngredientValue)),
-        Baker.extractEvent(EventFromInteractionTwo(interactionTwoIngredientValue)),
+        ProcessEvent.of(InitialEvent(initialIngredientValue)),
+        ProcessEvent.of(InteractionNineSuccessful(interactionNineIngredientValue)),
+        ProcessEvent.of(EventFromInteractionTwo(interactionTwoIngredientValue)),
         ProcessEvent("InteractionOneSuccessful", Seq("interactionOneIngredient" -> Converters.toValue(interactionOneIngredientValue))),
-        Baker.extractEvent(InteractionThreeSuccessful(interactionThreeIngredientValue))
+        ProcessEvent.of(InteractionThreeSuccessful(interactionThreeIngredientValue))
       )
 
       //Execute another event
@@ -923,13 +923,13 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       //Check if both the new event and the events occurred in the past are in the eventsList
       baker.getEvents(processId) should contain only(
-        Baker.extractEvent(InitialEvent(initialIngredientValue)),
-        Baker.extractEvent(EventFromInteractionTwo(interactionTwoIngredientValue)),
+        ProcessEvent.of(InitialEvent(initialIngredientValue)),
+        ProcessEvent.of(EventFromInteractionTwo(interactionTwoIngredientValue)),
         ProcessEvent("SecondEvent", Seq.empty),
         ProcessEvent("InteractionOneSuccessful", Seq("interactionOneIngredient" -> Converters.toValue(interactionOneIngredientValue))),
-        Baker.extractEvent(InteractionNineSuccessful(interactionNineIngredientValue)),
-        Baker.extractEvent(InteractionThreeSuccessful(interactionThreeIngredientValue)),
-        Baker.extractEvent(InteractionFourSuccessful(interactionFourIngredientValue))
+        ProcessEvent.of(InteractionNineSuccessful(interactionNineIngredientValue)),
+        ProcessEvent.of(InteractionThreeSuccessful(interactionThreeIngredientValue)),
+        ProcessEvent.of(InteractionFourSuccessful(interactionFourIngredientValue))
       )
     }
 

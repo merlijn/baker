@@ -60,7 +60,7 @@ class BAASClient(val host: String, val port: Int)(implicit val actorSystem: Acto
 
     //Create request to give to Baker
     log.info("Creating runtime event to fire")
-    val processEvent = Baker.extractEvent(event)
+    val processEvent = ProcessEvent.of(event)
 
     val request = HttpRequest(
         uri =  s"$baseUri/$requestId/event?confirm=${confirmation.name}",

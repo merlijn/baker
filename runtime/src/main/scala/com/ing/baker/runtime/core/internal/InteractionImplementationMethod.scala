@@ -77,6 +77,6 @@ case class InteractionImplementationMethod(implementation: AnyRef) extends Inter
       log.trace(s"[$invocationId] result: $output")
 
     // if output == null => None, otherwise extract event
-    Option(output).map(Baker.extractEvent)
+    Option(output).map(e => ProcessEvent.of(e))
   }
 }

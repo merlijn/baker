@@ -1,9 +1,29 @@
 package com.ing.baker.runtime.core
 
 import com.ing.baker.il.EventDescriptor
-import com.ing.baker.types.{NullValue, Value}
+import com.ing.baker.types.{Converters, NullValue, RecordValue, Value}
 
 import scala.collection.JavaConverters._
+
+object ProcessEvent {
+
+  /**
+    * Parses a POJO object into a ProcessEvent if possible.
+    *
+    * @param event The event object.
+    * @return
+    */
+  def of(event: Any): ProcessEvent = {
+    event match {
+      case runtimeEvent: ProcessEvent => runtimeEvent
+      case obj                        =>
+        Converters.toValue(obj) match {
+          case RecordValue(entries) => ProcessEvent(obj.getClass.getSimpleName, entries.toSeq)
+          case other                => throw new IllegalArgumentException(s"Unexpected value: $other")
+        }
+    }
+  }
+}
 
 case class ProcessEvent(name: String,
                         providedIngredients: Seq[(String, Value)]) {

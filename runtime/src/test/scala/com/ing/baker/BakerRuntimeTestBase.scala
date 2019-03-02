@@ -50,7 +50,7 @@ trait BakerRuntimeTestBase
   def ingredientMap(entries: (String, Any)*): Map[String, Value] =
     entries.map { case (name, obj) => name -> Converters.toValue(obj) }.toMap
 
-  def eventList(events: Any*): Seq[ProcessEvent]= events.map(e => Baker.extractEvent((e)))
+  def eventList(events: Any*): Seq[ProcessEvent]= events.map(e => ProcessEvent.of((e)))
 
   //Can be used to check the state after firing the initialEvent
   protected val afterInitialState = ingredientMap(

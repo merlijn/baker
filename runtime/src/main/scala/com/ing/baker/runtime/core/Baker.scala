@@ -22,10 +22,9 @@ import com.ing.baker.runtime.actor.recipe_manager.RecipeManagerProtocol._
 import com.ing.baker.runtime.actor.serialization.Encryption
 import com.ing.baker.runtime.actor.serialization.Encryption.NoEncryption
 import com.ing.baker.runtime.core
-import com.ing.baker.runtime.core.Baker._
 import com.ing.baker.runtime.core.events.BakerEvent
-import com.ing.baker.runtime.core.internal.{InteractionManager, InteractionImplementationMethod, RecipeRuntime}
-import com.ing.baker.types.{Converters, RecordValue, Value}
+import com.ing.baker.runtime.core.internal.{InteractionImplementationMethod, InteractionManager, RecipeRuntime}
+import com.ing.baker.types.Value
 import net.ceedubs.ficus.Ficus._
 import org.slf4j.LoggerFactory
 
@@ -34,24 +33,6 @@ import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 import scala.util.Try
-
-object Baker {
-
-  /**
-    * Transforms an object into a RuntimeEvent if possible.
-    */
-  def extractEvent(event: Any): ProcessEvent = {
-    // transforms the given object into a RuntimeEvent instance
-    event match {
-      case runtimeEvent: ProcessEvent => runtimeEvent
-      case obj                        =>
-        Converters.toValue(obj) match {
-          case RecordValue(entries) => ProcessEvent(obj.getClass.getSimpleName, entries.toSeq)
-          case other                => throw new IllegalArgumentException(s"Unexpected value: $other")
-        }
-    }
-  }
-}
 
 /**
   * The Baker is the component of the Baker library that runs one or multiples recipes.
@@ -228,7 +209,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
   def fireEventAsync(processId: String, event: Any, correlationId: Option[String] = None, timeout: FiniteDuration = defaultProcessEventTimeout): SensoryEventResponse = {
 
     // transforms the given object into a RuntimeEvent instance
-    val runtimeEvent: ProcessEvent = extractEvent(event)
+    val runtimeEvent: ProcessEvent = ProcessEvent.of(event)
 
     // sends the ProcessEvent command to the actor and retrieves a Source (stream) of responses.
     val response: Future[SourceRef[Any]] = processIndexActor
@@ -262,7 +243,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     */
   def resolveInteraction(processId: String, interactionName: String, event: Any, timeout: FiniteDuration = defaultProcessEventTimeout): Unit = {
 
-    val futureResult = processIndexActor.ask(ResolveBlockedInteraction(processId, interactionName, extractEvent(event)))(timeout)
+    val futureResult = processIndexActor.ask(ResolveBlockedInteraction(processId, interactionName, ProcessEvent.of(event)))(timeout)
 
     Await.result(futureResult, timeout)
   }
