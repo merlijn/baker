@@ -157,7 +157,6 @@ lazy val recipeDsl = project.in(file("recipe-dsl"))
       compileDeps(
         javaxInject,
         paranamer,
-        liftJson,
         reflections,
         scalaReflect(scalaVersion.value),
       ) ++
@@ -179,33 +178,8 @@ lazy val recipeCompiler = project.in(file("compiler"))
   )
   .dependsOn(recipeDsl, intermediateLanguage, testScope(recipeDsl))
 
-lazy val baas = project.in(file("baas"))
-  .settings(defaultModuleSettings)
-  .settings(noPublishSettings)
-  .settings(
-    moduleName := "baker-baas",
-    libraryDependencies ++=
-      compileDeps(
-        kryo,
-        kryoSerializers,
-        akkaHttp,
-        akkaPersistenceCassandra) ++
-      testDeps(
-        akkaSlf4j,
-        akkaTestKit,
-        logback,
-        mockito,
-        scalaTest,
-        junitInterface,
-        levelDB,
-        levelDBJni,
-        scalaCheck
-      )
-  )
-  .dependsOn(recipeDsl, recipeCompiler, intermediateLanguage, runtime, testScope(runtime))
-
 lazy val baker = project
   .in(file("."))
   .settings(defaultModuleSettings)
   .settings(noPublishSettings)
-  .aggregate(bakertypes, runtime, recipeCompiler, recipeDsl, intermediateLanguage, splitBrainResolver)
+  .aggregate(bakertypes, runtime, recipeCompiler, recipeDsl, intermediateLanguage)

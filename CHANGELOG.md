@@ -1,12 +1,13 @@
 # Changelog
 
-- Removed sieve reference from dsl
-- Removed unused RecipeValidationExceptions
+- Removed sieve reference from DSL
+- Removed unused RecipeValidationException classes
 - Removed BakerException
 - Removed EventListener interface, use annotated event listener instead
+- Removed akka cluster booting in Baker, use akka's cluster bootstrap and it's JoinDecider instead
 - Removed custom graceful shutdown since it duplicates akka's coordinated shutdown
 - Decide cluster or local setup based on the akka.actor.provider configuration
-- Removed seperate java api (JBaker)
+- Removed seperate java runtime api (JBaker)
 
 - Renames:
    RuntimeEvent                -> ProcessEvent
@@ -15,6 +16,7 @@
    Baker.processEvent          -> Baker.fireEvent
 
 - Auto detect interaction output (no more @FiresEvent(oneOf = ... )
+- Simplify the DSL module, merged scaladsl & javadsl, removed common
 - Lots of code cleanups
 
 

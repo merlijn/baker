@@ -3,7 +3,7 @@ import sbt._
 //noinspection TypeAnnotation
 object Dependencies {
 
-  val akkaVersion = "2.5.17"
+  val akkaVersion = "2.5.21"
   val jvmV = "1.8"
   val scalapbVersion = scalapb.compiler.Version.scalapbVersion
 
@@ -58,12 +58,11 @@ object Dependencies {
     .exclude("com.typesafe.akka", "akka-actor")
 
   val kryo =                      "com.esotericsoftware"       % "kryo"                                % "4.0.0"
+  val kryoSerializers =           "de.javakaffee"              %  "kryo-serializers"                   % "0.41"
 
   val protobufJava =              "com.google.protobuf"        % "protobuf-java"                       % "3.5.1"
 
   val betterFiles =               "com.github.pathikrit"       %% "better-files"                       % "3.6.0"
-
-  val kryoSerializers =           "de.javakaffee"              %  "kryo-serializers"                   % "0.41"
   val objenisis =                 "org.objenesis"              %  "objenesis"                          % "2.5.1"
 
   val jodaTime =                  "joda-time"                  %  "joda-time"                          % "2.9.9"
