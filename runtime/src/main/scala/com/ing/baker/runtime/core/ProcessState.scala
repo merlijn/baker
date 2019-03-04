@@ -1,6 +1,6 @@
 package com.ing.baker.runtime.core
 
-import com.ing.baker.il.failurestrategy.ExceptionStrategyOutcome
+import com.ing.baker.il.InteractionFailureStrategyOutcome
 import com.ing.baker.types.Value
 
 import scala.collection.JavaConverters._

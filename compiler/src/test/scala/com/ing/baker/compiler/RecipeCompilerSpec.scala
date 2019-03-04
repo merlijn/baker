@@ -2,7 +2,7 @@ package com.ing.baker.compiler
 
 import java.util.Optional
 
-import com.ing.baker.il.{CompiledRecipe, ValidationSettings}
+import com.ing.baker.il.{CompiledRecipe, RecipeValidationSettings}
 import com.ing.baker.recipe.TestRecipe._
 import com.ing.baker.recipe.javadsl
 import com.ing.baker.recipe.javadsl._
@@ -162,7 +162,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
         .withSensoryEvent(initialEvent)
 
       val compiledRecipe = RecipeCompiler.compileRecipe(recipe,
-        ValidationSettings(allowNonExecutableInteractions = false))
+        RecipeValidationSettings(allowNonExecutableInteractions = false))
 
       compiledRecipe.validationErrors should contain("InteractionEight is not executable")
     }

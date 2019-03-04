@@ -1,8 +1,7 @@
 package com.ing.baker.il.petrinet
 
 import com.ing.baker.il
-import com.ing.baker.il.failurestrategy.InteractionFailureStrategy
-import com.ing.baker.il.{EventOutputTransformer, _}
+import com.ing.baker.il.{EventOutputTransformer, InteractionFailureStrategy, _}
 import com.ing.baker.types.Value
 import org.slf4j._
 

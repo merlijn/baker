@@ -4,7 +4,7 @@ package compiler
 import com.ing.baker.il.RecipeValidations.postCompileValidations
 import com.ing.baker.il.petrinet.Place._
 import com.ing.baker.il.petrinet._
-import com.ing.baker.il.{CompiledRecipe, EventDescriptor, ValidationSettings}
+import com.ing.baker.il.{CompiledRecipe, EventDescriptor, RecipeValidationSettings}
 import com.ing.baker.petrinet.api._
 import com.ing.baker.recipe.javadsl.{Interaction, Recipe}
 import scalax.collection.edge.WLDiEdge
@@ -199,7 +199,7 @@ object RecipeCompiler {
     * @return
     */
   def compileRecipe(recipe: Recipe,
-                    validationSettings: ValidationSettings): CompiledRecipe = {
+                    validationSettings: RecipeValidationSettings): CompiledRecipe = {
 
     val precompileErrors: Seq[String] = Assertions.preCompileAssertions(recipe)
 
@@ -340,5 +340,5 @@ object RecipeCompiler {
     postCompileValidations(compiledRecipe, validationSettings)
   }
 
-  def compileRecipe(recipe: Recipe): CompiledRecipe = compileRecipe(recipe, ValidationSettings.defaultValidationSettings)
+  def compileRecipe(recipe: Recipe): CompiledRecipe = compileRecipe(recipe, RecipeValidationSettings.defaultValidationSettings)
 }

@@ -1,7 +1,7 @@
 package com.ing.baker.il
 
-object ValidationSettings {
-  val defaultValidationSettings = ValidationSettings()
+object RecipeValidationSettings {
+  val defaultValidationSettings = RecipeValidationSettings()
 }
 
 /**
@@ -15,6 +15,6 @@ object ValidationSettings {
   * @param allowDisconnectedness
   * @param allowNonExecutableInteractions
   */
-case class ValidationSettings(allowCycles: Boolean = true,
-                              allowDisconnectedness: Boolean = true,
-                              allowNonExecutableInteractions: Boolean = true)
+case class RecipeValidationSettings(allowCycles: Boolean = true,
+                                    allowDisconnectedness: Boolean = true,
+                                    allowNonExecutableInteractions: Boolean = true)

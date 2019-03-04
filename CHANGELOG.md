@@ -2,6 +2,7 @@
 
 - Removed sieve reference from DSL
 - Removed unused RecipeValidationException classes
+- Removed unused baas module
 - Removed BakerException
 - Removed EventListener interface, use annotated event listener instead
 - Removed akka cluster booting in Baker, use akka's cluster bootstrap and it's JoinDecider instead
@@ -17,7 +18,6 @@
 
 - Auto detect interaction output (no more @FiresEvent(oneOf = ... )
 - Simplify the DSL module, merged scaladsl & javadsl, removed common
-- Lots of code cleanups
 
 
 # 2.0.4

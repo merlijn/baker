@@ -86,7 +86,7 @@ object RecipeValidations {
     *   5. Check if the provided ingredients are of the same type as the expected ingredients
     */
   def postCompileValidations(compiledRecipe: CompiledRecipe,
-                             validationSettings: ValidationSettings): CompiledRecipe = {
+                             validationSettings: RecipeValidationSettings): CompiledRecipe = {
 
     // TODO don't use a mutable list but instead a more functional solutions such as folding or a writer monad
     val postCompileValidationErrors = mutable.MutableList.empty[String]

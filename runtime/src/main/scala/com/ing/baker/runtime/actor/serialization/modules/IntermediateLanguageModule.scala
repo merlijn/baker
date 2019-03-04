@@ -113,13 +113,13 @@ class IntermediateLanguageModule extends ProtoEventAdapterModule {
 
       protobuf.CompiledRecipe(Option(name), Some(recipeId), graph, producedTokens, validationErrors, eventReceiveMillis, retentionMillis)
 
-    case s: il.failurestrategy.InteractionFailureStrategy => s match {
-      case il.failurestrategy.BlockInteraction =>
+    case s: il.InteractionFailureStrategy => s match {
+      case il.InteractionFailureStrategy.BlockInteraction =>
         protobuf.InteractionFailureStrategy(protobuf.InteractionFailureStrategy.OneofType.BlockInteraction(protobuf.BlockInteraction()))
-      case il.failurestrategy.FireEventAfterFailure(eventDescriptor) =>
+      case il.InteractionFailureStrategy.FireEventAfterFailure(eventDescriptor) =>
         val fireAfterFailure = protobuf.FireEventAfterFailure(Option(ctx.toProto[protobuf.EventDescriptor](eventDescriptor)))
         protobuf.InteractionFailureStrategy(protobuf.InteractionFailureStrategy.OneofType.FireEventAfterFailure(fireAfterFailure))
-      case strategy: il.failurestrategy.RetryWithIncrementalBackoff =>
+      case strategy: il.InteractionFailureStrategy.RetryWithIncrementalBackoff =>
         val retry = protobuf.RetryWithIncrementalBackoff(
           initialTimeout = Option(strategy.initialTimeout.toMillis),
           backoffFactor = Option(strategy.backoffFactor),
@@ -174,7 +174,7 @@ class IntermediateLanguageModule extends ProtoEventAdapterModule {
               originalName = t.originalInteractionName.getOrMissing("originalInteractionName"),
               predefinedIngredients = t.predefinedParameters.mapValues(ctx.toDomain[Value]),
               maximumExecutionCount = t.maximumInteractionCount,
-              failureStrategy = t.failureStrategy.map(ctx.toDomain[il.failurestrategy.InteractionFailureStrategy]).getOrMissing("failureStrategy"),
+              failureStrategy = t.failureStrategy.map(ctx.toDomain[il.InteractionFailureStrategy]).getOrMissing("failureStrategy"),
               eventOutputTransformers = t.eventOutputTransformers.mapValues(ctx.toDomain[il.EventOutputTransformer])
             ))
 
@@ -198,13 +198,13 @@ class IntermediateLanguageModule extends ProtoEventAdapterModule {
 
     case fs: protobuf.InteractionFailureStrategy => fs.oneofType match {
       case protobuf.InteractionFailureStrategy.OneofType.BlockInteraction(_) =>
-        il.failurestrategy.BlockInteraction
+        il.InteractionFailureStrategy.BlockInteraction
       case protobuf.InteractionFailureStrategy.OneofType.FireEventAfterFailure(protobuf.FireEventAfterFailure(Some(event))) =>
-        il.failurestrategy.FireEventAfterFailure(ctx.toDomain[il.EventDescriptor](event))
+        il.InteractionFailureStrategy.FireEventAfterFailure(ctx.toDomain[il.EventDescriptor](event))
       case protobuf.InteractionFailureStrategy.OneofType.RetryWithIncrementalBackoff(
       protobuf.RetryWithIncrementalBackoff(Some(initialTimeout), Some(backoff), Some(maximumRetries), maxBetween, exhaustedEvent)
       ) =>
-        il.failurestrategy.RetryWithIncrementalBackoff(
+        il.InteractionFailureStrategy.RetryWithIncrementalBackoff(
           initialTimeout = Duration(initialTimeout, TimeUnit.MILLISECONDS),
           backoffFactor = backoff,
           maximumRetries = maximumRetries,

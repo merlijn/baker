@@ -4,8 +4,7 @@ import java.lang.reflect.InvocationTargetException
 
 import akka.event.EventStream
 import cats.effect.IO
-import com.ing.baker.il.{CompiledRecipe, IngredientDescriptor, processIdName}
-import com.ing.baker.il.failurestrategy.ExceptionStrategyOutcome
+import com.ing.baker.il.{CompiledRecipe, IngredientDescriptor, InteractionFailureStrategyOutcome, processIdName}
 import com.ing.baker.il.petrinet._
 import com.ing.baker.petrinet.api._
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceRuntime
@@ -13,7 +12,7 @@ import com.ing.baker.runtime.actor.process_instance.internal.ExceptionStrategy.{
 import com.ing.baker.runtime.actor.process_instance.internal._
 import com.ing.baker.runtime.core.events.{InteractionCompleted, InteractionFailed, InteractionStarted}
 import com.ing.baker.runtime.core.internal.RecipeRuntime._
-import com.ing.baker.runtime.core.{ProcessState, ProcessEvent}
+import com.ing.baker.runtime.core.{ProcessEvent, ProcessState}
 import com.ing.baker.types.{PrimitiveValue, Value}
 import org.slf4j.MDC
 
@@ -159,9 +158,9 @@ class RecipeRuntime(recipe: CompiledRecipe, interactionManager: InteractionManag
 
           // translates the recipe failure strategy to a petri net failure strategy
           failureStrategyOutcome match {
-            case ExceptionStrategyOutcome.BlockTransition => BlockTransition
-            case ExceptionStrategyOutcome.RetryWithDelay(delay) => RetryWithDelay(delay)
-            case ExceptionStrategyOutcome.Continue(eventName) => {
+            case InteractionFailureStrategyOutcome.BlockTransition => BlockTransition
+            case InteractionFailureStrategyOutcome.RetryWithDelay(delay) => RetryWithDelay(delay)
+            case InteractionFailureStrategyOutcome.Continue(eventName) => {
               val runtimeEvent = ProcessEvent(eventName, Seq.empty)
               Continue(createProducedMarking(outMarking, Some(runtimeEvent)), runtimeEvent)
             }

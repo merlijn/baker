@@ -3,7 +3,7 @@ package com.ing.baker.pbt
 import java.io.{File, PrintWriter}
 
 import com.ing.baker.compiler.RecipeCompiler
-import com.ing.baker.il.{CompiledRecipe, ValidationSettings}
+import com.ing.baker.il.{CompiledRecipe, RecipeValidationSettings}
 import com.ing.baker.recipe.javadsl
 import com.ing.baker.recipe.javadsl.{Event, Ingredient, Interaction, Recipe}
 import org.scalacheck.Prop.forAll
@@ -21,7 +21,7 @@ class RecipePropertiesSpec extends FunSuite with Checkers {
 
   test("Baker can compile any valid recipe") {
     val prop = forAll(recipeGen) { recipe =>
-      val validations = ValidationSettings(allowCycles = false, allowNonExecutableInteractions = false)
+      val validations = RecipeValidationSettings(allowCycles = false, allowNonExecutableInteractions = false)
 
       val compiledRecipe = RecipeCompiler.compileRecipe(recipe, validations)
 

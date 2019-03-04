@@ -1,6 +1,7 @@
 package com.ing.baker.il.failurestrategy
 
-import com.ing.baker.il.failurestrategy.ExceptionStrategyOutcome.{BlockTransition, RetryWithDelay}
+import com.ing.baker.il.InteractionFailureStrategy.RetryWithIncrementalBackoff
+import com.ing.baker.il.InteractionFailureStrategyOutcome.{BlockTransition, RetryWithDelay}
 import org.scalatest.{Matchers, WordSpecLike}
 
 import scala.concurrent.duration._

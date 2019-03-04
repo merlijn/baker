@@ -1,8 +1,7 @@
 package com.ing.baker
 
-import com.ing.baker.il.failurestrategy.InteractionFailureStrategy
 import com.ing.baker.il.petrinet._
-import com.ing.baker.il.{EventDescriptor, _}
+import com.ing.baker.il.{EventDescriptor, InteractionFailureStrategy, _}
 import com.ing.baker.recipe.javadsl
 import com.ing.baker.recipe.javadsl.Interaction
 import com.ing.baker.types._
@@ -45,18 +44,18 @@ package object compiler {
             case None                  => None
           }
 
-          (il.failurestrategy.RetryWithIncrementalBackoff(initialTimeout, backoffFactor, maximumRetries, maxTimeBetweenRetries, exhaustedRetryEvent), exhaustedRetryEvent)
+          (il.InteractionFailureStrategy.RetryWithIncrementalBackoff(initialTimeout, backoffFactor, maximumRetries, maxTimeBetweenRetries, exhaustedRetryEvent), exhaustedRetryEvent)
         case javadsl.InteractionFailureStrategy.BlockInteraction() => (
 
-          il.failurestrategy.BlockInteraction, None)
+          il.InteractionFailureStrategy.BlockInteraction, None)
         case javadsl.InteractionFailureStrategy.FireEventAfterFailure(eventNameOption) =>
           val eventName = eventNameOption.getOrElse(interactionDescriptor.name + exhaustedEventAppend)
           val exhaustedRetryEvent: EventDescriptor = EventDescriptor(eventName, Seq.empty)
 
-          (il.failurestrategy.FireEventAfterFailure(exhaustedRetryEvent), Some(exhaustedRetryEvent))
+          (il.InteractionFailureStrategy.FireEventAfterFailure(exhaustedRetryEvent), Some(exhaustedRetryEvent))
         case _ =>
 
-          (il.failurestrategy.BlockInteraction, None)
+          (il.InteractionFailureStrategy.BlockInteraction, None)
       }
     }
 
