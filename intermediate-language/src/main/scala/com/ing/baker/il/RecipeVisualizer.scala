@@ -43,9 +43,9 @@ object RecipeVisualizer {
     */
   private def nodeLabelFn: Either[Place, Transition] ⇒ String = {
     case Left(Place(label, EmptyEventIngredientPlace)) ⇒ s"empty:${label}"
-    case Left(place) ⇒ place.label
+    case Left(place) ⇒ place.label.split('.').last
     case Right(transition: MultiFacilitatorTransition) ⇒ s"multi:${transition.label}"
-    case Right(transition) => transition.label
+    case Right(transition) => transition.label.split('.').last
   }
 
   /**
