@@ -42,18 +42,24 @@ object RecipeVisualizer {
     * Returns the label for a node.
     */
   private def nodeLabelFn: Either[Place, Transition] ⇒ String = {
-    case Left(Place(label, EmptyEventIngredientPlace)) ⇒ s"empty:${label}"
-    case Left(place) ⇒ place.label.split('.').last
-    case Right(transition: MultiFacilitatorTransition) ⇒ s"multi:${transition.label}"
+    case Left(place)       ⇒ place.label.split('.').last
     case Right(transition) => transition.label.split('.').last
+  }
+
+  private def nodeIdFn: Either[Place, Transition] => String = {
+    case Left(place)       => place.label
+    case Right(transition) => transition.label
   }
 
   /**
     * Returns the style attributes for a node.
     */
   private def nodeDotAttrFn(style: RecipeVisualStyle): (RecipePetriNetGraph#NodeT, Set[String], Set[String]) => List[DotAttr] =
-    (node: RecipePetriNetGraph#NodeT, eventNames: Set[String], ingredientNames: Set[String]) ⇒
-      node.value match {
+    (node: RecipePetriNetGraph#NodeT, eventNames: Set[String], ingredientNames: Set[String]) ⇒ {
+
+      val labelAttr = DotAttr("label", nodeLabelFn(node.value.asInstanceOf[Either[Place, Transition]]))
+
+      val styleAttrs = node.value match {
         case Left(Place(_, InteractionEventOutputPlace)) => style.choiceAttributes
         case Left(Place(_, EventOrPreconditionPlace)) => style.preconditionORAttributes
         case Left(Place(_, EmptyEventIngredientPlace)) ⇒ style.emptyEventAttributes
@@ -69,6 +75,9 @@ object RecipeVisualizer {
         case Right(_) ⇒ style.eventAttributes
       }
 
+      styleAttrs :+ labelAttr
+    }
+
   private def generateDot(graph: RecipePetriNetGraph, style: RecipeVisualStyle, filter: String => Boolean, eventNames: Set[String], ingredientNames: Set[String]): String = {
 
     val myRoot = DotRootGraph(directed = graph.isDirected,
@@ -77,7 +86,7 @@ object RecipeVisualizer {
       attrList = style.rootAttributes)
 
     def recipeNodeTransformer(innerNode: RecipePetriNetGraph#NodeT): Option[(DotGraph, DotNodeStmt)] = {
-      Some((myRoot, DotNodeStmt(nodeLabelFn(innerNode.value), nodeDotAttrFn(style)(innerNode, eventNames, ingredientNames))))
+      Some((myRoot, DotNodeStmt(nodeIdFn(innerNode.value), nodeDotAttrFn(style)(innerNode, eventNames, ingredientNames))))
     }
 
     def recipeEdgeTransformer(innerEdge: RecipePetriNetGraph#EdgeT): Option[(DotGraph, DotEdgeStmt)] = {
@@ -85,7 +94,7 @@ object RecipeVisualizer {
       val source = innerEdge.edge.source
       val target = innerEdge.edge.target
 
-      Some((myRoot, DotEdgeStmt(nodeLabelFn(source.value), nodeLabelFn(target.value), List.empty)))
+      Some((myRoot, DotEdgeStmt(nodeIdFn(source.value), nodeIdFn(target.value), List.empty)))
     }
 
     // specifies which places to compact (remove)
