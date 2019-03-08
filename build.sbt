@@ -56,10 +56,9 @@ lazy val bakertypes = project.in(file("bakertypes"))
     moduleName := "baker-types",
     libraryDependencies ++= compileDeps(
       slf4jApi,
-      ficusConfig,
+      typeSafeConfig,
       objenisis,
       scalapbRuntime,
-      jodaTime,
       scalaReflect(scalaVersion.value)
     ) ++ testDeps(scalaTest, scalaCheck, logback, scalaCheck)
   )
@@ -102,6 +101,7 @@ lazy val runtime = project.in(file("runtime"))
         objenisis,
         scalapbRuntime,
         protobufJava,
+        jodaTime,
         kryo,
         kryoSerializers,
         slf4jApi

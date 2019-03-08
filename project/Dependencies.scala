@@ -23,7 +23,7 @@ object Dependencies {
   val akkaStream =                "com.typesafe.akka"          %% "akka-stream"                        % akkaVersion
   val akkaPersistence =           "com.typesafe.akka"          %% "akka-persistence"                   % akkaVersion
   val akkaPersistenceQuery =      "com.typesafe.akka"          %% "akka-persistence-query"             % akkaVersion
-  val akkaPersistenceCassandra =  "com.typesafe.akka"          %% "akka-persistence-cassandra"         % "0.54"
+  val akkaPersistenceCassandra =  "com.typesafe.akka"          %% "akka-persistence-cassandra"         % "0.58"
   val akkaCluster =               "com.typesafe.akka"          %% "akka-cluster"                       % akkaVersion
   val akkaClusterSharding =       "com.typesafe.akka"          %% "akka-cluster-sharding"              % akkaVersion
   val akkaSlf4j =                 "com.typesafe.akka"          %% "akka-slf4j"                         % akkaVersion
@@ -42,11 +42,11 @@ object Dependencies {
   val graphvizJava =              "guru.nidi"                  %  "graphviz-java"                      % "0.8.0"
 
   val catsEffect =                "org.typelevel"              %% "cats-effect"                        % "0.10"
-  val catsCore =                  "org.typelevel"              %% "cats-core"                          % "1.1.0"
+  val catsCore =                  "org.typelevel"              %% "cats-core"                          % "1.5.0"
 
   def scalaReflect(scalaV: String): ModuleID = "org.scala-lang"%  "scala-reflect"                      % scalaV
   val javaxInject =               "javax.inject"               %  "javax.inject"                       % "1"
-  val reflections =               "org.reflections"            % "reflections"                         % "0.9.11"
+  val reflections =               "org.reflections"            %  "reflections"                        % "0.9.11"
   val paranamer =                 "com.thoughtworks.paranamer" %  "paranamer"                          % "2.8"
   val liftJson =                  "net.liftweb"                %% "lift-json"                          % "3.3.0"
   
@@ -58,7 +58,7 @@ object Dependencies {
     .exclude("com.typesafe.akka", "akka-actor")
 
   val kryo =                      "com.esotericsoftware"       % "kryo"                                % "4.0.0"
-  val kryoSerializers =           "de.javakaffee"              %  "kryo-serializers"                   % "0.41"
+  val kryoSerializers =           "de.javakaffee"              % "kryo-serializers"                    % "0.41"
 
   val protobufJava =              "com.google.protobuf"        % "protobuf-java"                       % "3.5.1"
 
