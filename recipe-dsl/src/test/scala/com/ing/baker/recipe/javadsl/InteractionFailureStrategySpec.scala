@@ -1,6 +1,6 @@
-package com.ing.baker.recipe.common
+package com.ing.baker.recipe.javadsl
 
-import com.ing.baker.recipe.javadsl.InteractionFailureStrategy.{RetryWithIncrementalBackoff, UntilDeadline}
+import com.ing.baker.recipe.javadsl.InteractionFailureStrategy.RetryWithIncrementalBackoff
 import org.scalatest.{Matchers, WordSpecLike}
 
 import scala.concurrent.duration._
