@@ -89,21 +89,24 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     * @return A recipeId
     */
   @throws[TimeoutException]("When the request does not receive a reply within the given deadline")
-  def addRecipe(compiledRecipe: CompiledRecipe, timeout: FiniteDuration = defaultAddRecipeTimeout): String = {
+  def addRecipe(compiledRecipe: CompiledRecipe, allowMissingImplementations: Boolean = false, timeout: FiniteDuration = defaultAddRecipeTimeout): String = {
+
+    if (compiledRecipe.validationErrors.nonEmpty)
+      throw new IllegalArgumentException(compiledRecipe.validationErrors.mkString(", "))
 
     // check if every interaction has an implementation
     val implementationErrors = getImplementationErrors(compiledRecipe)
 
     if (implementationErrors.nonEmpty)
-      throw new IllegalStateException(implementationErrors.mkString(", "))
-
-    if (compiledRecipe.validationErrors.nonEmpty)
-      throw new IllegalArgumentException(compiledRecipe.validationErrors.mkString(", "))
+      if (allowMissingImplementations)
+        log.warn(s"Adding recipe '${compiledRecipe.name}' with missing interaction implementations: " + implementationErrors.mkString(", "))
+      else
+        throw new IllegalStateException("Missing interaction implementations: " + implementationErrors.mkString(", "))
 
     val futureResult = recipeManager.ask(AddRecipe(compiledRecipe))(timeout)
     Await.result(futureResult, timeout) match {
       case AddRecipeResponse(recipeId) => recipeId
-      case msg @ _ => throw new IllegalStateException(s"Received unexpected message of type ${msg.getClass}")
+      case msg                         => throw new IllegalStateException(s"Received unexpected message of type ${msg.getClass}")
     }
   }
 
