@@ -981,11 +981,11 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
       }
     }
 
-    "be able to return an index of all processes in local/inmemory mode" in {
+    "be able to return an index of all processes in local/inmemory mode" in withActorSystem(ActorSystem("IndexTestLocal")){ actorSystem =>
 
       val nrOfProcesses = 200
 
-      val (baker, recipeId) = setupBakerWithRecipe("IndexTestLocal")
+      val (baker, recipeId) = setupBakerWithRecipe("IndexTestLocal")(actorSystem)
 
       val processIds = (0 to nrOfProcesses).map(_ => java.util.UUID.randomUUID().toString).toSet
 

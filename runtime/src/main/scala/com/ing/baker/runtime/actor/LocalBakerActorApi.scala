@@ -14,29 +14,27 @@ import net.ceedubs.ficus.Ficus._
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class LocalBakerActorProvider(config: Config, configuredEncryption: Encryption) extends BakerActorProvider {
+class LocalBakerActorApi(config: Config, override val configuredEncryption: Encryption)(implicit actorSystem: ActorSystem, materializer: Materializer) extends BakerActorApi {
 
   private val retentionCheckInterval = config.as[FiniteDuration]("baker.actor.retention-check-interval")
   val actorIdleTimeout: Option[FiniteDuration] = config.as[Option[FiniteDuration]]("baker.actor.idle-timeout")
 
-  override def createProcessIndexActor(interactionManager: InteractionManager, recipeManager: ActorRef)(
-    implicit actorSystem: ActorSystem, materializer: Materializer): ActorRef = {
-
-    actorSystem.actorOf(
-      ProcessIndex.props(actorIdleTimeout, Some(retentionCheckInterval), configuredEncryption, interactionManager, recipeManager))
-  }
-
-  override def createRecipeManagerActor()(implicit actorSystem: ActorSystem, materializer: Materializer): ActorRef = {
+  override val recipeManagerActor: ActorRef = {
     actorSystem.actorOf(RecipeManager.props())
   }
 
-  override def getIndex(actorRef: ActorRef)(implicit system: ActorSystem, timeout: FiniteDuration): Seq[ActorMetadata] = {
+  override val processIndexActor: ActorRef = {
+    actorSystem.actorOf(
+    ProcessIndex.props(actorIdleTimeout, Some(retentionCheckInterval), configuredEncryption, interactionManager, recipeManagerActor))
+  }
+
+  override def getIndex(implicit timeout: FiniteDuration): Seq[ActorMetadata] = {
 
     import akka.pattern.ask
-    import system.dispatcher
+    import actorSystem.dispatcher
     implicit val akkaTimeout: akka.util.Timeout = timeout
 
-    val future = actorRef.ask(GetIndex).mapTo[Index].map(_.entries)
+    val future = processIndexActor.ask(GetIndex).mapTo[Index].map(_.entries)
 
     Await.result(future, timeout)
   }

@@ -240,6 +240,16 @@ trait BakerRuntimeTestBase
     milliseconds
   }
 
+  def withActorSystem(customActorSystem: ActorSystem)(fn: ActorSystem => Unit) = {
+
+    try {
+      fn(customActorSystem)
+    }
+    finally {
+      TestKit.shutdownActorSystem(customActorSystem)
+    }
+  }
+
   protected def resetMocks(): Unit =
     reset(testInteractionOneMock,
       testInteractionTwoMock,

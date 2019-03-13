@@ -1,5 +1,6 @@
 package com.ing.baker.runtime.core
 
+import akka.actor.ActorSystem
 import com.ing.baker._
 import com.ing.baker.compiler.RecipeCompiler
 import com.ing.baker.recipe.TestRecipe._
@@ -127,17 +128,17 @@ class BakerSetupSpec extends BakerRuntimeTestBase {
         } should have('message ("Ingredient 'initialIngredient' for interaction 'InteractionOne' is not provided by any event or interaction"))
       }
 
-      "a recipe does not provide an implementation for an interaction" in {
+      "a recipe does not provide an implementation for an interaction" in withActorSystem(ActorSystem("MissingImplementation")) { actorSystem =>
+
+        val baker = new Baker()(actorSystem)
 
         val recipe = Recipe("MissingImplementation")
           .withInteraction(interactionOne)
           .withSensoryEvent(initialEvent)
 
-        val baker = new Baker()
-
         intercept[IllegalStateException] {
           baker.addRecipe(RecipeCompiler.compileRecipe(recipe))
-        } should have('message ("No implementation provided for interaction: InteractionOne"))
+        } should have('message ("Missing interaction implementations: InteractionOne"))
       }
 
       // TODO uncheck ignore when fixed
@@ -153,7 +154,7 @@ class BakerSetupSpec extends BakerRuntimeTestBase {
 
         intercept[IllegalStateException] {
           baker.addRecipe(RecipeCompiler.compileRecipe(recipe))
-        } should have('message ("No implementation provided for interaction: InteractionOne"))
+        } should have('message ("Missing interaction implementations: InteractionOne"))
       }
     }
   }

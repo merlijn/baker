@@ -1,5 +1,6 @@
 package com.ing.baker.runtime.core
 
+import akka.actor.ActorSystem
 import akka.persistence.inmemory.extension.{InMemoryJournalStorage, StorageExtension}
 import akka.testkit.TestProbe
 import com.ing.baker._
@@ -36,7 +37,8 @@ class BakerInquireSpec extends BakerRuntimeTestBase {
     }
 
     "return all recipes if asked" in {
-      val (baker, recipeId) = setupBakerWithRecipe("returnAllRecipes", false)
+      // Note, this requires a new actor system since all the state of baker is there
+      val (baker, recipeId) = setupBakerWithRecipe("returnAllRecipes", false)(ActorSystem())
       val recipeId2 = baker.addRecipe(RecipeCompiler.compileRecipe(getRecipe("returnAllRecipes2")))
       val recipes: Map[String, RecipeInformation] = baker.getAllRecipes()
       recipes.size shouldBe 2
@@ -54,7 +56,8 @@ class BakerInquireSpec extends BakerRuntimeTestBase {
     }
 
     "return no errors of all recipes if none contain errors if asked" in {
-      val (baker, recipeId) = setupBakerWithRecipe("returnHealthAllRecipe", false)
+      // Note, this requires a new actor system since all the state of baker is there
+      val (baker, recipeId) = setupBakerWithRecipe("returnHealthAllRecipe", false)(ActorSystem())
       val recipeId2 = baker.addRecipe(RecipeCompiler.compileRecipe(getRecipe("returnHealthAllRecipe2")))
       val recipeInformations: Map[String, RecipeInformation] = baker.getAllRecipes()
       recipeInformations.size shouldBe 2

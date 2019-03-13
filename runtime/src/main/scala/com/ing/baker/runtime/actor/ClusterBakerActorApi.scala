@@ -8,7 +8,7 @@ import akka.cluster.singleton.{ClusterSingletonManager, ClusterSingletonManagerS
 import akka.stream.Materializer
 import akka.util.Timeout
 import com.ing.baker.il.sha256HashCode
-import com.ing.baker.runtime.actor.ClusterBakerActorProvider._
+import com.ing.baker.runtime.actor.ClusterBakerActorApi._
 import com.ing.baker.runtime.actor.process_index.ProcessIndex.ActorMetadata
 import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol._
 import com.ing.baker.runtime.actor.process_index._
@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory
 import scala.concurrent.duration._
 import scala.concurrent.{Await, TimeoutException}
 
-object ClusterBakerActorProvider {
+object ClusterBakerActorApi {
 
   case class GetShardIndex(entityId: String) extends BakerProtoMessage
 
@@ -54,24 +54,13 @@ object ClusterBakerActorProvider {
   val recipeManagerName = "RecipeManager"
 }
 
-class ClusterBakerActorProvider(config: Config, configuredEncryption: Encryption) extends BakerActorProvider {
+class ClusterBakerActorApi(config: Config, override val configuredEncryption: Encryption)(implicit actorSystem: ActorSystem, materializer: Materializer) extends BakerActorApi {
 
   private val nrOfShards = config.as[Int]("baker.actor.cluster.nr-of-shards")
   private val retentionCheckInterval = config.as[FiniteDuration]("baker.actor.retention-check-interval")
   private val actorIdleTimeout: Option[FiniteDuration] = config.as[Option[FiniteDuration]]("baker.actor.idle-timeout")
 
-  override def createProcessIndexActor(interactionManager: InteractionManager, recipeManager: ActorRef)(implicit actorSystem: ActorSystem, materializer: Materializer): ActorRef = {
-
-    ClusterSharding(actorSystem).start(
-      typeName = "ProcessIndexActor",
-      entityProps = ProcessIndex.props(actorIdleTimeout, Some(retentionCheckInterval), configuredEncryption, interactionManager, recipeManager),
-      settings = ClusterShardingSettings.create(actorSystem),
-      extractEntityId = ClusterBakerActorProvider.entityIdExtractor(nrOfShards),
-      extractShardId = ClusterBakerActorProvider.shardIdExtractor(nrOfShards)
-    )
-  }
-
-  override def createRecipeManagerActor()(implicit actorSystem: ActorSystem, materializer: Materializer): ActorRef = {
+  override val recipeManagerActor: ActorRef = {
 
     val singletonManagerProps = ClusterSingletonManager.props(
       RecipeManager.props(),
@@ -87,14 +76,25 @@ class ClusterBakerActorProvider(config: Config, configuredEncryption: Encryption
     actorSystem.actorOf(props = singletonProxyProps, name = "RecipeManagerProxy")
   }
 
-  def getIndex(actor: ActorRef)(implicit system: ActorSystem, timeout: FiniteDuration) = {
+  override val processIndexActor: ActorRef = {
+
+    ClusterSharding(actorSystem).start(
+      typeName = "ProcessIndexActor",
+      entityProps = ProcessIndex.props(actorIdleTimeout, Some(retentionCheckInterval), configuredEncryption, interactionManager, recipeManagerActor),
+      settings = ClusterShardingSettings.create(actorSystem),
+      extractEntityId = ClusterBakerActorApi.entityIdExtractor(nrOfShards),
+      extractShardId = ClusterBakerActorApi.shardIdExtractor(nrOfShards)
+    )
+  }
+
+  def getIndex(implicit timeout: FiniteDuration) = {
 
     import akka.pattern.ask
-    import system.dispatcher
+    import actorSystem.dispatcher
     implicit val akkaTimeout: Timeout = timeout
 
-    val futures = (0 to nrOfShards).map { shard => actor.ask(GetShardIndex(s"index-$shard")).mapTo[Index].map(_.entries) }
-    val collected: Seq[ActorMetadata] = Util.collectFuturesWithin(futures, timeout, system.scheduler).flatten
+    val futures = (0 to nrOfShards).map { shard => processIndexActor.ask(GetShardIndex(s"index-$shard")).mapTo[Index].map(_.entries) }
+    val collected: Seq[ActorMetadata] = Util.collectFuturesWithin(futures, timeout, actorSystem.scheduler).flatten
 
     collected
   }

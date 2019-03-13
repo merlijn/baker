@@ -3,7 +3,7 @@ package com.ing.baker.runtime.actor.serialization.modules
 import java.util.concurrent.TimeUnit
 
 import akka.stream.SourceRef
-import com.ing.baker.runtime.actor.ClusterBakerActorProvider.GetShardIndex
+import com.ing.baker.runtime.actor.ClusterBakerActorApi.GetShardIndex
 import com.ing.baker.runtime.actor.process_index.ProcessIndex.{Active, Deleted, ProcessStatus}
 import com.ing.baker.runtime.actor.process_index.{ProcessIndex, ProcessIndexProtocol => protocol, protobuf}
 import com.ing.baker.runtime.actor.protobuf.RuntimeEvent

@@ -7,7 +7,7 @@
 - Removed EventListener interface, use annotated event listener instead
 - Removed akka cluster booting in Baker, use akka's cluster bootstrap and it's JoinDecider instead
 - Removed custom graceful shutdown since it duplicates akka's coordinated shutdown
-- Decide cluster or local setup based on the akka.actor.provider configuration
+- Removed joda time depedency from types module
 - Removed seperate java runtime api (JBaker)
 
 - Renames:
@@ -16,8 +16,10 @@
    SensoryEventStatus.Received -> SensoryEventStatus.OK
    Baker.processEvent          -> Baker.fireEvent
 
+- Decide cluster or local setup based on the akka.actor.provider configuration
 - Auto detect interaction output (no more @FiresEvent(oneOf = ... )
 - Simplify the DSL module, merged scaladsl & javadsl, removed common
+- Optionally allow adding recipes with missing implementations
 
 
 # 2.0.4
