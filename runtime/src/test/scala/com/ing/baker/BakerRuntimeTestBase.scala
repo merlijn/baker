@@ -120,7 +120,7 @@ trait BakerRuntimeTestBase
                                    snapshotsPath: String = "target/snapshots"): Config =
     ConfigFactory.parseString(
       s"""
-         |include "baker.conf"
+         |
          |
          |akka {
          |
@@ -197,6 +197,7 @@ trait BakerRuntimeTestBase
     */
   protected def setupBakerWithRecipe(recipeName: String, appendUUIDToTheRecipeName: Boolean = true)
                                     (implicit actorSystem: ActorSystem): (Baker, String) = {
+
     val newRecipeName = if (appendUUIDToTheRecipeName) s"$recipeName-${UUID.randomUUID().toString}" else recipeName
     val recipe = getRecipe(newRecipeName)
     setupMockResponse()

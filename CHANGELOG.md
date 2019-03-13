@@ -20,7 +20,7 @@
 - Auto detect interaction output (no more @FiresEvent(oneOf = ... )
 - Simplify the DSL module, merged scaladsl & javadsl, removed common
 - Optionally allow adding recipes with missing implementations
-
+- Do not require an include of baker.conf
 
 # 2.0.4
 

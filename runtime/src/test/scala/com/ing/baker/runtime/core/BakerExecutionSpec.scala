@@ -967,7 +967,8 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val nrOfProcesses = 200
 
-      try {
+      withActorSystem(indexTestSystem) { _ =>
+
         val (baker, recipeId) = setupBakerWithRecipe("IndexTestCluster")(indexTestSystem)
 
         val processIds = (0 to nrOfProcesses).map(_ => java.util.UUID.randomUUID().toString).toSet
@@ -975,9 +976,6 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
         processIds.foreach(id => baker.createProcess(recipeId, id))
 
         baker.getIndex().map(_.processId) shouldBe processIds
-      }
-      finally {
-        TestKit.shutdownActorSystem(indexTestSystem)
       }
     }
 

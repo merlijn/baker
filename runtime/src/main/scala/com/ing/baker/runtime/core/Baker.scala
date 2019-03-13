@@ -32,6 +32,11 @@ import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 import scala.util.Try
 
+object Baker {
+
+  def apply(actorSystem: ActorSystem): Baker = new Baker()(actorSystem)
+}
+
 /**
   * The Baker is the component of the Baker library that runs one or multiples recipes.
   * For each recipe a new instance can be baked, sensory events can be send and state can be inquired upon
@@ -41,8 +46,6 @@ class Baker()(implicit val actorSystem: ActorSystem) {
   private val log = LoggerFactory.getLogger(classOf[Baker])
 
   private val config = actorSystem.settings.config
-  if (!config.as[Option[Boolean]]("baker.config-file-included").getOrElse(false))
-    throw new IllegalStateException("You must 'include baker.conf' in your application.conf")
 
   private val defaultCreateProcessTimeout = config.as[FiniteDuration]("baker.create-process-timeout")
   private val defaultProcessEventTimeout = config.as[FiniteDuration]("baker.process-event-timeout")
