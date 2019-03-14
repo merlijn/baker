@@ -249,15 +249,6 @@ class Baker()(implicit val actorSystem: ActorSystem) {
   def eventNames(processId: String, timeout: FiniteDuration = defaultInquireTimeout): List[String] =
     getProcessState(processId, timeout).eventNames
 
-  private def getEventsForRecipe(processId: String, compiledRecipe: CompiledRecipe): Source[(ProcessEvent, Long), NotUsed] = {
-    ProcessInstanceEventSourcing
-      .eventsForInstance[Place, Transition, ProcessState, ProcessEvent](compiledRecipe.name, processId, compiledRecipe.petriNet, bakerActorApi.configuredEncryption, readJournal, RecipeRuntime.recipeEventSourceFn)
-      .collect {
-        case (_, TransitionFiredEvent(_, _, _, _, time, _, _, event: ProcessEvent))
-          if event != null && compiledRecipe.allEvents.exists(e => e.name equals event.name) => (event, time)
-      }
-  }
-
   /**
     * Returns a stream of all events with their timestamps for a process.
     *
@@ -268,8 +259,14 @@ class Baker()(implicit val actorSystem: ActorSystem) {
 
     val futureResult = bakerActorApi.processIndexActor.ask(GetCompiledRecipe(processId))(defaultInquireTimeout)
 
-    Await.result(futureResult, defaultInquireTimeout) match {
-      case RecipeFound(compiledRecipe, _) => getEventsForRecipe(processId, compiledRecipe)
+    Source.fromFuture(futureResult).flatMapConcat {
+      case RecipeFound(compiledRecipe, _) =>
+        ProcessInstanceEventSourcing
+          .eventsForInstance[Place, Transition, ProcessState, ProcessEvent](compiledRecipe.name, processId, compiledRecipe.petriNet, bakerActorApi.configuredEncryption, readJournal, RecipeRuntime.recipeEventSourceFn)
+          .collect {
+            case (_, TransitionFiredEvent(_, _, _, _, time, _, _, event: ProcessEvent))
+             if event != null && compiledRecipe.allEvents.exists(e => e.name equals event.name) => (event, time)
+          }
       case ProcessDeleted(_)           => throw new ProcessDeletedException(s"Process $processId is deleted")
       case NoSuchProcess(_)            => throw new NoSuchProcessException(s"No process found for $processId")
       case msg @ _                     => throw new IllegalStateException(s"Received unexpected message of type: ${msg.getClass}")

@@ -20,18 +20,18 @@ object RecipeManager {
 
 class RecipeManager extends PersistentActor with ActorLogging {
 
-  val compiledRecipes: mutable.Map[String, (CompiledRecipe, Long)] = mutable.Map[String, (CompiledRecipe, Long)]()
+  val allRecipes: mutable.Map[String, (CompiledRecipe, Long)] = mutable.Map[String, (CompiledRecipe, Long)]()
 
-  private def hasCompiledRecipe(compiledRecipe: CompiledRecipe): Option[String] =
-    compiledRecipes.collectFirst { case (recipeId, (`compiledRecipe`, _)) =>  recipeId}
+  private def hasRecipe(recipe: CompiledRecipe): Option[String] =
+    allRecipes.collectFirst { case (recipeId, (`recipe`, _)) =>  recipeId}
 
   private def addRecipe(compiledRecipe: CompiledRecipe, timestamp: Long) =
-    compiledRecipes += (compiledRecipe.recipeId -> (compiledRecipe, timestamp))
+    allRecipes += (compiledRecipe.recipeId -> (compiledRecipe, timestamp))
 
 
   override def receiveCommand: Receive = {
     case AddRecipe(compiledRecipe) =>
-      val foundRecipe = hasCompiledRecipe(compiledRecipe)
+      val foundRecipe = hasRecipe(compiledRecipe)
       if (foundRecipe.isEmpty) {
         val timestamp = System.currentTimeMillis()
         persist(RecipeAdded(compiledRecipe, timestamp)) { _ =>
@@ -46,19 +46,19 @@ class RecipeManager extends PersistentActor with ActorLogging {
       }
 
     case GetRecipe(recipeId: String) =>
-      compiledRecipes.get(recipeId) match {
-        case Some((compiledRecipe, timestamp)) => sender() ! RecipeFound(compiledRecipe, timestamp)
+      allRecipes.get(recipeId) match {
+        case Some((recipe, timestamp)) => sender() ! RecipeFound(recipe, timestamp)
         case None => sender() ! NoRecipeFound(recipeId)
       }
 
     case GetAllRecipes =>
-      sender() ! AllRecipes(compiledRecipes.map {
-        case (recipeId, (compiledRecipe, timestamp)) => RecipeInformation(compiledRecipe, timestamp)
+      sender() ! AllRecipes(allRecipes.map {
+        case (recipeId, (recipe, timestamp)) => RecipeInformation(recipe, timestamp)
       }.toSeq)
   }
 
   override def receiveRecover: Receive = {
-    case RecipeAdded(compiledRecipe, timeStamp) => addRecipe(compiledRecipe, timeStamp)
+    case RecipeAdded(recipe, timeStamp) => addRecipe(recipe, timeStamp)
   }
 
   override def persistenceId: String = self.path.name

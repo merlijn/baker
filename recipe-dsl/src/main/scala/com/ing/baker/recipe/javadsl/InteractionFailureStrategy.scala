@@ -59,7 +59,7 @@ object InteractionFailureStrategy {
 
     def withFireRetryExhaustedEvent() = copy(fireRetryExhaustedEvent = Some(None))
 
-    def withFireRetryExhaustedEvent(fireRetryExhaustedEvent: Class[_]) = copy(fireRetryExhaustedEvent = Some(Some(fireRetryExhaustedEvent.getSimpleName)))
+    def withFireRetryExhaustedEvent(fireRetryExhaustedEvent: Class[_]) = copy(fireRetryExhaustedEvent = Some(Some(fireRetryExhaustedEvent.getName)))
 
     def withDeadline(duration: FiniteDuration) = copy(until = Some(UntilDeadline(duration)))
 
@@ -114,10 +114,10 @@ object InteractionFailureStrategy {
     }
   }
 
-  def FireEvent(): FireEventAfterFailure = FireEventAfterFailure(None)
+  def fireEvent(): FireEventAfterFailure = FireEventAfterFailure(None)
 
-  def FireEvent(eventClass: Class[_]): FireEventAfterFailure = FireEvent(eventClass.getSimpleName)
+  def fireEvent(eventClass: Class[_]): FireEventAfterFailure = fireEvent(eventClass.getSimpleName)
 
-  def FireEvent(eventName: String): FireEventAfterFailure =
+  def fireEvent(eventName: String): FireEventAfterFailure =
     FireEventAfterFailure(Some(eventName))
 }

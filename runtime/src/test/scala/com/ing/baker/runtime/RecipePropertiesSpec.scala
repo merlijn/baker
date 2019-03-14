@@ -1,4 +1,4 @@
-package com.ing.baker.pbt
+package com.ing.baker.runtime
 
 import java.io.{File, PrintWriter}
 

@@ -108,7 +108,7 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
       case other => other
     }
 
-  def getCompiledRecipe(recipeId: String): Option[CompiledRecipe] =
+  def getRecipe(recipeId: String): Option[CompiledRecipe] =
     getRecipeWithTimeStamp(recipeId).map { case (recipe, _) => recipe }
 
   def getOrCreateProcessActor(processId: String): ActorRef =
@@ -117,7 +117,7 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
   def createProcessActor(processId: String): ActorRef = {
     val recipeId = index(processId).recipeId
     val compiledRecipe: CompiledRecipe =
-      getCompiledRecipe(recipeId).getOrElse(throw new IllegalStateException(s"No recipe with recipe id '$recipeId' exists"))
+      getRecipe(recipeId).getOrElse(throw new IllegalStateException(s"No recipe with recipe id '$recipeId' exists"))
     createProcessActor(processId, compiledRecipe)
   }
 
@@ -142,7 +142,7 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
 
   def shouldDelete(meta: ActorMetadata): Boolean = {
     meta.processStatus != Deleted &&
-      getCompiledRecipe(meta.recipeId)
+      getRecipe(meta.recipeId)
         .flatMap(_.retentionPeriod)
         .exists { p => meta.createdDateTime + p.toMillis < System.currentTimeMillis() }
   }
@@ -163,7 +163,7 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
   def getInteractionJob(processId: String, interactionName: String, processActor: ActorRef): OptionT[Future, (InteractionTransition, Id)] = {
     // we find which job correlates with the interaction
     for {
-      recipe     <- OptionT.fromOption(getCompiledRecipe(index(processId).recipeId))
+      recipe     <- OptionT.fromOption(getRecipe(index(processId).recipeId))
       transition <- OptionT.fromOption(recipe.interactionTransitions.find(_.name == interactionName))
       state      <- OptionT(processActor.ask(GetState)(processInquireTimeout).mapTo[InstanceState].map(Option(_)))
       jobId      <- OptionT.fromOption(state.jobs.collectFirst { case (jobId, job) if job.transitionId == transition.id => jobId }  )
@@ -205,7 +205,7 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
         case None if !index.contains(processId) =>
 
           // First check if the recipe exists
-          getCompiledRecipe(recipeId) match {
+          getRecipe(recipeId) match {
             case Some(compiledRecipe) =>
 
               val createdTime = System.currentTimeMillis()
@@ -276,9 +276,7 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
         case _ =>
           // here we activate the process (if required) and forward the event
           withActiveProcess(processId) { actorRef =>
-            getCompiledRecipe(index(processId).recipeId).foreach { compiledRecipe: CompiledRecipe =>
-              forwardEvent(actorRef, compiledRecipe)
-            }
+            getRecipe(index(processId).recipeId).foreach { recipe => forwardEvent(actorRef, recipe) }
         }
       }
 
@@ -320,7 +318,7 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
             RecipeRuntime.validateInteractionOutput(interaction, Some(event)) match {
 
               case None        =>
-                val petriNet = getCompiledRecipe(index(processId).recipeId).get.petriNet
+                val petriNet = getRecipe(index(processId).recipeId).get.petriNet
                 val producedMarking = RecipeRuntime.createProducedMarking(petriNet.outMarking(interaction), Some(event))
                 val transformedEvent = RecipeRuntime.transformInteractionEvent(interaction, event)
 

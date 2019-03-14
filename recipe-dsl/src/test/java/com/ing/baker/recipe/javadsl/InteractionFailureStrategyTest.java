@@ -49,12 +49,12 @@ public class InteractionFailureStrategyTest {
     public void shouldSetupFiresEventWithClass() {
 
         InteractionFailureStrategy.FireEventAfterFailure eventName =
-                InteractionFailureStrategy.FireEvent("Foo");
+                InteractionFailureStrategy.fireEvent("Foo");
 
         assertEquals(eventName.eventName(), Some.apply("Foo"));
 
         InteractionFailureStrategy.FireEventAfterFailure clazz =
-                InteractionFailureStrategy.FireEvent(ExampleEvent.class);
+                InteractionFailureStrategy.fireEvent(ExampleEvent.class);
 
         assertEquals(clazz.eventName(), Some.apply("ExampleEvent"));
     }

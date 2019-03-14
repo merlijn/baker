@@ -103,12 +103,13 @@ object RecipeRuntime {
 
   // function that (optionally) transforms the output event using the event output transformers
   def transformInteractionEvent(interaction: InteractionTransition, runtimeEvent: ProcessEvent): ProcessEvent = {
-    interaction.eventOutputTransformers
-      .find { case (eventName, _) => runtimeEvent.name.equals(eventName) } match {
-      case Some((_, eventOutputTransformer)) =>
+    interaction.eventOutputTransformers.get(runtimeEvent.name) match {
+      case Some(transfomer) =>
         ProcessEvent(
-          eventOutputTransformer.newEventName,
-          runtimeEvent.providedIngredients.map { case (name, value) => eventOutputTransformer.ingredientRenames.getOrElse(name, name) -> value })
+          transfomer.newEventName,
+          runtimeEvent.providedIngredients.map {
+            case (name, value) => transfomer.ingredientRenames.getOrElse(name, name) -> value
+          })
       case None => runtimeEvent
     }
   }
@@ -161,8 +162,8 @@ class RecipeRuntime(recipe: CompiledRecipe, interactionManager: InteractionManag
             case InteractionFailureStrategyOutcome.BlockTransition => BlockTransition
             case InteractionFailureStrategyOutcome.RetryWithDelay(delay) => RetryWithDelay(delay)
             case InteractionFailureStrategyOutcome.Continue(eventName) => {
-              val runtimeEvent = ProcessEvent(eventName, Seq.empty)
-              Continue(createProducedMarking(outMarking, Some(runtimeEvent)), runtimeEvent)
+              val event = ProcessEvent(eventName, Seq.empty)
+              Continue(createProducedMarking(outMarking, Some(event)), event)
             }
           }
 
