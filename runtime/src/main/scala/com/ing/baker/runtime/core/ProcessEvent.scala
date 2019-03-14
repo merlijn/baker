@@ -18,28 +18,26 @@ object ProcessEvent {
       case runtimeEvent: ProcessEvent => runtimeEvent
       case obj                        =>
         Converters.toValue(obj) match {
-          case RecordValue(entries) => ProcessEvent(obj.getClass.getSimpleName, entries.toSeq)
+          case RecordValue(entries) => ProcessEvent(obj.getClass.getSimpleName, entries)
           case other                => throw new IllegalArgumentException(s"Unexpected value: $other")
         }
     }
   }
+
+  def apply(name: String, providedIngredients: Seq[(String, Value)]): ProcessEvent =
+    ProcessEvent(name, providedIngredients.toMap)
 }
 
 case class ProcessEvent(name: String,
-                        providedIngredients: Seq[(String, Value)]) {
+                        providedIngredients: Map[String, Value]) {
 
-  /**
-    * Returns a scala.collection.immutable.Map of the ingredients provided by this event.
-    *
-    */
-  def providedIngredientsMap: Map[String, Value] = providedIngredients.toMap
 
   /**
     * Returns a java.util.Map of the ingredients provided by this event.
     *
     * @return a map of the provided ingredients.
     */
-  def getProvidedIngredients: java.util.Map[String, Value] = providedIngredientsMap.asJava
+  def getProvidedIngredients: java.util.Map[String, Value] = providedIngredients.asJava
 
   /**
     * This checks if the runtime event is an instance of a event type.
@@ -64,7 +62,7 @@ case class ProcessEvent(name: String,
     else
       // we check all the required ingredient types, additional ones are ignored
       eventType.ingredients.flatMap { ingredient =>
-        providedIngredientsMap.get(ingredient.name) match {
+        providedIngredients.get(ingredient.name) match {
           case None        =>
             Seq(s"no value was provided for ingredient '${ingredient.name}'")
           // we can only check the class since the type parameters are available on objects

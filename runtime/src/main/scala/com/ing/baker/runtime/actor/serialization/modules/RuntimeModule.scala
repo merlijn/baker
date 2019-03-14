@@ -14,7 +14,7 @@ class RuntimeModule extends ProtoEventAdapterModule {
       protobuf.RuntimeEvent(Some(e.name), ingredients)
 
     case e: core.ProcessState =>
-      val ingredients = writeIngredients(e.ingredients.toSeq, ctx)
+      val ingredients = writeIngredients(e.ingredients, ctx)
       protobuf.ProcessState(Some(e.processId), ingredients, e.eventNames)
   }
 
@@ -27,11 +27,11 @@ class RuntimeModule extends ProtoEventAdapterModule {
       core.ProcessState(id, readIngredients(ingredients, ctx).toMap, events.toList)
   }
 
-  private def writeIngredients(ingredients: Seq[(String, Value)], ctx: ProtoEventAdapter): Seq[protobuf.Ingredient] = {
+  private def writeIngredients(ingredients: Map[String, Value], ctx: ProtoEventAdapter): Seq[protobuf.Ingredient] = {
     ingredients.map { case (name, value) =>
       val serializedValue = ctx.toProto[protobuf.Value](value)
       protobuf.Ingredient(Some(name), None, Some(serializedValue))
-    }
+    }.toSeq
   }
 
   private def readIngredients(ingredients: Seq[protobuf.Ingredient], ctx: ProtoEventAdapter): Seq[(String, Value)] = {

@@ -10,9 +10,10 @@ import com.ing.baker.recipe.TestRecipe._
 import com.ing.baker.recipe.javadsl.{InteractionFailureStrategy, Recipe}
 import com.ing.baker.runtime.core.events.RejectReason._
 import com.ing.baker.runtime.core.events._
-import com.ing.baker.types.PrimitiveValue
+import com.ing.baker.types.{PrimitiveValue, Value}
 import org.slf4j.LoggerFactory
 
+import scala.collection.immutable.Map
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
@@ -102,20 +103,26 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
       baker.createProcess(recipeId, processId)
       baker.fireEvent(processId, InitialEvent(initialIngredientValue), Some("someId"))
 
+      val initialEvent = ProcessEvent("InitialEvent", Map("initialIngredient" -> PrimitiveValue(`initialIngredientValue`)))
+      val interactionOneEvent = ProcessEvent("InteractionOneSuccessful", Map("interactionOneIngredient" -> PrimitiveValue("interactionOneIngredient")))
+      val interactionTwoEvent = ProcessEvent("EventFromInteractionTwo", Map("interactionTwoIngredient" -> PrimitiveValue("interactionTwoIngredient")))
+      val interactionThreeEvent = ProcessEvent("InteractionThreeSuccessful", Map("interactionThreeIngredient" -> PrimitiveValue("interactionThreeIngredient")))
+      val interactionNineEvent = ProcessEvent("InteractionNineSuccessful", Map("interactionNineIngredient" -> PrimitiveValue("interactionNineIngredient")))
+
       // TODO check the order of the timestamps later
       expectMsgInAnyOrderPF(listenerProbe,
         { case msg@ProcessCreated(_, `recipeId`, `recipeName`, `processId`) => msg },
-        { case msg@EventReceived(_, _, _, `processId`, Some("someId"), ProcessEvent("InitialEvent", Seq(Tuple2("initialIngredient", PrimitiveValue(`initialIngredientValue`))))) => msg },
+        { case msg@EventReceived(_, _, _, `processId`, Some("someId"), `initialEvent`)  => msg },
         { case msg@InteractionStarted(_, _, _, `processId`, "InteractionNine") => msg },
         { case msg@InteractionStarted(_, _, _, `processId`, "InteractionOne") => msg },
         { case msg@InteractionStarted(_, _, _, `processId`, "InteractionTwo") => msg },
         { case msg@InteractionStarted(_, _, _, `processId`, "InteractionThree") => msg },
         { case msg@InteractionStarted(_, _, _, `processId`, "ProvidesNothingInteraction") => msg },
-        { case msg@InteractionCompleted(_, _, _, _, `processId`, "InteractionOne", Some(ProcessEvent("InteractionOneSuccessful", Seq(Tuple2("interactionOneIngredient",PrimitiveValue("interactionOneIngredient")))))) => msg },
-        { case msg@InteractionCompleted(_, _, _, _, `processId`, "InteractionTwo", Some(ProcessEvent("EventFromInteractionTwo", Seq(Tuple2("interactionTwoIngredient", PrimitiveValue("interactionTwoIngredient")))))) => msg },
-        { case msg@InteractionCompleted(_, _, _, _, `processId`, "InteractionThree", Some(ProcessEvent("InteractionThreeSuccessful", Seq(Tuple2("interactionThreeIngredient", PrimitiveValue("interactionThreeIngredient")))))) => msg },
+        { case msg@InteractionCompleted(_, _, _, _, `processId`, "InteractionOne", Some(`interactionOneEvent`)) => msg },
+        { case msg@InteractionCompleted(_, _, _, _, `processId`, "InteractionTwo", Some(`interactionTwoEvent`)) => msg },
+        { case msg@InteractionCompleted(_, _, _, _, `processId`, "InteractionThree", Some(`interactionThreeEvent`)) => msg },
         { case msg@InteractionCompleted(_, _, _, _, `processId`, "ProvidesNothingInteraction", None) => msg },
-        { case msg@InteractionCompleted(_, _, _, _, `processId`, "InteractionNine", Some(ProcessEvent("InteractionNineSuccessful", Seq(Tuple2("interactionNineIngredient", PrimitiveValue("interactionNineIngredient")))))) => msg }
+        { case msg@InteractionCompleted(_, _, _, _, `processId`, "InteractionNine", Some(`interactionNineEvent`)) => msg }
       )
 
       listenerProbe.expectNoMessage(eventReceiveTimeout)
@@ -135,8 +142,10 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
       // We used async function here because ThirdEvent is not part of the recipe and throws exception
       baker.fireEventAsync(processId, ThirdEvent(), Some("someId"))
 
+      val thirdEventValue = ProcessEvent("ThirdEvent", Map.empty[String, Value])
+
       listenerProbe.fishForSpecificMessage(eventReceiveTimeout) {
-        case msg@EventRejected(_, `processId`, Some("someId"), ProcessEvent("ThirdEvent", Seq()), InvalidEvent) => msg
+        case msg@EventRejected(_, `processId`, Some("someId"), `thirdEventValue`, InvalidEvent) => msg
       }
 
       listenerProbe.expectNoMessage(eventReceiveTimeout)
@@ -155,8 +164,10 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
       baker.fireEvent(processId, InitialEvent(initialIngredientValue), Some("someId"))
       baker.fireEvent(processId, InitialEvent(initialIngredientValue), Some("someId")) // Same correlationId cannot be used twice
 
+      val initialEvent = ProcessEvent("InitialEvent", Map("initialIngredient" -> PrimitiveValue(`initialIngredientValue`)))
+
       listenerProbe.fishForSpecificMessage(eventReceiveTimeout) {
-        case msg@EventRejected(_, `processId`, Some("someId"), ProcessEvent("InitialEvent", Seq(Tuple2("initialIngredient", PrimitiveValue(`initialIngredientValue`)))), AlreadyReceived) => msg
+        case msg@EventRejected(_, `processId`, Some("someId"), `initialEvent`, AlreadyReceived) => msg
       }
 
       listenerProbe.expectNoMessage(eventReceiveTimeout)
@@ -175,8 +186,10 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
       baker.fireEvent(processId, InitialEvent(initialIngredientValue))
       baker.fireEvent(processId, InitialEvent(initialIngredientValue)) // Firing limit is set to 1 in the recipe
 
+      val initialEvent = ProcessEvent("InitialEvent", Map("initialIngredient" -> PrimitiveValue(`initialIngredientValue`)))
+
       listenerProbe.fishForSpecificMessage(eventReceiveTimeout) {
-        case msg@EventRejected(_, `processId`, None, ProcessEvent("InitialEvent", Seq(Tuple2("initialIngredient", PrimitiveValue(`initialIngredientValue`)))), FiringLimitMet) => msg
+        case msg@EventRejected(_, `processId`, None, `initialEvent`, FiringLimitMet) => msg
       }
 
       listenerProbe.expectNoMessage(eventReceiveTimeout)
@@ -197,8 +210,10 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
 
       baker.fireEvent(processId, InitialEvent(initialIngredientValue), Some("someId"))
 
+      val initialEvent = ProcessEvent("InitialEvent", Map("initialIngredient" -> PrimitiveValue(`initialIngredientValue`)))
+
       listenerProbe.fishForSpecificMessage(eventReceiveTimeout) {
-        case msg@EventRejected(_, `processId`, Some("someId"), ProcessEvent("InitialEvent", Seq(Tuple2("initialIngredient", PrimitiveValue(`initialIngredientValue`)))), ReceivePeriodExpired) => msg
+        case msg@EventRejected(_, `processId`, Some("someId"), `initialEvent`, ReceivePeriodExpired) => msg
       }
 
       listenerProbe.expectNoMessage(eventReceiveTimeout)
@@ -218,8 +233,10 @@ class BakerEventsSpec extends BakerRuntimeTestBase {
       // use a different processId and use async function because the sync version throws NoSuchProcessException
       baker.fireEventAsync(processId, InitialEvent(initialIngredientValue), Some("someId"))
 
+      val initialEvent = ProcessEvent("InitialEvent", Map("initialIngredient" -> PrimitiveValue(`initialIngredientValue`)))
+
       listenerProbe.fishForSpecificMessage(eventReceiveTimeout) {
-        case msg@EventRejected(_, `processId`, Some("someId"), ProcessEvent("InitialEvent", Seq(Tuple2("initialIngredient", PrimitiveValue(`initialIngredientValue`)))), NoSuchProcess) => msg
+        case msg@EventRejected(_, `processId`, Some("someId"), `initialEvent`, NoSuchProcess) => msg
       }
 
       listenerProbe.expectNoMessage(eventReceiveTimeout)

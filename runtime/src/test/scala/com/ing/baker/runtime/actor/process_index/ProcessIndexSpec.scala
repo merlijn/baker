@@ -175,7 +175,7 @@ class ProcessIndexSpec extends TestKit(ActorSystem("ProcessIndexSpec", ProcessIn
 
       petriNetActorProbe.expectMsg(initializeMsg)
 
-      val event = new ProcessEvent("Event", Seq.empty)
+      val event = new ProcessEvent("Event", Map.empty)
 
       actorIndex ! FireEvent(processId, event, None, true, 1 seconds)
 
@@ -199,7 +199,7 @@ class ProcessIndexSpec extends TestKit(ActorSystem("ProcessIndexSpec", ProcessIn
       val transitions: Set[Transition] = Set(EventTransition(eventType, true, None))
       when(petrinetMock.transitions).thenReturn(transitions)
 
-      val event = new ProcessEvent("Event", Seq.empty)
+      val event = new ProcessEvent("Event", Map.empty)
 
       actorIndex ! FireEvent(processId, event, None, true, 1 seconds)
 
@@ -229,7 +229,7 @@ class ProcessIndexSpec extends TestKit(ActorSystem("ProcessIndexSpec", ProcessIn
 
       petriNetActorProbe.expectMsg(initializeMsg)
 
-      val event = new ProcessEvent("Event", Seq.empty)
+      val event = new ProcessEvent("Event", Map.empty)
 
       actorIndex ! FireEvent(processId, event, None, true, 1 seconds)
 
@@ -262,7 +262,7 @@ class ProcessIndexSpec extends TestKit(ActorSystem("ProcessIndexSpec", ProcessIn
 
       petriNetActorProbe.expectMsg(initializeMsg)
 
-      val event = new ProcessEvent("Event", Seq.empty)
+      val event = new ProcessEvent("Event", Map.empty)
 
       actorIndex ! FireEvent(processId, event, None, true, 1 seconds)
 
@@ -296,7 +296,7 @@ class ProcessIndexSpec extends TestKit(ActorSystem("ProcessIndexSpec", ProcessIn
 
       petriNetActorProbe.expectMsg(initializeMsg)
 
-      val event = new ProcessEvent("Event", Seq.empty)
+      val event = new ProcessEvent("Event", Map.empty)
 
       actorIndex ! FireEvent(processId, event, None, true, 1 seconds)
 
