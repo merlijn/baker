@@ -39,7 +39,7 @@ object ProcessInstanceProtocol {
    * Command to fire a specific transition with input.
    */
   case class FireTransition(
-    transitionId: Long,
+    transitionId: Id,
     input: Any,
     correlationId: Option[String] = None) extends Command
 
@@ -49,7 +49,7 @@ object ProcessInstanceProtocol {
     * @param jobId The id of the job.
     * @param failureStrategy The new failure strategy
     */
-  case class OverrideExceptionStrategy(jobId: Long, failureStrategy: ExceptionStrategy) extends Command
+  case class OverrideExceptionStrategy(jobId: Id, failureStrategy: ExceptionStrategy) extends Command
 
   /**
    * A common trait for all responses coming from a petri net instance.
@@ -162,7 +162,7 @@ object ProcessInstanceProtocol {
    */
   case class JobState(
       id: Long,
-      transitionId: Long,
+      transitionId: Id,
       consumedMarking: Marking[Id],
       input: Any,
       exceptionState: Option[ExceptionState]) {

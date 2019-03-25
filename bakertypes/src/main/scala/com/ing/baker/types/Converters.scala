@@ -40,11 +40,11 @@ object Converters {
     }.toMap[Class[_], TypeModule]
   }
 
-  val defaultTypeConverter = new TypeAdapter(loadDefaultModulesFromConfig())
+  val defaultTypeAdapter = new TypeAdapter(loadDefaultModulesFromConfig())
 
   def readJavaType[T : TypeTag]: Type = readJavaType(createJavaType(mirror.typeOf[T]))
 
-  def readJavaType(javaType: java.lang.reflect.Type): Type = defaultTypeConverter.readType(javaType)
+  def readJavaType(javaType: java.lang.reflect.Type): Type = defaultTypeAdapter.readType(javaType)
 
   /**
     * Attempts to convert a java object to a value.
@@ -52,7 +52,7 @@ object Converters {
     * @param obj The java object
     * @return a Value
     */
-  def toValue(obj: Any): Value = defaultTypeConverter.fromJava(obj)
+  def toValue(obj: Any): Value = defaultTypeAdapter.fromJava(obj)
 
   /**
     * Attempts to convert a value to a desired java type.
@@ -63,7 +63,7 @@ object Converters {
     * @return An instance of the java type.
     */
   @throws[IllegalArgumentException]("If failing to convert to the desired java type")
-  def toJava(value: Value, javaType: java.lang.reflect.Type): Any = defaultTypeConverter.toJava(value, javaType)
+  def toJava(value: Value, javaType: java.lang.reflect.Type): Any = defaultTypeAdapter.toJava(value, javaType)
 
   /**
     * Attempts to convert a value to a desired java type.

@@ -51,15 +51,6 @@ object Util {
 
   private val sequenceTimeoutExtra = 10 seconds
 
-  /**
-    * Returns a future that returns a default value after a specified timeout.
-
-    */
-  def futureWithTimeout[T](future: Future[T], timeout: FiniteDuration, default: T, scheduler: akka.actor.Scheduler)(implicit ec: ExecutionContext): Future[T] = {
-    val timeoutFuture = akka.pattern.after(timeout, scheduler)(Future.successful(default))
-    Future.firstCompletedOf(Seq(future, timeoutFuture))
-  }
-
   def collectFuturesWithin[T, M[X] <: scala.TraversableOnce[X]](futures: M[Future[T]], timeout: FiniteDuration, scheduler: akka.actor.Scheduler)(implicit ec: ExecutionContext): Seq[T] = {
 
     val size = futures.size
