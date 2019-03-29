@@ -246,7 +246,7 @@ object ProtoEventAdapterSpec {
       state <- instanceStateGen
       newJobs <- Gen.listOf(jobIdGen).map(_.toSet)
       output <- Runtime.runtimeEventGen
-    } yield TransitionFired(jobId, transitionId, correlationId, consumed, produced, state, newJobs, output)
+    } yield TransitionFired(jobId, transitionId, correlationId, consumed, produced, newJobs, output)
 
     val transitionFailedGen = for {
       jobId <- jobIdGen

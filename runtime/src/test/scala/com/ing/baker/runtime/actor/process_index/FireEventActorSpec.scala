@@ -54,9 +54,9 @@ class FireEventActorSpec extends TestKit(ActorSystem("ProcessApiSpec", FireEvent
 
       processProbe.expectMsgPF() { case FireTransition(_, _, _) => }
 
-      processProbe.reply(TransitionFired(1, 1, None, Map.empty, Map.empty, null, Set(2, 3), null))
-      processProbe.reply(TransitionFired(2, 2, None, Map.empty, Map.empty, null, Set.empty, null))
-      processProbe.reply(TransitionFired(3, 3, None, Map.empty, Map.empty, null, Set.empty, null))
+      processProbe.reply(TransitionFired(1, 1, None, Map.empty, Map.empty, Set(2, 3), null))
+      processProbe.reply(TransitionFired(2, 2, None, Map.empty, Map.empty, Set.empty, null))
+      processProbe.reply(TransitionFired(3, 3, None, Map.empty, Map.empty, Set.empty, null))
 
       runSource.request(3).expectNext(1, 2, 3)
       runSource.expectComplete()
@@ -74,9 +74,9 @@ class FireEventActorSpec extends TestKit(ActorSystem("ProcessApiSpec", FireEvent
 
       processProbe.expectMsgType[FireTransition]
 
-      processProbe.reply(TransitionFired(1, 1, None, Map.empty, Map.empty, null, Set(2, 3), null))
+      processProbe.reply(TransitionFired(1, 1, None, Map.empty, Map.empty, Set(2, 3), null))
       processProbe.reply(TransitionFailed(2, 2, None, Map.empty, null, "", ProcessInstanceProtocol.ExceptionStrategy.BlockTransition))
-      processProbe.reply(TransitionFired(3, 3, None, Map.empty, Map.empty, null, Set.empty, null))
+      processProbe.reply(TransitionFired(3, 3, None, Map.empty, Map.empty, Set.empty, null))
 
       runSource.request(3).expectNext(1, 2, 3)
       runSource.expectComplete()

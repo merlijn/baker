@@ -139,7 +139,7 @@ message TransitionFiredMessage {
     optional string correlationId = 3;
     repeated MarkingData consumed = 4;
     repeated MarkingData produced = 5;
-    optional InstanceState state = 6;
+//    optional InstanceState state = 6; DO NOT REUSE THIS IDENTIFIER
     repeated int64 newJobsIds = 7;
     optional SerializedData output = 8;
 }
