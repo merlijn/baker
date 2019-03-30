@@ -191,18 +191,27 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     */
   def fireEventAsync(processId: String, event: Any, correlationId: Option[String] = None, timeout: FiniteDuration = defaultProcessEventTimeout): SensoryEventResponse = {
 
+    val source = fireEventStream(processId, event, correlationId, timeout)
+
+    new SensoryEventResponse(processId, source)
+  }
+
+  /**
+    * Notifies Baker that an event has happened.
+    *
+    * Returns a source (stream) of response messages, it is the responsibility of the user to run the source and collect some result.
+    */
+  def fireEventStream(processId: String, event: Any, correlationId: Option[String], timeout: FiniteDuration): Source[Any, NotUsed] = {
     // transforms the given object into a RuntimeEvent instance
     val runtimeEvent: ProcessEvent = ProcessEvent.of(event)
 
-    // sends the ProcessEvent command to the actor and retrieves a Source (stream) of responses.
-    val response: Future[SourceRef[Any]] = bakerActorApi.processIndexActor
+    // sends the ProcessEvent command to the actor and retrieves future response.
+    val response: Future[FireEventResponse] = bakerActorApi.processIndexActor
       .ask(ProcessIndexProtocol.FireEvent(processId, runtimeEvent, correlationId, true, timeout))(timeout)
       .mapTo[FireEventResponse]
-      .map(_.sourceRef)
 
-    val source = Await.result(response, timeout)
-
-    new SensoryEventResponse(processId, source)
+    // obtain the source (stream) of responses
+    Source.fromFuture(response).flatMapConcat(_.sourceRef)
   }
 
   /**
