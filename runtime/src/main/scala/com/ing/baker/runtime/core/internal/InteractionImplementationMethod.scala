@@ -58,12 +58,12 @@ case class InteractionImplementationMethod(implementation: AnyRef) extends Inter
     }
   }.toSeq
 
-  override def execute(input: Seq[Value]): Option[ProcessEvent] =  {
+  override def execute(input: Seq[(String, Value)]): Option[ProcessEvent] =  {
 
     val invocationId = UUID.randomUUID().toString
 
     // translate the Value objects to the expected input types
-    val inputArgs: Seq[AnyRef] = input.zip(method.getGenericParameterTypes).map {
+    val inputArgs: Seq[AnyRef] = input.map(_._2).zip(method.getGenericParameterTypes).map {
       case (value, targetType) => value.as(targetType).asInstanceOf[AnyRef]
     }
 

@@ -20,10 +20,11 @@ trait InteractionImplementation {
   /**
     * Executes the interaction.
     *
+    * TODO return type should be async
     * TODO input could be map instead of sequence??
     *
     * @param input
     * @return
     */
-  def execute(input: Seq[Value]): Option[ProcessEvent]
+  def execute(input: Seq[(String, Value)]): Option[ProcessEvent]
 }

@@ -17,8 +17,14 @@ trait BakerActorApi extends Extension {
 
   val configuredEncryption: Encryption
 
+  /**
+    * The recipe manager actor.
+    */
   val recipeManagerActor: ActorRef
 
+  /**
+    * The process index actor.
+    */
   val processIndexActor: ActorRef
 
   def getIndex(implicit timeout: FiniteDuration): Seq[ActorMetadata]
