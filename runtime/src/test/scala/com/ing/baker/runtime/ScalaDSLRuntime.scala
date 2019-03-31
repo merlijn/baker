@@ -2,8 +2,8 @@ package com.ing.baker.runtime
 
 import com.ing.baker.recipe.javadsl.{Event, Ingredient, Interaction}
 import com.ing.baker.runtime.core.{InteractionImplementation, ProcessEvent}
-import com.ing.baker.types.Converters.toJava
-import com.ing.baker.types.{Converters, Type, Value}
+import com.ing.baker.types.Reflect.toJava
+import com.ing.baker.types.{Reflect, Type, Value}
 
 import scala.reflect.runtime.universe.TypeTag
 
@@ -44,7 +44,7 @@ object ScalaDSLRuntime {
   implicit class EventOps(e: Event) {
     def instance(values: Any*): ProcessEvent = {
 
-      val providedIngredients: Seq[(String, Value)] =  e.providedIngredients.map(_.name).zip(values.toSeq.map(Converters.toValue))
+      val providedIngredients: Seq[(String, Value)] =  e.providedIngredients.map(_.name).zip(values.toSeq.map(Reflect.toValue))
 
       ProcessEvent(e.name, providedIngredients)
     }
@@ -53,7 +53,7 @@ object ScalaDSLRuntime {
   implicit object IngredientMap {
 
     def apply(values: (Ingredient, Any)*): Map[String, Value] = {
-      values.map { case (key, value) => key.name -> Converters.toValue(value)
+      values.map { case (key, value) => key.name -> Reflect.toValue(value)
       }.toMap
     }
   }

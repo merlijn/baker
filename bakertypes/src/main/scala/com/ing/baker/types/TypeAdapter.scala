@@ -2,7 +2,7 @@ package com.ing.baker.types
 
 import java.lang.reflect.ParameterizedType
 
-import com.ing.baker.types.Converters.readJavaType
+import com.ing.baker.types.Reflect.readJavaType
 import com.ing.baker.types.modules._
 
 import scala.reflect.runtime.universe

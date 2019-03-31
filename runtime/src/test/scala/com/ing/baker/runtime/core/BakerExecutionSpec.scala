@@ -12,7 +12,7 @@ import com.ing.baker.recipe.TestRecipe._
 import com.ing.baker.recipe.javadsl.InteractionFailureStrategy.FireEventAfterFailure
 import com.ing.baker.recipe.javadsl.{InteractionFailureStrategy, Recipe}
 import com.ing.baker.runtime.core.events.BakerEvent
-import com.ing.baker.types.Converters
+import com.ing.baker.types.Reflect
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
@@ -913,7 +913,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
         ProcessEvent.of(InitialEvent(initialIngredientValue)),
         ProcessEvent.of(InteractionNineSuccessful(interactionNineIngredientValue)),
         ProcessEvent.of(EventFromInteractionTwo(interactionTwoIngredientValue)),
-        ProcessEvent("InteractionOneSuccessful", Seq("interactionOneIngredient" -> Converters.toValue(interactionOneIngredientValue))),
+        ProcessEvent("InteractionOneSuccessful", Seq("interactionOneIngredient" -> Reflect.toValue(interactionOneIngredientValue))),
         ProcessEvent.of(InteractionThreeSuccessful(interactionThreeIngredientValue))
       )
 
@@ -925,7 +925,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
         ProcessEvent.of(InitialEvent(initialIngredientValue)),
         ProcessEvent.of(EventFromInteractionTwo(interactionTwoIngredientValue)),
         ProcessEvent("SecondEvent", Seq.empty),
-        ProcessEvent("InteractionOneSuccessful", Seq("interactionOneIngredient" -> Converters.toValue(interactionOneIngredientValue))),
+        ProcessEvent("InteractionOneSuccessful", Seq("interactionOneIngredient" -> Reflect.toValue(interactionOneIngredientValue))),
         ProcessEvent.of(InteractionNineSuccessful(interactionNineIngredientValue)),
         ProcessEvent.of(InteractionThreeSuccessful(interactionThreeIngredientValue)),
         ProcessEvent.of(InteractionFourSuccessful(interactionFourIngredientValue))

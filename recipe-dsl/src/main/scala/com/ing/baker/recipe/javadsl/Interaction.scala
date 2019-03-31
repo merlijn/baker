@@ -4,7 +4,7 @@ import java.lang.reflect.Method
 
 import com.ing.baker.recipe.javadsl.ReflectionHelpers._
 import com.ing.baker.recipe.{annotations, javadsl}
-import com.ing.baker.types.Converters
+import com.ing.baker.types.Reflect
 import org.reflections.Reflections
 
 import scala.annotation.varargs
@@ -181,7 +181,7 @@ case class Interaction private(
     addPredefinedIngredient(newPredefinedIngredients.asScala.toMap)
 
   private def addPredefinedIngredient(params: Map[String, AnyRef]): Interaction =
-    copy(predefinedIngredients = predefinedIngredients ++ params.map{case (key, value) => key -> Converters.toValue(value)})
+    copy(predefinedIngredients = predefinedIngredients ++ params.map{case (key, value) => key -> Reflect.toValue(value)})
 
   /**
     * This renames a input ingredient
@@ -261,7 +261,7 @@ case class Interaction private(
     withPredefinedIngredients(values.toMap)
 
   def withPredefinedIngredients(data: Map[String, Any]): Interaction =
-    copy(predefinedIngredients = predefinedIngredients ++ data.map{case (key, value) => key -> Converters.toValue(value)})
+    copy(predefinedIngredients = predefinedIngredients ++ data.map{case (key, value) => key -> Reflect.toValue(value)})
 
   def withOverriddenIngredientName(oldIngredient: String,
                                    newIngredient: String): Interaction =

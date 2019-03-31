@@ -3,8 +3,8 @@ package com.ing.baker.types.modules
 import java.lang
 
 import com.ing.baker.types
-import com.ing.baker.types.Converters
-import com.ing.baker.types.Converters.readJavaType
+import com.ing.baker.types.Reflect
+import com.ing.baker.types.Reflect.readJavaType
 import com.ing.baker.types.modules.PrimitiveModuleSpec._
 import org.scalacheck.Gen
 import org.scalacheck.Prop.{BooleanOperators, forAll}
@@ -64,12 +64,12 @@ class PrimitiveModuleSpec extends WordSpecLike with Matchers with Checkers {
 
       def checkType[T : TypeTag](gen: Gen[T]) = {
 
-        val parsedType = Converters.readJavaType[T]
+        val parsedType = Reflect.readJavaType[T]
 
         val property = forAll(gen) { original =>
 
-          val value = Converters.toValue(original)
-          val parsed = Converters.toJava[T](value)
+          val value = Reflect.toValue(original)
+          val parsed = Reflect.toJava[T](value)
 
           value.isInstanceOf(parsedType) :| s"$value is not an instance of $parsedType" &&
           parsed.equals(original) :| s"$value != $parsed"

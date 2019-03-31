@@ -11,7 +11,7 @@ import com.ing.baker.recipe.CaseClassIngredient
 import com.ing.baker.recipe.TestRecipe.{fireTwoEventsInteraction, _}
 import com.ing.baker.recipe.javadsl.Recipe
 import com.ing.baker.runtime.core.{Baker, ProcessEvent}
-import com.ing.baker.types.{Converters, Value}
+import com.ing.baker.types.{Reflect, Value}
 import com.typesafe.config.{Config, ConfigFactory}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -49,7 +49,7 @@ trait BakerRuntimeTestBase
   protected val errorMessage = "This is the error message"
 
   def ingredientMap(entries: (String, Any)*): Map[String, Value] =
-    entries.map { case (name, obj) => name -> Converters.toValue(obj) }.toMap
+    entries.map { case (name, obj) => name -> Reflect.toValue(obj) }.toMap
 
   def eventList(events: Any*): Seq[ProcessEvent]= events.map(e => ProcessEvent.of((e)))
 

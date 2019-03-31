@@ -1,7 +1,7 @@
 package com.ing.baker.runtime.core
 
 import com.ing.baker.il.EventDescriptor
-import com.ing.baker.types.{Converters, NullValue, RecordValue, Value}
+import com.ing.baker.types.{Reflect, NullValue, RecordValue, Value}
 
 import scala.collection.JavaConverters._
 
@@ -17,7 +17,7 @@ object ProcessEvent {
     event match {
       case runtimeEvent: ProcessEvent => runtimeEvent
       case obj                        =>
-        Converters.toValue(obj) match {
+        Reflect.toValue(obj) match {
           case RecordValue(entries) => ProcessEvent(obj.getClass.getSimpleName, entries)
           case other                => throw new IllegalArgumentException(s"Unexpected value: $other")
         }

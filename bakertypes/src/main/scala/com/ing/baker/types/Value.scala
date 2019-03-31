@@ -90,7 +90,7 @@ sealed trait Value extends Serializable {
     * @param javaType The java type
     * @return An instance of the java class.
     */
-  def as(javaType: java.lang.reflect.Type): Any = Converters.toJava(this, javaType)
+  def as(javaType: java.lang.reflect.Type): Any = Reflect.toJava(this, javaType)
 
   /**
     * Attempts to adapt the value to the given java class.
@@ -99,7 +99,7 @@ sealed trait Value extends Serializable {
     * @tparam T The java class type
     * @return An instance of the java class.
     */
-  def as[T](clazz: Class[T]): T = Converters.toJava(this, clazz).asInstanceOf[T]
+  def as[T](clazz: Class[T]): T = Reflect.toJava(this, clazz).asInstanceOf[T]
 
   /**
     * Attempts to convert this value to a java.util.List with the given generic class type parameter.
@@ -169,9 +169,9 @@ sealed trait Value extends Serializable {
     * @tparam T The java type
     * @return An instance of the java class.
     */
-  def as[T : universe.TypeTag]: T = Converters.toJava[T](this)
+  def as[T : universe.TypeTag]: T = Reflect.toJava[T](this)
 
-  def equalsObject(obj: Any): Boolean = Try { equals(Converters.toValue(obj)) }.getOrElse(false)
+  def equalsObject(obj: Any): Boolean = Try { equals(Reflect.toValue(obj)) }.getOrElse(false)
 }
 
 /**

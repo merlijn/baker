@@ -3,7 +3,7 @@ package com.ing.baker.runtime.core.internal
 import java.util.UUID
 
 import com.ing.baker.runtime.core.{ProcessEvent, _}
-import com.ing.baker.types.{Converters, Type, Value}
+import com.ing.baker.types.{Reflect, Type, Value}
 import org.slf4j.LoggerFactory
 
 import scala.util.Try
@@ -52,7 +52,7 @@ case class InteractionImplementationMethod(implementation: AnyRef) extends Inter
     */
   override val inputTypes: Seq[Type] = method.getGenericParameterTypes.map { javaType =>
     try {
-      Converters.readJavaType(javaType)
+      Reflect.readJavaType(javaType)
     } catch {
       case e: Exception => throw new IllegalArgumentException(s"Unsupported parameter type for interaction implementation '$name'", e)
     }

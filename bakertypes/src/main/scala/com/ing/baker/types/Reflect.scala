@@ -7,7 +7,7 @@ import scala.collection.JavaConverters._
 import scala.reflect.runtime.universe
 import scala.reflect.runtime.universe.TypeTag
 
-object Converters {
+object Reflect {
 
   private val log = LoggerFactory.getLogger("com.ing.baker.types")
 

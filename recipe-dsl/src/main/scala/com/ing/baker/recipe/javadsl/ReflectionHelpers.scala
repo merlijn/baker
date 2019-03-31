@@ -4,7 +4,7 @@ import java.lang.annotation.Annotation
 import java.lang.reflect.{Method, Type}
 
 import com.ing.baker.recipe.annotations
-import com.ing.baker.types.Converters
+import com.ing.baker.types.Reflect
 import com.thoughtworks.paranamer.AnnotationParanamer
 
 object ReflectionHelpers {
@@ -41,7 +41,7 @@ object ReflectionHelpers {
 
   def parseType(javaType: java.lang.reflect.Type, errorMessage: String): com.ing.baker.types.Type = {
     try {
-      Converters.readJavaType(javaType)
+      Reflect.readJavaType(javaType)
     } catch {
       case e: Exception => throw new IllegalArgumentException(errorMessage, e)
     }

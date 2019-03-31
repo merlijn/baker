@@ -9,12 +9,12 @@ package object modules {
 
   def transitivityProperty[T : TypeTag](gen: Gen[T]): Prop = {
 
-    val parsedType = Converters.readJavaType[T]
+    val parsedType = Reflect.readJavaType[T]
 
     forAll(gen) { original =>
 
-      val value = Converters.toValue(original)
-      val parsed = Converters.toJava[T](value)
+      val value = Reflect.toValue(original)
+      val parsed = Reflect.toJava[T](value)
 
       value.isInstanceOf(parsedType) :| s"$value is not an instance of $parsedType" &&
         parsed.equals(original) :| s"$value != $parsed"
