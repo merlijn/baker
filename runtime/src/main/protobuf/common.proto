@@ -29,9 +29,9 @@ enum PrimitiveType {
     FLOAT_BIG = 18;
     CHAR_ARRAY = 17;
     BYTE_ARRAY = 22;
-    DATE = 23;
 
     // depcrecated but do not remove!
+    DATE = 23;
     BIG_INT_JAVA = 21;
     BIG_DECIMAL_JAVA = 19;
     DOUBLE_PRIMITIVE = 16;

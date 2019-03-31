@@ -4,7 +4,33 @@ import java.nio.charset.StandardCharsets
 import java.util
 
 import scala.reflect.runtime.universe
-import scala.util.Try
+import scala.util.{Random, Try}
+
+object Value {
+
+  def generate(t: Type): Value = t match {
+
+    case CharArray => PrimitiveValue("")
+    case Int32     => PrimitiveValue(Random.nextInt(Int.MaxValue))
+    case Int64     => PrimitiveValue(Random.nextInt(Int.MaxValue).toLong)
+    case Bool      => PrimitiveValue(Random.nextBoolean())
+    case OptionType(entryType) =>
+      if (Random.nextBoolean())
+        generate(entryType)
+      else
+        NullValue
+    case ListType(entryType) =>
+      val n = Random.nextInt(7) + 1
+      val entries = (0 to n).map(_ => generate(entryType))
+      ListValue(entries.toList)
+    case RecordType(fields) =>
+      val entries = fields.map {
+        case RecordField(name, fieldType) => name -> generate(fieldType)
+      }.toMap
+      RecordValue(entries)
+    case _ => throw new IllegalStateException("Unsupported type")
+  }
+}
 
 sealed trait Value extends Serializable {
 
@@ -12,7 +38,6 @@ sealed trait Value extends Serializable {
 
   def isInstanceOf(t: Type): Boolean = (t, this) match {
     case (_, NullValue)                                      => true
-    case (Date, PrimitiveValue(_: Long | _: java.lang.Long)) => true
     case (expected: PrimitiveType, PrimitiveValue(value))    => primitiveMappings.get(value.getClass) match {
       case None => false
       case Some(actual) => expected.isAssignableFrom(actual)
@@ -34,8 +59,6 @@ sealed trait Value extends Serializable {
   def validate(t: Type): Option[String] =  (t, this) match {
 
     case (_, NullValue)                  => None
-    case (Date, PrimitiveValue(_: Long | _: java.lang.Long)) => None
-    case (Date, PrimitiveValue(other))                       => Some(s"$other is not an instance of Date")
 
     case (expected: PrimitiveType, PrimitiveValue(value)) => primitiveMappings.get(value.getClass) match {
       case Some(actual) if expected.isAssignableFrom(actual) => None

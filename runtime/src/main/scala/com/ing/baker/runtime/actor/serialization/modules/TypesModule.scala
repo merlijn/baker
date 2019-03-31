@@ -26,7 +26,6 @@ class TypesModule extends ProtoEventAdapterModule {
     case types.FloatBig => createPrimitive(PrimitiveType.FLOAT_BIG)
     case types.IntBig => createPrimitive(PrimitiveType.INT_BIG)
     case types.ByteArray => createPrimitive(PrimitiveType.BYTE_ARRAY)
-    case types.Date => createPrimitive(PrimitiveType.DATE)
 
     case types.OptionType(entryType) =>
       val entryProto = ctx.toProto[protobuf.Type](entryType)
@@ -101,7 +100,7 @@ class TypesModule extends ProtoEventAdapterModule {
         case Primitive(INT_BIG) => types.IntBig
         case Primitive(BYTE_ARRAY) => types.ByteArray
         case Primitive(CHAR_ARRAY) => types.CharArray
-        case Primitive(DATE) => types.Date
+
 
         // deprecated fields
         case Primitive(INT) => types.Int32
@@ -111,12 +110,10 @@ class TypesModule extends ProtoEventAdapterModule {
         case Primitive(DOUBLE_PRIMITIVE) => types.Float64
         case Primitive(SHORT_PRIMITIVE) => types.Int16
         case Primitive(LONG_PRIMITIVE) => types.Int64
+        case Primitive(DATE) => types.Int64
         case Primitive(CHARACTER_PRIMITIVE) => types.Char
         case Primitive(BIG_DECIMAL_JAVA) => types.FloatBig
         case Primitive(BIG_INT_JAVA) => types.IntBig
-
-        case Primitive(JODA_LOCAL_DATE) => types.Date
-        case Primitive(JODA_LOCAL_DATETIME) => types.Date
 
         case Optional(OptionalType(Some(value))) => types.OptionType(ctx.toDomain[types.Type](value))
 

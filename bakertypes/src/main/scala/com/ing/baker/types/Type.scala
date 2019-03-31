@@ -14,17 +14,11 @@ sealed trait Type {
 
       case (a, b) if a == b => true
 
-      case (Bool, Bool) => true
-      case (Byte, Byte) => true
-      case (Char, Char) => true
-      case (Date, Date) => true
-      case (Int16, Int16) => true
-      case (Int32, Int32 | Int16) => true
-      case (Int64, Int64 | Int32 | Int16) => true
-      case (IntBig, IntBig | Int64 | Int32 | Int16) => true
-      case (Float32, Float32) => true
-      case (Float64, Float64 | Float32) => true
-      case (FloatBig, FloatBig | Float32 | Float64) => true
+      case (Int32, Int16) => true
+      case (Int64, Int32 | Int16) => true
+      case (IntBig, Int64 | Int32 | Int16) => true
+      case (Float64, Float32) => true
+      case (FloatBig, Float32 | Float64) => true
 
       case (OptionType(entryTypeA), OptionType(entryTypeB)) => entryTypeA.isAssignableFrom(entryTypeB)
 
@@ -130,13 +124,4 @@ case object ByteArray extends PrimitiveType
   * Character array
   */
 case object CharArray extends PrimitiveType
-
-/**
-  * Date is technically equal to Int64
-  *
-  * The definition we use is:
-  *
-  * A UTC date in the ISO-8601 calendar system with millisecond precision
-  */
-case object Date extends PrimitiveType
 

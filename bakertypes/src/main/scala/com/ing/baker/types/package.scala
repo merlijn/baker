@@ -18,7 +18,7 @@ package object types {
   def getBaseClass(javaType: java.lang.reflect.Type): Class[_] = javaType match {
     case c: Class[_] => c
     case t: ParameterizedType => getBaseClass(t.getRawType)
-    case t @ _ => throw new IllegalArgumentException(s"Unsupported type: $javaType")
+    case _ => throw new IllegalArgumentException(s"Unsupported type: $javaType")
   }
 
   def getTypeParameter(javaType: java.lang.reflect.Type, index: Int): java.lang.reflect.Type = {
@@ -46,13 +46,13 @@ package object types {
   val primitiveTypes: Set[Type] = Set(
     types.Bool,
     types.Byte,
-    types.Int16,
     types.Char,
+    types.Int16,
     types.Int32,
     types.Int64,
+    types.IntBig,
     types.Float32,
     types.Float64,
-    types.IntBig,
     types.FloatBig,
     types.ByteArray,
     types.CharArray)
