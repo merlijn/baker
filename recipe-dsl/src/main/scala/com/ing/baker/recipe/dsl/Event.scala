@@ -1,0 +1,30 @@
+package com.ing.baker.recipe.dsl
+
+import com.ing.baker.types.reflect.Reflect.mirror
+
+import scala.reflect.runtime.universe.TypeTag
+
+object Event {
+
+  def reflect[T : TypeTag]: Event = reflect(mirror.runtimeClass(mirror.typeOf[T]))
+
+  def reflect(eventClass: Class[_], maxFiringLimit: Option[Int] = None): Event = {
+    val name = eventClass.getSimpleName
+
+    val ingredients: Seq[Ingredient] = eventClass.getDeclaredFields
+      .filter(field => !field.isSynthetic)
+      .map(f => Ingredient(f.getName, ReflectionHelpers.parseType(f.getGenericType, s"Unsupported type for ingredient '${f.getName}' on event '${eventClass.getSimpleName}'")))
+      .toSeq
+
+    Event(name, ingredients, maxFiringLimit)
+  }
+}
+
+case class Event(name: String,
+                 providedIngredients: Seq[Ingredient] = Seq.empty,
+                 maxFiringLimit: Option[Int] = None) {
+
+  def withMaxFiringLimit(limit: Int): Event = copy(maxFiringLimit = Some(limit))
+
+  def withoutFiringLimit(): Event = copy(maxFiringLimit = None)
+}

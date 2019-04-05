@@ -2,11 +2,11 @@ package com.ing.baker.recipe
 
 import java.util.Optional
 
-import com.ing.baker.recipe.javadsl._
+import com.ing.baker.recipe.dsl._
 
 import scala.concurrent.duration._
 
-//By adding the javadsl Ingredient tag the object will be serialized by Kryo
+//By adding the dsl Ingredient tag the object will be serialized by Kryo
 class ComplexObjectIngredient(value: String)
 
 case class CaseClassIngredient(a: Int, b: String)
@@ -85,7 +85,7 @@ object TestRecipe {
 
   case class InteractionOneSuccessful(interactionOneOriginalIngredient: String)
 
-  val interactionOneSuccessful: javadsl.Event = Event.reflect[InteractionOneSuccessful]
+  val interactionOneSuccessful: dsl.Event = Event.reflect[InteractionOneSuccessful]
 
   //Interactions used in the recipe & implementations (we use traits instead of case classes since we use mocks for the real implementations
   val interactionOne =

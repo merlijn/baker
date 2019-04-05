@@ -3,8 +3,8 @@ package com.ing.baker.compiler;
 import com.ing.baker.il.CompiledRecipe;
 import com.ing.baker.recipe.annotations.FiresEvent;
 import com.ing.baker.recipe.annotations.ProcessId;
-import com.ing.baker.recipe.javadsl.Interaction;
-import com.ing.baker.recipe.javadsl.Recipe;
+import com.ing.baker.recipe.dsl.Interaction;
+import com.ing.baker.recipe.dsl.Recipe;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,7 +13,6 @@ import org.junit.rules.ExpectedException;
 import javax.inject.Named;
 import java.util.ArrayList;
 
-import static com.ing.baker.recipe.javadsl.Interaction.reflect;
 import static org.junit.Assert.assertEquals;
 
 public class JavaCompiledRecipeTest {

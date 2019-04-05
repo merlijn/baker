@@ -4,8 +4,8 @@ import java.io.{File, PrintWriter}
 
 import com.ing.baker.compiler.RecipeCompiler
 import com.ing.baker.il.{CompiledRecipe, RecipeValidationSettings}
-import com.ing.baker.recipe.javadsl
-import com.ing.baker.recipe.javadsl.{Event, Ingredient, Interaction, Recipe}
+import com.ing.baker.recipe.dsl
+import com.ing.baker.recipe.dsl.{Event, Ingredient, Interaction, Recipe}
 import org.scalacheck.Prop.forAll
 import org.scalacheck.Test.Parameters.defaultVerbose
 import org.scalacheck._
@@ -138,10 +138,10 @@ object RecipePropertiesSpec {
     .withSensoryEvents(sensoryEvents.toSet)
     .withInteractions(interactions.toList: _*)
 
-  def interactionsGen(events: Iterable[javadsl.Event]): Gen[Set[Interaction]] = Gen.const(getInteractions(events))
+  def interactionsGen(events: Iterable[dsl.Event]): Gen[Set[Interaction]] = Gen.const(getInteractions(events))
 
-  def getInteractions(sensoryEvents: Iterable[javadsl.Event]): Set[Interaction] = {
-    @tailrec def interaction(ingredients: Set[javadsl.Ingredient], events: Set[javadsl.Event], acc: Set[Interaction]): Set[Interaction] = ingredients match {
+  def getInteractions(sensoryEvents: Iterable[dsl.Event]): Set[Interaction] = {
+    @tailrec def interaction(ingredients: Set[dsl.Ingredient], events: Set[dsl.Event], acc: Set[Interaction]): Set[Interaction] = ingredients match {
       case _ingredients if _ingredients.isEmpty => acc
       case ingredientsLeft =>
         val (andPreconditionEvents, orPreconditionEvents) = getPreconditionEvents(events)
@@ -184,7 +184,7 @@ object RecipePropertiesSpec {
     * @param ingredients input ingredients set
     * @return Tuple3(interactionDescriptor, outputIngredients, outputEvents)
     */
-  def getInteractionDescriptor(ingredients: Set[javadsl.Ingredient], andPreconditionEvents: Set[javadsl.Event], orPreconditionEvents: Set[javadsl.Event]): (Interaction, Set[javadsl.Event]) = {
+  def getInteractionDescriptor(ingredients: Set[dsl.Ingredient], andPreconditionEvents: Set[dsl.Event], orPreconditionEvents: Set[dsl.Event]): (Interaction, Set[dsl.Event]) = {
     //each interaction fires a single event
     val events = sample(interactionOutputGen)
 
@@ -201,12 +201,12 @@ object RecipePropertiesSpec {
     * @param events events set
     * @return Tuple2(andPreconditionEvents, orPreconditionEvents)
     */
-  def getPreconditionEvents(events: Set[javadsl.Event]): (Set[javadsl.Event], Set[javadsl.Event]) = {
+  def getPreconditionEvents(events: Set[dsl.Event]): (Set[dsl.Event], Set[dsl.Event]) = {
     val nrOfAndPreconditionEvents = sample(Gen.chooseNum(0, maxNrOfPreconditionEvents))
     val nrOfOrPreconditionEvents = sample(Gen.chooseNum(0, maxNrOfPreconditionEvents))
 
-    val andPreconditionEvents: Set[javadsl.Event] = Random.shuffle(events).take(nrOfAndPreconditionEvents)
-    val orPreconditionEvents: Set[javadsl.Event] = {
+    val andPreconditionEvents: Set[dsl.Event] = Random.shuffle(events).take(nrOfAndPreconditionEvents)
+    val orPreconditionEvents: Set[dsl.Event] = {
       val pickedEvents = Random.shuffle(events -- andPreconditionEvents).take(nrOfOrPreconditionEvents)
       if (pickedEvents.size < 2) Set.empty
       else pickedEvents
@@ -215,7 +215,7 @@ object RecipePropertiesSpec {
     (andPreconditionEvents, orPreconditionEvents)
   }
 
-  def getIngredientsFrom(events: Iterable[javadsl.Event]): Set[javadsl.Ingredient] = events.flatMap(_.providedIngredients).toSet
+  def getIngredientsFrom(events: Iterable[dsl.Event]): Set[dsl.Ingredient] = events.flatMap(_.providedIngredients).toSet
 
   def ingredientValuesFrom[T](ingredients: Seq[T], nameExtractor: T => String): Map[String, Any] = ingredients map (t => nameExtractor(t) -> "") toMap
 

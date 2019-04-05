@@ -7,7 +7,7 @@ import akka.persistence.inmemory.extension.{InMemoryJournalStorage, StorageExten
 import akka.testkit.TestProbe
 import com.ing.baker._
 import com.ing.baker.recipe.TestRecipe._
-import com.ing.baker.recipe.javadsl.{InteractionFailureStrategy, Recipe}
+import com.ing.baker.recipe.dsl.{InteractionFailureStrategy, Recipe}
 import com.ing.baker.runtime.core.events.RejectReason._
 import com.ing.baker.runtime.core.events._
 import com.ing.baker.types.{PrimitiveValue, Value}

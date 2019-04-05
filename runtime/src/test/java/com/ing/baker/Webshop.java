@@ -4,9 +4,9 @@ import com.ing.baker.compiler.RecipeCompiler;
 import com.ing.baker.il.CompiledRecipe;
 import com.ing.baker.recipe.annotations.FiresEvent;
 import com.ing.baker.recipe.annotations.ProcessId;
-import com.ing.baker.recipe.javadsl.Interaction;
-import com.ing.baker.recipe.javadsl.InteractionFailureStrategy;
-import com.ing.baker.recipe.javadsl.Recipe;
+import com.ing.baker.recipe.dsl.Interaction;
+import com.ing.baker.recipe.dsl.InteractionFailureStrategy;
+import com.ing.baker.recipe.dsl.Recipe;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 

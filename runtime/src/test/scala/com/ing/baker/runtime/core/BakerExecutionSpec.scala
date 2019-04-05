@@ -9,8 +9,8 @@ import akka.testkit.{TestDuration, TestKit, TestProbe}
 import com.ing.baker._
 import com.ing.baker.compiler.RecipeCompiler
 import com.ing.baker.recipe.TestRecipe._
-import com.ing.baker.recipe.javadsl.InteractionFailureStrategy.FireEventAfterFailure
-import com.ing.baker.recipe.javadsl.{InteractionFailureStrategy, Recipe}
+import com.ing.baker.recipe.dsl.InteractionFailureStrategy.FireEventAfterFailure
+import com.ing.baker.recipe.dsl.{InteractionFailureStrategy, Recipe}
 import com.ing.baker.runtime.core.events.BakerEvent
 import com.ing.baker.types.reflect.Reflect
 import org.mockito.Matchers._

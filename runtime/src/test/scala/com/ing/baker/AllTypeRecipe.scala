@@ -1,6 +1,6 @@
 package com.ing.baker
 
-import com.ing.baker.recipe.javadsl._
+import com.ing.baker.recipe.dsl._
 import org.joda.time.{DateTime, LocalDate, LocalDateTime}
 
 import scala.concurrent.duration.DurationInt

@@ -4,8 +4,8 @@ import java.util.Optional
 
 import com.ing.baker.il.{CompiledRecipe, RecipeValidationSettings}
 import com.ing.baker.recipe.TestRecipe._
-import com.ing.baker.recipe.javadsl
-import com.ing.baker.recipe.javadsl._
+import com.ing.baker.recipe.dsl
+import com.ing.baker.recipe.dsl._
 import com.ing.baker.types.{NullValue, PrimitiveValue}
 import org.scalatest.{Matchers, WordSpecLike}
 
@@ -61,7 +61,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
       val wrongProcessIdInteraction =
         Interaction(
           name = "wrongProcessIdInteraction",
-          input = Seq(Ingredient.reflect[Int](javadsl.processIdName), initialIngredient),
+          input = Seq(Ingredient.reflect[Int](dsl.processIdName), initialIngredient),
           output = Seq.empty)
 
       val recipe = Recipe("NonProvidedIngredient")
