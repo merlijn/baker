@@ -47,7 +47,7 @@ object Event {
 
 case class Event(name: String,
                  providedIngredients: Seq[Ingredient],
-                 maxFiringLimit: Option[Int]) {
+                 maxFiringLimit: Option[Int] = None) {
 
   def withMaxFiringLimit(limit: Int) = copy(maxFiringLimit = Some(limit))
 

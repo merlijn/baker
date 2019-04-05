@@ -118,6 +118,5 @@ object InteractionFailureStrategy {
 
   def fireEvent(eventClass: Class[_]): FireEventAfterFailure = fireEvent(eventClass.getSimpleName)
 
-  def fireEvent(eventName: String): FireEventAfterFailure =
-    FireEventAfterFailure(Some(eventName))
+  def fireEvent(eventName: String): FireEventAfterFailure = FireEventAfterFailure(Some(eventName))
 }
