@@ -8,6 +8,7 @@ import com.ing.baker.types.reflect.Reflect._
 import com.ing.baker.types.ConvertersTestData.TestEnum
 import com.ing.baker.types.ConvertersTestData.TestEnum.{ValueA, ValueB, ValueC}
 import com.ing.baker.types._
+import com.ing.baker.types.reflect.Reflect
 import org.scalatest.{Matchers, WordSpecLike}
 
 import scala.collection.JavaConverters._
@@ -151,7 +152,7 @@ class JavaModulesSpec extends WordSpecLike with Matchers {
       javaList.add("b")
       javaList.add("c")
 
-      listValueABC.asList(classOf[String]) shouldBe javaList
+      Reflect.toJava[java.util.List[String]](listValueABC) shouldBe javaList
     }
 
     "be able to create java.util.Set<T> objects" in {
@@ -161,7 +162,7 @@ class JavaModulesSpec extends WordSpecLike with Matchers {
       javaSet.add("b")
       javaSet.add("c")
 
-      listValueABC.asSet(classOf[String]) shouldBe javaSet
+      Reflect.toJava[java.util.Set[String]](listValueABC) shouldBe javaSet
     }
 
     "be able to create java.util.Map<K, V> objects" in {
@@ -171,18 +172,7 @@ class JavaModulesSpec extends WordSpecLike with Matchers {
       javaMap.put("b", 2)
       javaMap.put("c", 3)
 
-      mapValue.asMap(classOf[String], classOf[java.lang.Integer]) shouldBe javaMap
-    }
-
-    "fail to convert a unsupported value into a java List<T>/Set<T>/Map<K, V> objects" in {
-      intercept[IllegalArgumentException] (PrimitiveValue("a").asList(classOf[String]))
-        .getMessage shouldBe "value of type class com.ing.baker.types.PrimitiveValue cannot be converted to a java.util.List object"
-
-      intercept[IllegalArgumentException] (PrimitiveValue("a").asSet(classOf[String]))
-        .getMessage shouldBe "value of type class com.ing.baker.types.PrimitiveValue cannot be converted to a java.util.Set object"
-
-      intercept[IllegalArgumentException] (PrimitiveValue("a").asMap(classOf[String], classOf[java.lang.Integer]))
-        .getMessage shouldBe "value of type class com.ing.baker.types.PrimitiveValue cannot be converted to a java.util.Map object"
+      Reflect.toJava[java.util.Map[String, java.lang.Integer]](mapValue) shouldBe javaMap
     }
 
     "be able to parse pojo objects" in {

@@ -1,5 +1,7 @@
 package com.ing.baker.types.reflect
 
+import java.lang.reflect.ParameterizedType
+
 import com.ing.baker.types._
 import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
@@ -11,6 +13,43 @@ import scala.reflect.runtime.universe.TypeTag
 object Reflect {
 
   private val log = LoggerFactory.getLogger("com.ing.baker.types")
+
+  val mirror: universe.Mirror = universe.runtimeMirror(classOf[Value].getClassLoader)
+
+  /**
+    * Attempts to return the 'raw' or base class of a type. For example:
+    *
+    * String           -> String
+    * List[String]     -> List
+    * Map[String, Int] -> Map
+    */
+  def getBaseClass(javaType: java.lang.reflect.Type): Class[_] = javaType match {
+    case c: Class[_] => c
+    case t: ParameterizedType => getBaseClass(t.getRawType)
+    case _ => throw new IllegalArgumentException(s"Unsupported type: $javaType")
+  }
+
+  def getTypeParameter(javaType: java.lang.reflect.Type, index: Int): java.lang.reflect.Type = {
+    javaType.asInstanceOf[ParameterizedType].getActualTypeArguments()(index)
+  }
+
+  def isAssignableToBaseClass(javaType: java.lang.reflect.Type, base: Class[_]) = base.isAssignableFrom(getBaseClass(javaType))
+
+  def createJavaType(paramType: universe.Type): java.lang.reflect.Type = {
+    val typeConstructor = mirror.runtimeClass(paramType)
+    val innerTypes = paramType.typeArgs.map(createJavaType).toArray
+
+    if (innerTypes.isEmpty) {
+      typeConstructor
+    } else {
+      new java.lang.reflect.ParameterizedType {
+        override def getRawType: java.lang.reflect.Type = typeConstructor
+        override def getActualTypeArguments: Array[java.lang.reflect.Type] = innerTypes
+        override def getOwnerType: java.lang.reflect.Type = null
+        override def toString() = s"ParameterizedType: $typeConstructor[${getActualTypeArguments.mkString(",")}]"
+      }
+    }
+  }
 
   def loadDefaultModulesFromConfig(): Map[Class[_], TypeModule] = {
     val defaultConfig = ConfigFactory.load()

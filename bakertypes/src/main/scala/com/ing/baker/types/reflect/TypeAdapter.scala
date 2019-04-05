@@ -5,6 +5,7 @@ import java.lang.reflect.ParameterizedType
 import com.ing.baker.types._
 import com.ing.baker.types.reflect.Reflect.readJavaType
 import com.ing.baker.types.reflect.modules.PrimitiveModule
+import com.ing.baker.types.reflect.Reflect._
 
 import scala.reflect.runtime.universe
 

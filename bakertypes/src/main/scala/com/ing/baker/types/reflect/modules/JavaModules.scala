@@ -5,6 +5,8 @@ import java.util
 
 import com.ing.baker.types._
 import com.ing.baker.types.reflect.TypeAdapter
+import com.ing.baker.types.reflect.Reflect._
+
 
 import scala.collection.JavaConverters._
 

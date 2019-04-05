@@ -2,7 +2,7 @@ package com.ing.baker.types.reflect.modules
 
 import java.lang.reflect
 
-import com.ing.baker.types._
+import com.ing.baker.types.reflect.Reflect._
 import com.ing.baker.types.reflect.TypeModule
 
 import scala.reflect.runtime.universe.TypeTag

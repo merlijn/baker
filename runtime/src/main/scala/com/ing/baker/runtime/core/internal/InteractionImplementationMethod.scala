@@ -65,7 +65,7 @@ case class InteractionImplementationMethod(implementation: AnyRef) extends Inter
 
     // translate the Value objects to the expected input types
     val inputArgs: Seq[AnyRef] = input.map(_._2).zip(method.getGenericParameterTypes).map {
-      case (value, targetType) => value.as(targetType).asInstanceOf[AnyRef]
+      case (value, targetType) => Reflect.toJava(value, targetType).asInstanceOf[AnyRef]
     }
 
     if (log.isTraceEnabled)

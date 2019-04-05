@@ -1,7 +1,7 @@
 package com.ing.baker.recipe.javadsl
 
 import com.ing.baker.recipe.javadsl
-import com.ing.baker.types.mirror
+import com.ing.baker.types.reflect.Reflect.mirror
 
 import scala.language.experimental.macros
 import scala.reflect.runtime.universe.TypeTag

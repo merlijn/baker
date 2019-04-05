@@ -5,6 +5,7 @@ import java.lang.reflect.ParameterizedType
 import com.ing.baker.types
 import com.ing.baker.types._
 import com.ing.baker.types.reflect.{TypeAdapter, TypeModule}
+import com.ing.baker.types.reflect.Reflect._
 
 class PrimitiveModule extends TypeModule {
 

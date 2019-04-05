@@ -4,6 +4,7 @@ import java.lang.reflect.ParameterizedType
 
 import com.ing.baker.types._
 import com.ing.baker.types.reflect.TypeAdapter
+import com.ing.baker.types.reflect.Reflect._
 
 object ScalaModules {
 

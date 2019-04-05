@@ -4,6 +4,7 @@ import java.lang.reflect.Modifier
 
 import com.ing.baker.types._
 import com.ing.baker.types.reflect.{TypeAdapter, TypeModule}
+import com.ing.baker.types.reflect.Reflect._
 import org.objenesis.ObjenesisStd
 
 class PojoModule extends TypeModule {
