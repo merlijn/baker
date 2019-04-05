@@ -1,11 +1,11 @@
-package com.ing.baker.types.modules
+package com.ing.baker.types.reflect.modules
 
 import java.lang
 
 import com.ing.baker.types
-import com.ing.baker.types.reflect.Reflect.readJavaType
-import com.ing.baker.types.modules.PrimitiveModuleSpec._
 import com.ing.baker.types.reflect.Reflect
+import com.ing.baker.types.reflect.Reflect.readJavaType
+import com.ing.baker.types.reflect.modules.PrimitiveModuleSpec._
 import org.scalacheck.Gen
 import org.scalacheck.Prop.{BooleanOperators, forAll}
 import org.scalacheck.Test.Parameters.defaultVerbose

@@ -1,6 +1,5 @@
-package com.ing.baker.types
+package com.ing.baker.types.reflect
 
-import com.ing.baker.types.reflect.Reflect
 import org.scalacheck.Prop.{BooleanOperators, forAll}
 import org.scalacheck.{Gen, Prop}
 

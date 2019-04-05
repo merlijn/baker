@@ -280,7 +280,7 @@ object ProtoEventAdapterSpec {
   object Types {
 
     import com.ing.baker.types._
-    import com.ing.baker.types.modules.PrimitiveModuleSpec._
+    import com.ing.baker.types.reflect.modules.PrimitiveModuleSpec._
 
     val fieldNameGen = Gen.alphaStr
 

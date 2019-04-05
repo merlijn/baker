@@ -1,4 +1,4 @@
-package com.ing.baker.types;
+package com.ing.baker.types.reflect.modules;
 
 public class ConvertersTestData {
 

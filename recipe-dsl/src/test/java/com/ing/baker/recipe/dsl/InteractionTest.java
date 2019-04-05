@@ -1,21 +1,18 @@
 package com.ing.baker.recipe.dsl;
 
-import com.ing.baker.recipe.dsl.RecipeValidationException;
 import com.ing.baker.recipe.dsl.events.InteractionProvidedEvent;
 import com.ing.baker.recipe.dsl.events.InteractionProvidedEvent2;
 import com.ing.baker.recipe.dsl.events.SensoryEventWithIngredient;
 import com.ing.baker.recipe.dsl.events.SensoryEventWithoutIngredient;
-import com.ing.baker.recipe.dsl.interactions.*;
+import com.ing.baker.recipe.dsl.interactions.FiresEventInteraction;
+import com.ing.baker.recipe.dsl.interactions.SimpleInteraction;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import scala.Option;
 
 import static com.ing.baker.recipe.dsl.Interaction.reflect;
-import static com.ing.baker.recipe.dsl.dslTestHelper.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 public class InteractionTest {
     @Rule
@@ -44,14 +41,14 @@ public class InteractionTest {
                 id.withRequiredEvent(SensoryEventWithIngredient.class);
 
         assertEquals(idWithRequiredEvent.requiredEvents().size(), 1);
-        assertTrue(idWithRequiredEvent.requiredEvents().contains(sensoryEventWithIngredientCheck().name()));
+        assertTrue(idWithRequiredEvent.requiredEvents().contains("SensoryEventWithIngredient"));
 
         Interaction idWithRequiredEvents =
                 id.withRequiredEvents(SensoryEventWithIngredient.class, SensoryEventWithoutIngredient.class);
 
         assertEquals(idWithRequiredEvents.requiredEvents().size(), 2);
-        assertTrue(idWithRequiredEvents.requiredEvents().contains(sensoryEventWithIngredientCheck().name()));
-        assertTrue(idWithRequiredEvents.requiredEvents().contains(sensoryEventWithoutIngredientCheck().name()));
+        assertTrue(idWithRequiredEvents.requiredEvents().contains("SensoryEventWithIngredient"));
+        assertTrue(idWithRequiredEvents.requiredEvents().contains("SensoryEventWithoutIngredient"));
     }
 
     @Test
@@ -85,8 +82,8 @@ public class InteractionTest {
                 id.withRequiredOneOfEvents(SensoryEventWithIngredient.class, SensoryEventWithoutIngredient.class);
 
         assertEquals(idWithRequiredOneOfEvents.requiredOneOfEvents().head().size(), 2);
-        assertTrue(idWithRequiredOneOfEvents.requiredOneOfEvents().head().contains(sensoryEventWithIngredientCheck().name()));
-        assertTrue(idWithRequiredOneOfEvents.requiredOneOfEvents().head().contains(sensoryEventWithoutIngredientCheck().name()));
+        assertTrue(idWithRequiredOneOfEvents.requiredOneOfEvents().head().contains("SensoryEventWithIngredient"));
+        assertTrue(idWithRequiredOneOfEvents.requiredOneOfEvents().head().contains("SensoryEventWithoutIngredient"));
     }
 
     @Test

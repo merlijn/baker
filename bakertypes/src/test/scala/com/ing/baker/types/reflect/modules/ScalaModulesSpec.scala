@@ -1,4 +1,4 @@
-package com.ing.baker.types.modules
+package com.ing.baker.types.reflect.modules
 
 import com.ing.baker.types
 import com.ing.baker.types.reflect.Reflect.{readJavaType, toJava, toValue}
