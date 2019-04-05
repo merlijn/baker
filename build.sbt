@@ -1,6 +1,9 @@
 import Dependencies.{scalaGraph, _}
 import sbt.Keys._
 
+import CrossPlugin.autoImport.crossProject
+import CrossPlugin.autoImport.CrossType
+
 def testScope(project: ProjectReference) = project % "test->test;test->compile"
 
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
@@ -50,15 +53,49 @@ lazy val defaultModuleSettings = commonSettings ++ dependencyOverrideSettings ++
 
 lazy val scalaPBSettings = Seq(PB.targets in Compile := Seq(scalapb.gen() -> (sourceManaged in Compile).value))
 
-lazy val bakertypes = project.in(file("bakertypes"))
+lazy val bakertypes = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("bakertypes"))
   .settings(defaultModuleSettings)
   .settings(
     moduleName := "baker-types",
+    fork := false,
     libraryDependencies ++= compileDeps(
       objenisis,
       scalaReflect(scalaVersion.value)
     ) ++ testDeps(scalaTest, scalaCheck, logback, scalaCheck)
   )
+
+lazy val bakertypesJvm = bakertypes.jvm
+lazy val bakertypesJs = bakertypes.js
+
+lazy val recipeDsl = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Pure)
+  .in(file("recipe-dsl"))
+  .settings(defaultModuleSettings)
+  .settings(
+    moduleName := "baker-recipe-dsl",
+    fork := false,
+    // we have to exclude the sources because of a compiler bug: https://issues.scala-lang.org/browse/SI-10134
+    sources in (Compile, doc) := Seq.empty,
+    libraryDependencies ++=
+      compileDeps(
+        javaxInject,
+        paranamer,
+        reflections,
+        scalaReflect(scalaVersion.value),
+      ) ++
+        testDeps(
+          scalaTest,
+          scalaCheck,
+          junitInterface,
+          slf4jApi,
+          logback
+        )
+  ).dependsOn(bakertypes)
+
+lazy val recipeDslJvm = recipeDsl.jvm
+lazy val recipeDslJs = recipeDsl.js
 
 lazy val intermediateLanguage = project.in(file("intermediate-language"))
   .settings(defaultModuleSettings)
@@ -71,7 +108,7 @@ lazy val intermediateLanguage = project.in(file("intermediate-language"))
       objenisis,
       typeSafeConfig
     ) ++ testDeps(scalaTest, scalaCheck, logback)
-  ).dependsOn(bakertypes)
+  ).dependsOn(bakertypesJvm)
 
 
 lazy val runtime = project.in(file("runtime"))
@@ -118,29 +155,9 @@ lazy val runtime = project.in(file("runtime"))
         logback)
         ++ providedDeps(findbugs)
   )
-  .dependsOn(intermediateLanguage, testScope(recipeDsl), testScope(recipeCompiler), testScope(bakertypes))
+  .dependsOn(intermediateLanguage, testScope(recipeDslJvm), testScope(recipeCompiler), testScope(bakertypesJvm))
 
-lazy val recipeDsl = project.in(file("recipe-dsl"))
-  .settings(defaultModuleSettings)
-  .settings(
-    moduleName := "baker-recipe-dsl",
-    // we have to exclude the sources because of a compiler bug: https://issues.scala-lang.org/browse/SI-10134
-    sources in (Compile, doc) := Seq.empty,
-    libraryDependencies ++=
-      compileDeps(
-        javaxInject,
-        paranamer,
-        reflections,
-        scalaReflect(scalaVersion.value),
-      ) ++
-        testDeps(
-          scalaTest,
-          scalaCheck,
-          junitInterface,
-          slf4jApi,
-          logback
-        )
-  ).dependsOn(bakertypes)
+
 
 lazy val recipeCompiler = project.in(file("compiler"))
   .settings(defaultModuleSettings)
@@ -149,10 +166,10 @@ lazy val recipeCompiler = project.in(file("compiler"))
     libraryDependencies ++=
       compileDeps(slf4jApi) ++ testDeps(scalaTest, scalaCheck, logback)
   )
-  .dependsOn(recipeDsl, intermediateLanguage, testScope(recipeDsl))
+  .dependsOn(recipeDslJvm, intermediateLanguage, testScope(recipeDslJvm))
 
 lazy val baker = project
   .in(file("."))
   .settings(defaultModuleSettings)
   .settings(noPublishSettings)
-  .aggregate(bakertypes, runtime, recipeCompiler, recipeDsl, intermediateLanguage)
+  .aggregate(bakertypesJvm, bakertypesJs, recipeDslJvm, recipeDslJs, intermediateLanguage, recipeCompiler, runtime)
