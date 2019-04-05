@@ -2,6 +2,9 @@ package com.ing.baker
 
 package object types {
 
+  /**
+    * The set of all primitive types.
+    */
   val primitiveTypes: Set[Type] = Set(
     types.Bool,
     types.Byte,
@@ -16,6 +19,11 @@ package object types {
     types.ByteArray,
     types.CharArray)
 
+  /**
+    * Java primitive mappings:
+    *
+    * Wrapper class -> primitive class
+    */
   val javaPrimitiveMappings: Map[Class[_], Class[_]] = Map(
     classOf[java.lang.Boolean]   -> java.lang.Boolean.TYPE,
     classOf[java.lang.Byte]      -> java.lang.Byte.TYPE,

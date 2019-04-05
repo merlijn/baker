@@ -3,16 +3,12 @@ package com.ing.baker.types.reflect
 import java.lang.reflect.ParameterizedType
 
 import com.ing.baker.types._
-import com.typesafe.config.ConfigFactory
-import org.slf4j.LoggerFactory
+import com.ing.baker.types.reflect.TypeAdapter.defaultTypeAdapter
 
-import scala.collection.JavaConverters._
 import scala.reflect.runtime.universe
 import scala.reflect.runtime.universe.TypeTag
 
 object Reflect {
-
-  private val log = LoggerFactory.getLogger("com.ing.baker.types")
 
   val mirror: universe.Mirror = universe.runtimeMirror(classOf[Value].getClassLoader)
 
@@ -50,37 +46,6 @@ object Reflect {
       }
     }
   }
-
-  def loadDefaultModulesFromConfig(): Map[Class[_], TypeModule] = {
-    val defaultConfig = ConfigFactory.load()
-
-    defaultConfig.getConfig("baker.types").entrySet().asScala.map {
-      entry =>
-
-        def stripQuotes(str: String) = str.stripPrefix("\"").stripSuffix("\"")
-
-        try {
-
-          val moduleClassName = stripQuotes(entry.getValue.unwrapped.asInstanceOf[String])
-          val className = stripQuotes(entry.getKey)
-
-          val clazz = classOf[Value].getClassLoader().loadClass(className)
-          val moduleClass = classOf[Value].getClassLoader().loadClass(moduleClassName)
-          val module = moduleClass.newInstance().asInstanceOf[TypeModule]
-
-          Some(clazz -> module)
-        }
-        catch {
-          case e: Exception =>
-            log.error("Failed to load type module: ", e)
-            None
-        }
-    }.collect {
-      case Some(entry) => entry
-    }.toMap[Class[_], TypeModule]
-  }
-
-  val defaultTypeAdapter = new TypeAdapter(loadDefaultModulesFromConfig())
 
   def readJavaType[T : TypeTag]: Type = readJavaType(createJavaType(mirror.typeOf[T]))
 

@@ -4,10 +4,28 @@ import java.lang.reflect.ParameterizedType
 
 import com.ing.baker.types._
 import com.ing.baker.types.reflect.Reflect.readJavaType
-import com.ing.baker.types.reflect.modules.PrimitiveModule
+import com.ing.baker.types.reflect.modules._
 import com.ing.baker.types.reflect.Reflect._
 
 import scala.reflect.runtime.universe
+
+object TypeAdapter {
+
+  val defaultModules: Map[Class[_], TypeModule] = Map(
+    classOf[java.util.List[_]] -> new JavaModules.ListModule(),
+    classOf[java.util.Set[_]] -> new JavaModules.SetModule(),
+    classOf[java.util.Map[_,_]] -> new JavaModules.MapModule(),
+    classOf[java.util.Optional[_]] -> new JavaModules.OptionalModule(),
+    classOf[java.lang.Enum[_]] -> new EnumModule(),
+    classOf[scala.collection.immutable.List[_]] -> new ScalaModules.ListModule(),
+    classOf[scala.collection.immutable.Set[_]] -> new ScalaModules.SetModule(),
+    classOf[scala.collection.immutable.Map[_,_]] -> new ScalaModules.MapModule(),
+    classOf[Option[_]] -> new ScalaModules.OptionModule(),
+    classOf[java.lang.Object] -> new PojoModule()
+  )
+
+  val defaultTypeAdapter = new TypeAdapter(defaultModules)
+}
 
 class TypeAdapter(private val modules: Map[Class[_], TypeModule]) {
 
