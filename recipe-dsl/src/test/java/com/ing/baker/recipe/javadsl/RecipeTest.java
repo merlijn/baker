@@ -11,7 +11,6 @@ import org.junit.rules.ExpectedException;
 
 import java.time.Duration;
 
-import static com.ing.baker.recipe.javadsl.Interaction.of;
 import static com.ing.baker.recipe.javadsl.JavadslTestHelper.*;
 import static org.junit.Assert.assertEquals;
 
@@ -23,7 +22,7 @@ public class RecipeTest {
     @Test
     public void shouldSetupRecipeWithOneInteractionDescriptor() {
         Recipe recipe = new Recipe("OneInteractionRecipe")
-                .withInteraction(of(SimpleInteraction.class));
+                .withInteraction(Interaction.reflect(SimpleInteraction.class));
         assertEquals(recipe.getEvents().size(), 0);
         assertEquals(recipe.getInteractions().size(), 1);
     }
@@ -32,9 +31,9 @@ public class RecipeTest {
     public void shouldSetupRecipeWithMultipleInteractionDescriptors() {
         Recipe recipe = new Recipe("MultipleInteractionsRecipe")
                 .withInteractions(
-                        of(RequiresProcessIdStringInteraction.class),
-                        of(FiresTwoEventInteraction.class),
-                        of(SimpleInteraction.class));
+                        Interaction.reflect(RequiresProcessIdStringInteraction.class),
+                        Interaction.reflect(FiresTwoEventInteraction.class),
+                        Interaction.reflect(SimpleInteraction.class));
         assertEquals(recipe.getEvents().size(), 0);
         assertEquals(recipe.getInteractions().size(), 3);
     }
@@ -94,9 +93,9 @@ public class RecipeTest {
     public void shouldBeAbleToAddARecipeToARecipe() {
         Recipe subRecipe = new Recipe("OneSensoryEventRecipe")
                 .withSensoryEvent(SensoryEventWithIngredient.class)
-                .withInteraction(of(SimpleInteraction.class));
+                .withInteraction(Interaction.reflect(SimpleInteraction.class));
         Recipe recipe = new Recipe("OneInteractionRecipe")
-                .withInteraction(of(FiresTwoEventInteraction.class))
+                .withInteraction(Interaction.reflect(FiresTwoEventInteraction.class))
                 .withSensoryEvent(SensoryEventWithoutIngredient.class)
                 .withRecipe(subRecipe);
         assertEquals(recipe.getEvents().size(), 1);

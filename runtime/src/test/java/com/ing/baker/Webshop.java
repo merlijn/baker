@@ -4,6 +4,7 @@ import com.ing.baker.compiler.RecipeCompiler;
 import com.ing.baker.il.CompiledRecipe;
 import com.ing.baker.recipe.annotations.FiresEvent;
 import com.ing.baker.recipe.annotations.ProcessId;
+import com.ing.baker.recipe.javadsl.Interaction;
 import com.ing.baker.recipe.javadsl.InteractionFailureStrategy;
 import com.ing.baker.recipe.javadsl.Recipe;
 import com.typesafe.config.Config;
@@ -13,7 +14,6 @@ import javax.inject.Named;
 import java.time.Duration;
 import java.util.concurrent.TimeoutException;
 
-import static com.ing.baker.recipe.javadsl.Interaction.of;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -103,12 +103,12 @@ public class Webshop {
                     CustomerInfoReceived.class,
                     PaymentMade.class)
             .withInteractions(
-                    of(ValidateOrder.class),
-                    of(ManufactureGoods.class)
+                    Interaction.reflect(ValidateOrder.class),
+                    Interaction.reflect(ManufactureGoods.class)
                             .withRequiredEvents(PaymentMade.class, ValidateOrder.Valid.class),
-                    of(SendInvoice.class)
+                    Interaction.reflect(SendInvoice.class)
                             .withRequiredEvents(ShipGoods.GoodsShipped.class),
-                    of(ShipGoods.class))
+                    Interaction.reflect(ShipGoods.class))
             .withDefaultFailureStrategy(
                     new InteractionFailureStrategy.RetryWithIncrementalBackoffBuilder()
                             .withInitialDelay(Duration.ofMillis(100))

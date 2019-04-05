@@ -12,8 +12,8 @@ object InteractionDescriptorSpec {
     input = Seq(customerName),
     output = Seq()
   )
-  val agreementsAcceptedEvent = Event("agreementsAccepted")
-  val anOtherEvent = Event("anOtherEvent")
+  val agreementsAcceptedEvent = Event("agreementsAccepted",  providedIngredients = Seq.empty)
+  val anOtherEvent = Event("anOtherEvent",  providedIngredients = Seq.empty)
 }
 
 class InteractionDescriptorSpec extends WordSpecLike with Matchers {

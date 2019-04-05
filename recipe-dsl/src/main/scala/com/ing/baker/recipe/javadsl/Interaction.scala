@@ -10,7 +10,7 @@ import org.reflections.Reflections
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
 
-case class Interaction private(
+case class Interaction(
       name: String,
       input: Seq[Ingredient],
       output: Seq[Event],
@@ -134,44 +134,6 @@ case class Interaction private(
     addPredefinedIngredient(Map(ingredientName -> ingredientValue))
 
   /**
-    * This sets two input ingredient to a set value. In this case the ingredients wont be taken from the runtime recipe.
-    *
-    * @param ingredientName1  the name of the first ingredient
-    * @param ingredientValue1 the value of first the ingredient
-    * @param ingredientName2  the name of the second ingredient
-    * @param ingredientValue2 the value of second the ingredient
-    * @return
-    */
-  def withPredefinedIngredients(ingredientName1: String,
-                                ingredientValue1: AnyRef,
-                                ingredientName2: String,
-                                ingredientValue2: AnyRef): Interaction =
-    addPredefinedIngredient(
-      Map(ingredientName1 -> ingredientValue1, ingredientName2 -> ingredientValue2))
-
-  /**
-    * This sets three input ingredient to a set value. In this case the ingredients wont be taken from the runtime recipe.
-    *
-    * @param ingredientName1  the name of the first ingredient
-    * @param ingredientValue1 the value of first the ingredient
-    * @param ingredientName2  the name of the second ingredient
-    * @param ingredientValue2 the value of second the ingredient
-    * @param ingredientName3  the name of third the ingredient
-    * @param ingredientValue3 the value of third the ingredient
-    * @return
-    */
-  def withPredefinedIngredients(ingredientName1: String,
-                                ingredientValue1: AnyRef,
-                                ingredientName2: String,
-                                ingredientValue2: AnyRef,
-                                ingredientName3: String,
-                                ingredientValue3: AnyRef): Interaction =
-    addPredefinedIngredient(
-      Map(ingredientName1 -> ingredientValue1,
-        ingredientName2 -> ingredientValue2,
-        ingredientName3 -> ingredientValue3))
-
-  /**
     * This sets input ingredients to set values. In this case the ingredients wont be taken from the runtime recipe.
     *
     * @param newPredefinedIngredients The map containing ingredientName and ingredientValue for ingredients you want to set
@@ -219,7 +181,7 @@ case class Interaction private(
                                       newEventName: String,
                                       ingredientRenames: Map[String, String]): Interaction = {
 
-    val originalEvent: javadsl.Event = javadsl.Event.fromClass(eventClazz, None)
+    val originalEvent: javadsl.Event = javadsl.Event.reflect(eventClazz, None)
 
     if (!output.contains(originalEvent))
       throw new RecipeValidationException(s"Event transformation given for Interaction $name but does not fire event ${originalEvent.name}")
@@ -280,7 +242,7 @@ object Interaction {
 
   private val interactionMethodName: String = "apply"
 
-  def apply(interactionClass: Class[_], newName: Option[String]): Interaction = {
+  def reflect(interactionClass: Class[_], newName: Option[String]): Interaction = {
 
     val name: String = interactionClass.getSimpleName
 
@@ -344,7 +306,7 @@ object Interaction {
       else autoDetectOutput()
     }
 
-    val output: Seq[Event] = getOutputClasses().map(javadsl.Event.fromClass(_, None))
+    val output: Seq[Event] = getOutputClasses().map(javadsl.Event.reflect(_, None))
 
     val originalName: Option[String] = newName match {
       case None => Some(name)
@@ -354,7 +316,7 @@ object Interaction {
     Interaction(newName.getOrElse(name), inputIngredients, output, originalName, Set.empty, Set.empty, Map.empty, Map.empty, None, None, Map.empty)
   }
 
-  def of[T](interactionClass: Class[T]): Interaction = apply(interactionClass, None)
+  def reflect[T](interactionClass: Class[T]): Interaction = reflect(interactionClass, None)
 
-  def of[T](interactionClass: Class[T], name: String): Interaction = apply(interactionClass, Some(name))
+  def reflect[T](interactionClass: Class[T], name: String): Interaction = reflect(interactionClass, Some(name))
 }

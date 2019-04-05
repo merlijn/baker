@@ -18,15 +18,15 @@ object Examples {
 
     // events
 
-    val goodsShipped = Event("GoodsShipped", trackingId)
-    val orderPlaced = Event("OrderPlaced", order)
-    val customer = Event("Customer", name, address, email)
-    val customerInfoReceived = Event("CustomerInfoReceived", customerInfo)
-    val paymentMade = Event("PaymentMade")
-    val valid = Event("Valid")
-    val sorry = Event("Sorry")
-    val goodsManufactured = Event("GoodsManufactured", goods)
-    val invoiceWasSent = Event("InvoiceWasSent")
+    val goodsShipped = Event("GoodsShipped",  providedIngredients = Seq(trackingId))
+    val orderPlaced = Event("OrderPlaced",  providedIngredients = Seq(order))
+    val customer = Event("Customer",  providedIngredients = Seq(name, address, email))
+    val customerInfoReceived = Event(name = "CustomerInfoReceived",  providedIngredients = Seq(customerInfo))
+    val paymentMade = Event(name = "PaymentMade",  providedIngredients = Seq.empty)
+    val valid = Event(name = "Valid", providedIngredients = Seq.empty)
+    val sorry = Event(name = "Sorry", providedIngredients = Seq.empty)
+    val goodsManufactured = Event("GoodsManufactured",  providedIngredients = Seq(goods))
+    val invoiceWasSent = Event("InvoiceWasSent", providedIngredients = Seq.empty)
 
     // interactions
 
@@ -84,17 +84,17 @@ object Examples {
 
     // events
 
-    val getAccountSuccessful = Event("GetAccountSuccessful", iban)
-    val getAccountFailed = Event("GetAccountFailed", getAccountFailedReason)
+    val getAccountSuccessful = Event(name = "GetAccountSuccessful", providedIngredients = Seq(iban))
+    val getAccountFailed = Event(name = "GetAccountFailed", providedIngredients = Seq(getAccountFailedReason))
 
-    val assignAccountSuccessful = Event("AssignAccountSuccessful")
-    val assignAccountFailed = Event("AssignAccountFailed", assignAccountFailedReason)
+    val assignAccountSuccessful = Event(name = "AssignAccountSuccessful", providedIngredients = Seq.empty)
+    val assignAccountFailed = Event(name = "AssignAccountFailed",  providedIngredients = Seq(assignAccountFailedReason))
 
-    val registerIndividualSuccessful = Event("RegisterIndividualSuccessful", customerId)
-    val registerIndividualFailed = Event("RegisterIndividualFailed", registerIndividualFailedReason)
+    val registerIndividualSuccessful = Event(name = "RegisterIndividualSuccessful",  providedIngredients = Seq(customerId))
+    val registerIndividualFailed = Event(name = "RegisterIndividualFailed",  providedIngredients = Seq(registerIndividualFailedReason))
 
-    val termsAndConditionsAccepted = Event("TermsAndConditionsAccepted")
-    val individualInformationSubmitted = Event("individualInformationSubmitted", name, address)
+    val termsAndConditionsAccepted = Event(name = "TermsAndConditionsAccepted", providedIngredients = Seq.empty)
+    val individualInformationSubmitted = Event(name = "individualInformationSubmitted",  providedIngredients = Seq(name, address))
 
     // interactions
 
@@ -137,13 +137,13 @@ object Examples {
     val accountName = Ingredient[Integer]("accountName")
 
     //Events
-    val agreementsAcceptedEvent = Event("agreementsAccepted")
-    val manualApprovedEvent = Event("manualApproved")
-    val automaticApprovedEvent = Event("automaticApproved")
-    val NameProvidedEvent = Event("nameProvided", customerName)
-    val accountOpenedEvent = Event("accountOpened", accountId, accountName)
-    val accountOpenedFailedEvent = Event("accountOpenedFailed")
-    val createCustomerSuccessful = Event("CreateCustomerSuccessful", customerId)
+    val agreementsAcceptedEvent = Event(name = "agreementsAccepted", providedIngredients = Seq.empty)
+    val manualApprovedEvent = Event(name = "manualApproved", providedIngredients = Seq.empty)
+    val automaticApprovedEvent = Event(name = "automaticApproved", providedIngredients = Seq.empty)
+    val NameProvidedEvent = Event(name = "nameProvided", providedIngredients = Seq(customerName))
+    val accountOpenedEvent = Event(name = "accountOpened", providedIngredients = Seq(accountId, accountName))
+    val accountOpenedFailedEvent = Event(name = "accountOpenedFailed", providedIngredients = Seq.empty)
+    val createCustomerSuccessful = Event(name = "CreateCustomerSuccessful", providedIngredients = Seq(customerId))
 
     //Recipe
     //Interactions

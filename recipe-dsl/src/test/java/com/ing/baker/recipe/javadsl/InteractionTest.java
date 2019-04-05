@@ -23,21 +23,21 @@ public class InteractionTest {
 
     @Test
     public void shouldCreateInteractionDescriptorWithDefaultName() {
-        Interaction id = of(SimpleInteraction.class);
+        Interaction id = Interaction.reflect(SimpleInteraction.class);
         assertEquals("SimpleInteraction", id.name());
         assertEquals(id.output().size(), 1);
-        assertEquals(id.output().apply(0), Event.fromClass(SimpleInteraction.InitialIngredientEvent.class, Option.empty()));
+        assertEquals(id.output().apply(0), Event.reflect(SimpleInteraction.InitialIngredientEvent.class, Option.empty()));
     }
 
     @Test
     public void shouldCreateInteractionDescriptorWithChangedName() {
-        Interaction id = of(SimpleInteraction.class, "ChangedName");
+        Interaction id = reflect(SimpleInteraction.class, "ChangedName");
         assertEquals("ChangedName", id.name());
     }
 
     @Test
     public void shouldUpdateTheRequiredEventListFromClass() {
-        Interaction id = of(SimpleInteraction.class);
+        Interaction id = Interaction.reflect(SimpleInteraction.class);
         assertTrue(id.requiredEvents().isEmpty());
 
         Interaction idWithRequiredEvent =
@@ -56,7 +56,7 @@ public class InteractionTest {
 
     @Test
     public void shouldUpdateTheRequiredEventListFromName() {
-        Interaction id = of(SimpleInteraction.class);
+        Interaction id = Interaction.reflect(SimpleInteraction.class);
         assertTrue(id.requiredEvents().isEmpty());
 
         final String sensoryEventWithIngredientName = SensoryEventWithIngredient.class.getSimpleName();
@@ -78,7 +78,7 @@ public class InteractionTest {
 
     @Test
     public void shouldUpdateTheRequiredOneOfEventListFromClass() {
-        Interaction id = of(SimpleInteraction.class);
+        Interaction id = Interaction.reflect(SimpleInteraction.class);
         assertTrue(id.requiredOneOfEvents().isEmpty());
 
         Interaction idWithRequiredOneOfEvents =
@@ -91,7 +91,7 @@ public class InteractionTest {
 
     @Test
     public void shouldUpdateTheRequiredOneOfEventListFromName() {
-        Interaction id = of(SimpleInteraction.class);
+        Interaction id = Interaction.reflect(SimpleInteraction.class);
         assertTrue(id.requiredOneOfEvents().isEmpty());
 
         final String sensoryEventWithIngredientName = SensoryEventWithIngredient.class.getSimpleName();
@@ -107,7 +107,7 @@ public class InteractionTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldRejectUsingLessThanTwoOneOfRequiredEvents() {
-        Interaction id = of(SimpleInteraction.class);
+        Interaction id = Interaction.reflect(SimpleInteraction.class);
         assertTrue(id.requiredOneOfEvents().isEmpty());
 
         id.withRequiredOneOfEvents(SensoryEventWithIngredient.class);
@@ -115,7 +115,7 @@ public class InteractionTest {
 
     @Test
     public void shouldUpdateTheMaximumInteractionCount() {
-        Interaction id = of(SimpleInteraction.class);
+        Interaction id = Interaction.reflect(SimpleInteraction.class);
         assertTrue(id.maximumExecutionCount().isEmpty());
 
         Interaction idWithMaximumInteractionCount =
@@ -131,7 +131,7 @@ public class InteractionTest {
 
     @Test
     public void shouldUpdateTheEventOutputTransformers(){
-        Interaction id = of(FiresEventInteraction.class);
+        Interaction id = Interaction.reflect(FiresEventInteraction.class);
         assertTrue(id.eventOutputTransformers().isEmpty());
 
         Interaction idWithOutputEventTransformer =
@@ -142,7 +142,7 @@ public class InteractionTest {
 
     @Test
     public void shouldNotUpdateTheEventOutputTransformersWhenSpecificEventNotFired(){
-        Interaction id = of(FiresEventInteraction.class);
+        Interaction id = Interaction.reflect(FiresEventInteraction.class);
         assertTrue(id.eventOutputTransformers().isEmpty());
 
         exception.expect(RecipeValidationException.class);

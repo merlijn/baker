@@ -3,6 +3,7 @@ package com.ing.baker.compiler;
 import com.ing.baker.il.CompiledRecipe;
 import com.ing.baker.recipe.annotations.FiresEvent;
 import com.ing.baker.recipe.annotations.ProcessId;
+import com.ing.baker.recipe.javadsl.Interaction;
 import com.ing.baker.recipe.javadsl.Recipe;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -188,7 +189,7 @@ public class JavaCompiledRecipeTest {
 
     public static Recipe setupSimpleRecipe() {
         return new Recipe("TestRecipe")
-                .withInteraction(of(InteractionOne.class)
+                .withInteraction(Interaction.reflect(InteractionOne.class)
                         .withRequiredEvent(EventOne.class))
                 .withSensoryEvent(EventOne.class);
     }
@@ -196,13 +197,13 @@ public class JavaCompiledRecipeTest {
     public static Recipe setupComplexRecipe() {
         return new Recipe("TestRecipe")
                 .withInteractions(
-                        of(InteractionOne.class)
+                        Interaction.reflect(InteractionOne.class)
                                 .withRequiredEvent(EventOne.class),
-                        of(InteractionOne.class, "InteractionOneRenamed")
+                        reflect(InteractionOne.class, "InteractionOneRenamed")
                                 .withRequiredEvent(EventOne.class),
-                        of(InteractionTwo.class)
+                        Interaction.reflect(InteractionTwo.class)
                                 .withRequiredEvent(EventTwo.class),
-                        of(InteractionThree.class))
+                        Interaction.reflect(InteractionThree.class))
                 .withSensoryEvents(
                         EventOne.class,
                         EventTwo.class,

@@ -36,12 +36,12 @@ object TestRecipe {
   val missingScalaOptionalDirectString  = Ingredient[String]("missingScalaOptional")
   val missingScalaOptional2 = Ingredient[Option[Int]]("missingScalaOptional2")
 
+  case class InitialEvent(initialIngredient: String)
+
   //Events as used in the recipe & objects used in runtime
   val initialEvent = Event("InitialEvent", Seq(initialIngredient), maxFiringLimit = None)
 
-  case class InitialEvent(initialIngredient: String)
-
-  val initialEventExtendedName = Event("InitialEventExtendedName", initialIngredientExtendedName)
+  val initialEventExtendedName = Event("InitialEventExtendedName", Seq(initialIngredientExtendedName))
 
   case class InitialEventExtendedName(initialIngredientExtendedName: String)
 
@@ -61,25 +61,25 @@ object TestRecipe {
 
   case class NotUsedSensoryEvent()
 
-  val eventFromInteractionTwo = Event("EventFromInteractionTwo", interactionTwoIngredient)
+  val eventFromInteractionTwo = Event("EventFromInteractionTwo", Seq(interactionTwoIngredient))
 
   case class EventFromInteractionTwo(interactionTwoIngredient: String)
 
-  val event1FromInteractionSeven = Event("Event1FromInteractionSeven", interactionSevenIngredient1)
+  val event1FromInteractionSeven = Event("Event1FromInteractionSeven", Seq(interactionSevenIngredient1))
 
   case class Event1FromInteractionSeven(interactionSevenIngredient1: String)
 
-  val event2FromInteractionSeven = Event("Event2FromInteractionSeven", interactionSevenIngredient2)
+  val event2FromInteractionSeven = Event("Event2FromInteractionSeven", Seq(interactionSevenIngredient2))
 
   case class Event2FromInteractionSeven(interactionSevenIngredient2: String)
 
-  val emptyEvent = Event("EmptyEvent")
+  val emptyEvent = Event("EmptyEvent", providedIngredients = Seq.empty)
 
   case class EmptyEvent()
 
-  val exhaustedEvent = Event("RetryExhausted")
+  val exhaustedEvent = Event("RetryExhausted", providedIngredients = Seq.empty)
 
-  val unboxedProviderEvent = Event("UnboxedProviderEvent", missingJavaOptionalDirectString, initialIngredient, missingScalaOptionalDirectString)
+  val unboxedProviderEvent = Event("UnboxedProviderEvent", Seq(missingJavaOptionalDirectString, initialIngredient, missingScalaOptionalDirectString))
 
   case class UnboxedProviderEvent(missingJavaOptional: String, initialIngredient: String, missingScalaOptional: String)
 
