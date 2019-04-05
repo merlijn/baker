@@ -26,7 +26,7 @@ package object compiler {
     val originalEvents: Seq[EventDescriptor] = interactionDescriptor.output.map(e => parseDSLEvent(e))
 
     val eventOutputTransformers: Map[String, EventOutputTransformer] = interactionDescriptor.eventOutputTransformers.map {
-      case (event, transformer) => event.name -> EventOutputTransformer(transformer.newEventName, transformer.ingredientRenames) }
+      case (event, transformer) => event -> EventOutputTransformer(transformer.newEventName, transformer.ingredientRenames) }
 
     val predefinedIngredients: Map[String, Value] =
       inputFields.flatMap {

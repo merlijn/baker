@@ -208,7 +208,7 @@ object RecipeCompiler {
     // all ingredients provided by interactions
     val interactionIngredients: Seq[String] = recipe.interactions.flatMap(i => i.output.flatMap { e =>
         // check if the event was renamed (check if there is a transformer for this event)
-        i.eventOutputTransformers.get(e) match {
+        i.eventOutputTransformers.get(e.name) match {
           case Some(transformer) => e.providedIngredients.map(_.name).map(name => transformer.ingredientRenames.getOrElse(name, name))
           case None              => e.providedIngredients.map(_.name)
         }
