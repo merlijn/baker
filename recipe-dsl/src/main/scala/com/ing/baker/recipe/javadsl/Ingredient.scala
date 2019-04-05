@@ -7,7 +7,7 @@ import scala.reflect.runtime.{universe => ru}
 
 object Ingredient {
 
-  def apply[T : ru.TypeTag](name: String): Ingredient = Ingredient(name, Reflect.readJavaType[T])
+  def reflect[T : ru.TypeTag](name: String): Ingredient = Ingredient(name, Reflect.readJavaType[T])
 }
 
 case class Ingredient(val name: String, val ingredientType: Type) {

@@ -11,7 +11,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import scala.Option;
 
-import static com.ing.baker.recipe.javadsl.Interaction.of;
+import static com.ing.baker.recipe.javadsl.Interaction.reflect;
 import static com.ing.baker.recipe.javadsl.JavadslTestHelper.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;

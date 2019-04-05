@@ -7,7 +7,7 @@ class InteractionSpec extends WordSpecLike with Matchers {
   "an Interaction" when {
     "calling the Equals method" should {
       "return true if same interaction instance" in {
-        val customerName = Ingredient[String]("customerName")
+        val customerName = Ingredient.reflect[String]("customerName")
         val createCustomer = Interaction(
           name = "CreateCustomer",
           input = Seq(customerName),
@@ -17,8 +17,8 @@ class InteractionSpec extends WordSpecLike with Matchers {
       }
 
       "return true if different interaction instance with same signature" in {
-        val customerName = Ingredient[String]("customerName")
-        val customerId = Ingredient[String]("customerId")
+        val customerName = Ingredient.reflect[String]("customerName")
+        val customerId = Ingredient.reflect[String]("customerId")
         val CreateCustomer = Interaction(
           name = "CreateCustomer",
           input = Seq(customerName),
@@ -33,8 +33,8 @@ class InteractionSpec extends WordSpecLike with Matchers {
       }
 
       "return false if different interaction instance with different name" in {
-        val customerName = Ingredient[String]("customerName")
-        val customerId = Ingredient[String]("customerId")
+        val customerName = Ingredient.reflect[String]("customerName")
+        val customerId = Ingredient.reflect[String]("customerId")
         val CreateCustomer = Interaction(
           name = "CreateCustomer",
           input = Seq(customerName),
@@ -49,8 +49,8 @@ class InteractionSpec extends WordSpecLike with Matchers {
       }
 
       "return false if different object" in {
-        val customerName = Ingredient[String]("customerName")
-        val customerId = Ingredient[String]("customerId")
+        val customerName = Ingredient.reflect[String]("customerName")
+        val customerId = Ingredient.reflect[String]("customerId")
         val CreateCustomer = Interaction(
           name = "CreateCustomer",
           input = Seq(customerName),

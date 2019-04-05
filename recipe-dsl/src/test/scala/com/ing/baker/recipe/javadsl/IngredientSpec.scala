@@ -11,14 +11,14 @@ class IngredientSpec extends WordSpecLike with Matchers {
 
       "correctly derive the type" in {
 
-        val ingredient = Ingredient[String]("foo")
+        val ingredient = Ingredient.reflect[String]("foo")
         ingredient.name shouldBe "foo"
         ingredient.ingredientType shouldBe types.CharArray
       }
 
       "correctly derive a higher kinded type" in {
 
-        val ingredient = Ingredient[Option[String]]("foo")
+        val ingredient = Ingredient.reflect[Option[String]]("foo")
         ingredient.name shouldBe "foo"
         ingredient.ingredientType shouldBe OptionType(types.CharArray)
       }
@@ -27,36 +27,36 @@ class IngredientSpec extends WordSpecLike with Matchers {
     "calling the Equals method" should {
 
       "return true if same ingredient instance" in {
-        val customerName = Ingredient[String]("customerName")
+        val customerName = Ingredient.reflect[String]("customerName")
         customerName.equals(customerName) shouldBe true
       }
 
       "return true if different ingredient with same name and type" in {
-        val customerName = Ingredient[String]("customerName")
-        val customerName2 = Ingredient[String]("customerName")
+        val customerName = Ingredient.reflect[String]("customerName")
+        val customerName2 = Ingredient.reflect[String]("customerName")
         customerName.equals(customerName2) shouldBe true
       }
 
       "return false if different ingredient with different name and same type" in {
-        val customerName = Ingredient[String]("customerName")
-        val agreementName = Ingredient[String]("agreementName")
+        val customerName = Ingredient.reflect[String]("customerName")
+        val agreementName = Ingredient.reflect[String]("agreementName")
         customerName.equals(agreementName) shouldBe false
       }
 
       "return false if different ingredient with same name and different type" in {
-        val customerName = Ingredient[String]("customerName")
-        val customerName2 = Ingredient[Integer]("customerName")
+        val customerName = Ingredient.reflect[String]("customerName")
+        val customerName2 = Ingredient.reflect[Integer]("customerName")
         customerName.equals(customerName2) shouldBe false
       }
 
       "return false if different ingredient with different name and different type" in {
-        val customerName = Ingredient[String]("customerName")
-        val agreementName = Ingredient[Integer]("agreementName")
+        val customerName = Ingredient.reflect[String]("customerName")
+        val agreementName = Ingredient.reflect[Integer]("agreementName")
         customerName.equals(agreementName) shouldBe false
       }
 
       "return false if different object" in {
-        val customerName = Ingredient[String]("customerName")
+        val customerName = Ingredient.reflect[String]("customerName")
         val otherObject = ""
         customerName.equals(otherObject) shouldBe false
       }

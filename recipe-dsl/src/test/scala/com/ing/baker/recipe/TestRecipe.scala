@@ -14,27 +14,27 @@ case class CaseClassIngredient(a: Int, b: String)
 object TestRecipe {
 
   //inputIngredients = Seq as used in the recipe
-  val initialIngredientOld = Ingredient[String]("initialIngredientOld")
-  val initialIngredient = Ingredient[String]("initialIngredient")
-  val interactionOneOriginalIngredient = Ingredient[String]("interactionOneOriginalIngredient")
-  val initialIngredientExtendedName = Ingredient[String]("initialIngredientExtendedName")
-  val interactionOneIngredient = Ingredient[String]("interactionOneIngredient")
-  val interactionTwoIngredient = Ingredient[String]("interactionTwoIngredient")
-  val interactionThreeIngredient = Ingredient[String]("interactionThreeIngredient")
-  val interactionFourIngredient = Ingredient[String]("interactionFourIngredient")
-  val interactionFiveIngredient = Ingredient[String]("interactionFiveIngredient")
-  val interactionSixIngredient = Ingredient[String]("interactionSixIngredient")
-  val interactionSevenIngredient1 = Ingredient[String]("interactionSevenIngredient1")
-  val interactionSevenIngredient2 = Ingredient[String]("interactionSevenIngredient2")
-  val interactionNineIngredient = Ingredient[String]("interactionNineIngredient")
-  val complexObjectIngredient = Ingredient[ComplexObjectIngredient]("complexOjectIngredient")
-  val caseClassIngredient = Ingredient[CaseClassIngredient]("caseClassIngredient")
-  val missingJavaOptional = Ingredient[Optional[String]]("missingJavaOptional")
-  val missingJavaOptionalDirectString  = Ingredient[String]("missingJavaOptional")
-  val missingJavaOptional2  = Ingredient[Optional[Int]]("missingJavaOptional2")
-  val missingScalaOptional  = Ingredient[Option[String]]("missingScalaOptional")
-  val missingScalaOptionalDirectString  = Ingredient[String]("missingScalaOptional")
-  val missingScalaOptional2 = Ingredient[Option[Int]]("missingScalaOptional2")
+  val initialIngredientOld = Ingredient.reflect[String]("initialIngredientOld")
+  val initialIngredient = Ingredient.reflect[String]("initialIngredient")
+  val interactionOneOriginalIngredient = Ingredient.reflect[String]("interactionOneOriginalIngredient")
+  val initialIngredientExtendedName = Ingredient.reflect[String]("initialIngredientExtendedName")
+  val interactionOneIngredient = Ingredient.reflect[String]("interactionOneIngredient")
+  val interactionTwoIngredient = Ingredient.reflect[String]("interactionTwoIngredient")
+  val interactionThreeIngredient = Ingredient.reflect[String]("interactionThreeIngredient")
+  val interactionFourIngredient = Ingredient.reflect[String]("interactionFourIngredient")
+  val interactionFiveIngredient = Ingredient.reflect[String]("interactionFiveIngredient")
+  val interactionSixIngredient = Ingredient.reflect[String]("interactionSixIngredient")
+  val interactionSevenIngredient1 = Ingredient.reflect[String]("interactionSevenIngredient1")
+  val interactionSevenIngredient2 = Ingredient.reflect[String]("interactionSevenIngredient2")
+  val interactionNineIngredient = Ingredient.reflect[String]("interactionNineIngredient")
+  val complexObjectIngredient = Ingredient.reflect[ComplexObjectIngredient]("complexOjectIngredient")
+  val caseClassIngredient = Ingredient.reflect[CaseClassIngredient]("caseClassIngredient")
+  val missingJavaOptional = Ingredient.reflect[Optional[String]]("missingJavaOptional")
+  val missingJavaOptionalDirectString  = Ingredient.reflect[String]("missingJavaOptional")
+  val missingJavaOptional2  = Ingredient.reflect[Optional[Int]]("missingJavaOptional2")
+  val missingScalaOptional  = Ingredient.reflect[Option[String]]("missingScalaOptional")
+  val missingScalaOptionalDirectString  = Ingredient.reflect[String]("missingScalaOptional")
+  val missingScalaOptional2 = Ingredient.reflect[Option[Int]]("missingScalaOptional2")
 
   case class InitialEvent(initialIngredient: String)
 
@@ -85,7 +85,7 @@ object TestRecipe {
 
   case class InteractionOneSuccessful(interactionOneOriginalIngredient: String)
 
-  val interactionOneSuccessful: javadsl.Event = Event[InteractionOneSuccessful]
+  val interactionOneSuccessful: javadsl.Event = Event.reflect[InteractionOneSuccessful]
 
   //Interactions used in the recipe & implementations (we use traits instead of case classes since we use mocks for the real implementations
   val interactionOne =
@@ -118,7 +118,7 @@ object TestRecipe {
     Interaction(
       name = "InteractionThree",
       input = Seq(interactionOneIngredient, interactionTwoIngredient),
-      output = Seq(Event[InteractionThreeSuccessful]))
+      output = Seq(Event.reflect[InteractionThreeSuccessful]))
 
   trait InteractionThree {
     val name: String = "InteractionThree"
@@ -132,7 +132,7 @@ object TestRecipe {
     Interaction(
       name = "InteractionFour",
       input = Seq.empty,
-      output = Seq(Event[InteractionFourSuccessful]))
+      output = Seq(Event.reflect[InteractionFourSuccessful]))
 
   trait InteractionFour {
     val name: String = "InteractionFour"
@@ -146,7 +146,7 @@ object TestRecipe {
     Interaction(
       name = "InteractionFive",
       input = Seq(processId, initialIngredient, initialIngredientExtendedName),
-      output = Seq(Event[InteractionFiveSuccessful]))
+      output = Seq(Event.reflect[InteractionFiveSuccessful]))
 
   trait InteractionFive {
     val name: String = "InteractionFive"
@@ -160,7 +160,7 @@ object TestRecipe {
     Interaction(
       name = "InteractionSix",
       input = Seq(initialIngredientExtendedName),
-      output = Seq(Event[InteractionSixSuccessful]))
+      output = Seq(Event.reflect[InteractionSixSuccessful]))
 
   trait InteractionSix {
     val name: String = "InteractionSix"
@@ -222,7 +222,7 @@ object TestRecipe {
     Interaction(
       name = "InteractionNine",
       input = Seq(processId, initialIngredient),
-      output = Seq(Event[InteractionNineSuccessful]))
+      output = Seq(Event.reflect[InteractionNineSuccessful]))
 
   trait InteractionNine {
     val name: String = "InteractionNine"
@@ -236,7 +236,7 @@ object TestRecipe {
     Interaction(
       name = "ComplexIngredientInteraction",
       input = Seq(initialIngredient),
-      Seq(Event[ComplexIngredientInteractionSuccessful]))
+      Seq(Event.reflect[ComplexIngredientInteractionSuccessful]))
 
   trait ComplexIngredientInteraction {
     val name: String = "ComplexIngredientInteraction"
@@ -250,7 +250,7 @@ object TestRecipe {
     Interaction(
       name = "CaseClassIngredientInteraction",
       input = Seq(initialIngredient),
-      output = Seq(Event[CaseClassIngredientInteractionSuccessful]))
+      output = Seq(Event.reflect[CaseClassIngredientInteractionSuccessful]))
 
   trait CaseClassIngredientInteraction {
     val name: String = "CaseClassIngredientInteraction"

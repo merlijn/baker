@@ -113,7 +113,7 @@ object RecipePropertiesSpec {
 
   val ingredientGen: Gen[Ingredient] = for {
     name <- nameGen
-  } yield Ingredient[String](name)
+  } yield Ingredient.reflect[String](name)
 
   val eventGen: Gen[Event] = for {
     name <- nameGen

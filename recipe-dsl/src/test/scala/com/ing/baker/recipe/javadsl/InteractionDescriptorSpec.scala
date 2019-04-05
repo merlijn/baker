@@ -5,8 +5,8 @@ import org.scalatest.{Matchers, WordSpecLike}
 import InteractionDescriptorSpec._
 
 object InteractionDescriptorSpec {
-  val customerName = Ingredient[String]("customerName")
-  val customerId = Ingredient[String]("customerId")
+  val customerName = Ingredient.reflect[String]("customerName")
+  val customerId = Ingredient.reflect[String]("customerId")
   val createCustomer = Interaction(
     name = "CreateCustomer",
     input = Seq(customerName),

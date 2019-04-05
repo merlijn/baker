@@ -61,7 +61,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
       val wrongProcessIdInteraction =
         Interaction(
           name = "wrongProcessIdInteraction",
-          input = Seq(Ingredient[Int](javadsl.processIdName), initialIngredient),
+          input = Seq(Ingredient.reflect[Int](javadsl.processIdName), initialIngredient),
           output = Seq.empty)
 
       val recipe = Recipe("NonProvidedIngredient")
@@ -73,7 +73,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
     }
 
     "give a list of wrong ingredients if an ingredient is of the wrong type" in {
-      val initialIngredientInt = Ingredient[Int]("initialIngredient")
+      val initialIngredientInt = Ingredient.reflect[Int]("initialIngredient")
       val initialEventInt = Event("InitialEvent", Seq(initialIngredientInt), None)
 
       val recipe = Recipe("WrongTypedIngredient")
@@ -86,10 +86,10 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
     }
 
     "give a list of wrong ingredients if an Optional ingredient is of the wrong Optional type" in {
-      val initialIngredientOptionalInt = Ingredient[Optional[Int]]("initialIngredientOptionalInt")
-      val initialIngredientOptionalString = Ingredient[Optional[String]]("initialIngredientOptionalInt")
-      val initialIngredientOptionInt = Ingredient[Option[List[Int]]]("initialIngredientOptionInt")
-      val initialIngredientOptionString = Ingredient[Option[List[String]]]("initialIngredientOptionInt")
+      val initialIngredientOptionalInt = Ingredient.reflect[Optional[Int]]("initialIngredientOptionalInt")
+      val initialIngredientOptionalString = Ingredient.reflect[Optional[String]]("initialIngredientOptionalInt")
+      val initialIngredientOptionInt = Ingredient.reflect[Option[List[Int]]]("initialIngredientOptionInt")
+      val initialIngredientOptionString = Ingredient.reflect[Option[List[String]]]("initialIngredientOptionInt")
       val initialEventIntOptional = Event("initialEventIntOptional", Seq(initialIngredientOptionalString), None)
       val initialEventIntOption = Event("initialEventIntOption", Seq(initialIngredientOptionString), None)
       val interactionOptional =
@@ -116,7 +116,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
     }
 
     "give no errors if an Optional ingredient is of the correct Optional type" in {
-      val initialIngredientInt = Ingredient[Optional[List[Int]]]("initialIngredient")
+      val initialIngredientInt = Ingredient.reflect[Optional[List[Int]]]("initialIngredient")
       val initialEventInt = Event("InitialEvent", Seq(initialIngredientInt), None)
       val interactionOptional =
         Interaction(
@@ -188,7 +188,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
 
     "fail compilation for an empty or null named ingredient" in {
       List("", null) foreach { name =>
-        val invalidIngredient = Ingredient[String](name)
+        val invalidIngredient = Ingredient.reflect[String](name)
         val recipe = Recipe("IngredientNameTest").withSensoryEvent(Event("someEvent", Seq(invalidIngredient))).withInteraction(interactionOne)
 
         intercept[IllegalArgumentException](RecipeCompiler.compileRecipe(recipe)) getMessage() shouldBe "Ingredient with a null or empty name found"
@@ -242,8 +242,8 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
     }
 
     "interactions with RENAMED optional ingredients via events that ARE provided SHOULD NOT be provided as empty" in {
-      val stringOptionIngredient = Ingredient[Option[String]]("stringOptionIngredient")
-      val renamedStringOptionIngredient = Ingredient[Option[String]]("renamedStringOptionIngredient")
+      val stringOptionIngredient = Ingredient.reflect[Option[String]]("stringOptionIngredient")
+      val renamedStringOptionIngredient = Ingredient.reflect[Option[String]]("renamedStringOptionIngredient")
 
       val eventWithOptionIngredient = Event("eventWithOptionIngredient", Seq(stringOptionIngredient))
 

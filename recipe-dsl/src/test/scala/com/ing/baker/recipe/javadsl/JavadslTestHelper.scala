@@ -3,8 +3,8 @@ package com.ing.baker.recipe.javadsl
 object JavadslTestHelper {
 
   //Ingredients
-  val initialIngredientCheck: Ingredient = Ingredient[String]("initialIngredient")
-  val ProcessIdStringCheck: Ingredient = Ingredient[String]("$ProcessId$")
+  val initialIngredientCheck: Ingredient = Ingredient.reflect[String]("initialIngredient")
+  val ProcessIdStringCheck: Ingredient = Ingredient.reflect[String]("$ProcessId$")
   //Events
   val interactionProvidedEventCheck: Event = new Event("InteractionProvidedEvent", Seq.empty, None)
   val interactionProvidedEvent2Check: Event = new Event("InteractionProvidedEvent2", Seq.empty, None)

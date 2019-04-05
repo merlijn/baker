@@ -13,7 +13,7 @@ import org.junit.rules.ExpectedException;
 import javax.inject.Named;
 import java.util.ArrayList;
 
-import static com.ing.baker.recipe.javadsl.Interaction.of;
+import static com.ing.baker.recipe.javadsl.Interaction.reflect;
 import static org.junit.Assert.assertEquals;
 
 public class JavaCompiledRecipeTest {
@@ -199,7 +199,7 @@ public class JavaCompiledRecipeTest {
                 .withInteractions(
                         Interaction.reflect(InteractionOne.class)
                                 .withRequiredEvent(EventOne.class),
-                        reflect(InteractionOne.class, "InteractionOneRenamed")
+                        Interaction.reflect(InteractionOne.class, "InteractionOneRenamed")
                                 .withRequiredEvent(EventOne.class),
                         Interaction.reflect(InteractionTwo.class)
                                 .withRequiredEvent(EventTwo.class),

@@ -7,7 +7,7 @@ import scala.reflect.runtime.universe.TypeTag
 
 object Event {
 
-  def apply[T : TypeTag]: Event = reflect(mirror.runtimeClass(mirror.typeOf[T]))
+  def reflect[T : TypeTag]: Event = reflect(mirror.runtimeClass(mirror.typeOf[T]))
 
   def reflect(eventClass: Class[_], maxFiringLimit: Option[Int] = None): Event = {
     val name = eventClass.getSimpleName
@@ -42,7 +42,7 @@ case class Event(name: String,
                  providedIngredients: Seq[Ingredient] = Seq.empty,
                  maxFiringLimit: Option[Int] = None) {
 
-  def withMaxFiringLimit(limit: Int) = copy(maxFiringLimit = Some(limit))
+  def withMaxFiringLimit(limit: Int): Event = copy(maxFiringLimit = Some(limit))
 
-  def withoutFiringLimit() = copy(maxFiringLimit = None)
+  def withoutFiringLimit(): Event = copy(maxFiringLimit = None)
 }

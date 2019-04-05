@@ -4,6 +4,7 @@ import java.lang.reflect.Method
 
 import com.ing.baker.recipe.javadsl.ReflectionHelpers._
 import com.ing.baker.recipe.{annotations, javadsl}
+import com.ing.baker.types.Value
 import com.ing.baker.types.reflect.Reflect
 import org.reflections.Reflections
 
@@ -17,7 +18,7 @@ case class Interaction(
       originalName: Option[String] = None,
       requiredEvents: Set[String] = Set.empty,
       requiredOneOfEvents: Set[Set[String]] = Set.empty,
-      predefinedIngredients: Map[String, com.ing.baker.types.Value] = Map.empty,
+      predefinedIngredients: Map[String, Value] = Map.empty,
       renamedInputIngredients: Map[String, String] = Map.empty,
       maximumExecutionCount: Option[Int] = None,
       failureStrategy: Option[InteractionFailureStrategy] = None,
@@ -234,8 +235,6 @@ case class Interaction(
 
   def withEventOutputTransformer(event: Event, newEventName: String, ingredientRenames: Map[String, String]): Interaction =
     copy(eventOutputTransformers = eventOutputTransformers + (event -> EventOutputTransformer(newEventName, ingredientRenames)))
-
-
 }
 
 object Interaction {

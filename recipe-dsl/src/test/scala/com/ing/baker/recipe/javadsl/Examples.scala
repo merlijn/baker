@@ -8,13 +8,13 @@ object Examples {
 
     // ingredients
 
-    val customerInfo = Ingredient[CustomerInfo]("customerInfo")
-    val goods = Ingredient[String]("goods")
-    val trackingId = Ingredient[String]("trackingId")
-    val order = Ingredient[String]("order")
-    val name = Ingredient[String]("name")
-    val address = Ingredient[String]("address")
-    val email = Ingredient[String]("email")
+    val customerInfo = Ingredient.reflect[CustomerInfo]("customerInfo")
+    val goods = Ingredient.reflect[String]("goods")
+    val trackingId = Ingredient.reflect[String]("trackingId")
+    val order = Ingredient.reflect[String]("order")
+    val name = Ingredient.reflect[String]("name")
+    val address = Ingredient.reflect[String]("address")
+    val email = Ingredient.reflect[String]("email")
 
     // events
 
@@ -73,14 +73,14 @@ object Examples {
 
     // ingredients
 
-    val iban = Ingredient[String]("iban")
-    val name = Ingredient[String]("name")
-    val address = Ingredient[String]("address")
-    val customerId = Ingredient[String]("customerId")
+    val iban = Ingredient.reflect[String]("iban")
+    val name = Ingredient.reflect[String]("name")
+    val address = Ingredient.reflect[String]("address")
+    val customerId = Ingredient.reflect[String]("customerId")
 
-    val getAccountFailedReason = Ingredient[String]("getAccountFailedReason")
-    val registerIndividualFailedReason = Ingredient[String]("registerIndividualFailedReason")
-    val assignAccountFailedReason = Ingredient[String]("registerIndividualFailedReason")
+    val getAccountFailedReason = Ingredient.reflect[String]("getAccountFailedReason")
+    val registerIndividualFailedReason = Ingredient.reflect[String]("registerIndividualFailedReason")
+    val assignAccountFailedReason = Ingredient.reflect[String]("registerIndividualFailedReason")
 
     // events
 
@@ -131,10 +131,10 @@ object Examples {
   object onboarding {
 
     //Ingredients
-    val customerName = Ingredient[String]("customerName")
-    val customerId = Ingredient[String]("customerId")
-    val accountId = Ingredient[Integer]("accountId")
-    val accountName = Ingredient[Integer]("accountName")
+    val customerName = Ingredient.reflect[String]("customerName")
+    val customerId = Ingredient.reflect[String]("customerId")
+    val accountId = Ingredient.reflect[Integer]("accountId")
+    val accountName = Ingredient.reflect[Integer]("accountName")
 
     //Events
     val agreementsAcceptedEvent = Event(name = "agreementsAccepted", providedIngredients = Seq.empty)
@@ -155,7 +155,7 @@ object Examples {
 
     val openAccount = Interaction(
       name = "OpenAccount",
-      input =Seq(customerId),
+      input = Seq(customerId),
       output = Seq(accountOpenedEvent, accountOpenedFailedEvent))
 
     val onboardingRecipe: Recipe =
