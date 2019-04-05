@@ -3,6 +3,8 @@ package com.ing.baker.types
 import java.nio.charset.StandardCharsets
 import java.util
 
+import com.ing.baker.types.reflect.Reflect
+
 import scala.reflect.runtime.universe
 import scala.util.{Random, Try}
 

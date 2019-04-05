@@ -1,9 +1,10 @@
-package com.ing.baker.types
+package com.ing.baker.types.reflect
 
 import java.lang.reflect.ParameterizedType
 
-import com.ing.baker.types.Reflect.readJavaType
-import com.ing.baker.types.modules._
+import com.ing.baker.types._
+import com.ing.baker.types.reflect.Reflect.readJavaType
+import com.ing.baker.types.reflect.modules.PrimitiveModule
 
 import scala.reflect.runtime.universe
 

@@ -4,7 +4,7 @@ import java.lang.reflect.Method
 
 import com.ing.baker.recipe.javadsl.ReflectionHelpers._
 import com.ing.baker.recipe.{annotations, javadsl}
-import com.ing.baker.types.Reflect
+import com.ing.baker.types.reflect.Reflect
 import org.reflections.Reflections
 
 import scala.annotation.varargs

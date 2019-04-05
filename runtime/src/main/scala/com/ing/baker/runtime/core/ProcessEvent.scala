@@ -1,7 +1,8 @@
 package com.ing.baker.runtime.core
 
 import com.ing.baker.il.EventDescriptor
-import com.ing.baker.types.{Reflect, NullValue, RecordValue, Value}
+import com.ing.baker.types.reflect.Reflect
+import com.ing.baker.types.{NullValue, RecordValue, Value}
 
 import scala.collection.JavaConverters._
 

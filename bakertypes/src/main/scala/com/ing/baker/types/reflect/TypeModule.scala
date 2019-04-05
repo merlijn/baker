@@ -1,4 +1,6 @@
-package com.ing.baker.types
+package com.ing.baker.types.reflect
+
+import com.ing.baker.types.{Type, Value}
 
 trait TypeModule {
 

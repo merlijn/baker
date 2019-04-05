@@ -1,9 +1,10 @@
-package com.ing.baker.types.modules
+package com.ing.baker.types.reflect.modules
 
 import java.lang.reflect.ParameterizedType
 
 import com.ing.baker.types
 import com.ing.baker.types._
+import com.ing.baker.types.reflect.{TypeAdapter, TypeModule}
 
 class PrimitiveModule extends TypeModule {
 

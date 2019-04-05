@@ -11,7 +11,8 @@ import com.ing.baker.recipe.CaseClassIngredient
 import com.ing.baker.recipe.TestRecipe.{fireTwoEventsInteraction, _}
 import com.ing.baker.recipe.javadsl.Recipe
 import com.ing.baker.runtime.core.{Baker, ProcessEvent}
-import com.ing.baker.types.{Reflect, Value}
+import com.ing.baker.types.Value
+import com.ing.baker.types.reflect.Reflect
 import com.typesafe.config.{Config, ConfigFactory}
 import org.mockito.Matchers._
 import org.mockito.Mockito._

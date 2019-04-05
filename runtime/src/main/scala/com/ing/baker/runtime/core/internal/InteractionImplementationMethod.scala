@@ -3,7 +3,8 @@ package com.ing.baker.runtime.core.internal
 import java.util.UUID
 
 import com.ing.baker.runtime.core.{ProcessEvent, _}
-import com.ing.baker.types.{Reflect, Type, Value}
+import com.ing.baker.types.reflect.Reflect
+import com.ing.baker.types.{Type, Value}
 import org.slf4j.LoggerFactory
 
 import scala.util.Try

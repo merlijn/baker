@@ -1,9 +1,10 @@
-package com.ing.baker.types.modules
+package com.ing.baker.types.reflect.modules
 
 import java.lang.reflect.ParameterizedType
 import java.util
 
 import com.ing.baker.types._
+import com.ing.baker.types.reflect.TypeAdapter
 
 import scala.collection.JavaConverters._
 
@@ -120,5 +121,3 @@ object JavaModules {
     }
   }
 }
-
-

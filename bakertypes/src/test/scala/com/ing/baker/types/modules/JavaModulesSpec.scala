@@ -4,7 +4,7 @@ import java.util
 import java.util.Optional
 
 import com.ing.baker.types
-import com.ing.baker.types.Reflect._
+import com.ing.baker.types.reflect.Reflect._
 import com.ing.baker.types.ConvertersTestData.TestEnum
 import com.ing.baker.types.ConvertersTestData.TestEnum.{ValueA, ValueB, ValueC}
 import com.ing.baker.types._

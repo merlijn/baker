@@ -1,9 +1,9 @@
-package com.ing.baker.types.modules
+package com.ing.baker.types.reflect.modules
 
-import java.lang.reflect
 import java.lang.reflect.ParameterizedType
 
 import com.ing.baker.types._
+import com.ing.baker.types.reflect.TypeAdapter
 
 object ScalaModules {
 
@@ -74,13 +74,13 @@ object ScalaModules {
 
   class OptionModule extends ClassModule[Option[_]] {
 
-    override def readType(context: TypeAdapter, javaType: reflect.Type): Type = javaType match {
+    override def readType(context: TypeAdapter, javaType: java.lang.reflect.Type): Type = javaType match {
       case clazz: ParameterizedType if classOf[scala.Option[_]].isAssignableFrom(getBaseClass(clazz)) =>
         val entryType = context.readType(clazz.getActualTypeArguments()(0))
         OptionType(entryType)
     }
 
-    override def toJava(context: TypeAdapter, value: Value, javaType: reflect.Type): Any = (value, javaType) match {
+    override def toJava(context: TypeAdapter, value: Value, javaType: java.lang.reflect.Type): Any = (value, javaType) match {
       case (_, generic: ParameterizedType) if classOf[Option[_]].isAssignableFrom(getBaseClass(generic.getRawType)) =>
         val optionType = generic.getActualTypeArguments()(0)
         value match {
@@ -99,6 +99,3 @@ object ScalaModules {
     }
   }
 }
-
-
-

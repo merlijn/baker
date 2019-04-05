@@ -1,5 +1,6 @@
-package com.ing.baker.types
+package com.ing.baker.types.reflect
 
+import com.ing.baker.types._
 import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
 

@@ -1,6 +1,7 @@
 package com.ing.baker.recipe.javadsl
 
-import com.ing.baker.types.{Reflect, Type, Value}
+import com.ing.baker.types.reflect.Reflect
+import com.ing.baker.types.{Type, Value}
 
 import scala.language.experimental.macros
 import scala.reflect.runtime.{universe => ru}

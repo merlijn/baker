@@ -1,7 +1,7 @@
 package com.ing.baker.types.modules
 
 import com.ing.baker.types
-import com.ing.baker.types.Reflect.{readJavaType, toJava, toValue}
+import com.ing.baker.types.reflect.Reflect.{readJavaType, toJava, toValue}
 import com.ing.baker.types._
 import org.scalatest.prop.Checkers
 import org.scalatest.{Matchers, WordSpecLike}

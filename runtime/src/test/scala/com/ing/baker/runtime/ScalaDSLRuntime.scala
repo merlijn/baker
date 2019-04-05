@@ -2,8 +2,9 @@ package com.ing.baker.runtime
 
 import com.ing.baker.recipe.javadsl.{Event, Ingredient, Interaction}
 import com.ing.baker.runtime.core.{InteractionImplementation, ProcessEvent}
-import com.ing.baker.types.Reflect.toJava
-import com.ing.baker.types.{Reflect, Type, Value}
+import com.ing.baker.types.reflect.Reflect
+import com.ing.baker.types.reflect.Reflect.toJava
+import com.ing.baker.types.{Type, Value}
 
 import scala.reflect.runtime.universe.TypeTag
 
