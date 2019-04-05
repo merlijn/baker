@@ -34,41 +34,41 @@ case class Interaction(
   /**
     * This sets a requirement for this interaction that a specific event needs to have been fired before it can execute.
     *
-    * @param newRequiredEvent the class of the events that needs to have been fired
+    * @param eventClass the class of the events that needs to have been fired
     * @return
     */
-  def withRequiredEvent(newRequiredEvent: Class[_]): Interaction =
-    copy(requiredEvents = requiredEvents + newRequiredEvent.getSimpleName)
+  def withRequiredEvent(eventClass: Class[_]): Interaction =
+    copy(requiredEvents = requiredEvents + eventClass.getSimpleName)
 
   /**
     * This sets a requirement for this interaction that some specific events needs to have been fired before it can execute.
     *
-    * @param newRequiredEvents the classes of the events.
+    * @param eventClasses the classes of the events.
     * @return
     */
   @SafeVarargs
   @varargs
-  def withRequiredEvents(newRequiredEvents: Class[_]*): Interaction =
-    copy(requiredEvents = requiredEvents ++ newRequiredEvents.map(_.getSimpleName))
+  def withRequiredEvents(eventClasses: Class[_]*): Interaction =
+    copy(requiredEvents = requiredEvents ++ eventClasses.map(_.getSimpleName))
 
   /**
     * This sets a requirement for this interaction that some specific events needs to have been fired before it can execute.
     *
-    * @param newRequiredEvents the classes of the event.
+    * @param eventClasses the classes of the event.
     * @return
     */
-  def withRequiredEvents(newRequiredEvents: java.util.Set[Class[_]]): Interaction =
-    copy(requiredEvents = requiredEvents ++ newRequiredEvents.asScala.map(_.getSimpleName))
+  def withRequiredEvents(eventClasses: java.util.Set[Class[_]]): Interaction =
+    copy(requiredEvents = requiredEvents ++ eventClasses.asScala.map(_.getSimpleName))
 
 
   /**
     * This sets a requirement for this interaction that a specific event needs to have been fired before it can execute.
     *
-    * @param newRequiredEventName the name of the events that needs to have been fired
+    * @param eventName the name of the events that needs to have been fired
     * @return
     */
-  def withRequiredEventFromName(newRequiredEventName: String): Interaction =
-    copy(requiredEvents = requiredEvents + newRequiredEventName)
+  def withRequiredEventFromName(eventName: String): Interaction =
+    copy(requiredEvents = requiredEvents + eventName)
 
   /**
     * This sets a requirement for this interaction that some specific events needs to have been fired before it can execute.
@@ -84,25 +84,25 @@ case class Interaction(
   /**
     * This sets a requirement for this interaction that some specific events needs to have been fired before it can execute.
     *
-    * @param newRequiredEvents the names of the events.
+    * @param eventNames the names of the events.
     * @return
     */
-  def withRequiredEventsFromName(newRequiredEvents: java.util.Set[String]): Interaction =
-    copy(requiredEvents = requiredEvents ++ newRequiredEvents.asScala)
+  def withRequiredEventsFromName(eventNames: java.util.Set[String]): Interaction =
+    copy(requiredEvents = requiredEvents ++ eventNames.asScala)
 
   /**
     * This sets a requirement for this interaction that one of the given events needs to have been fired before it can execute.
     *
-    * @param newRequiredOneOfEvents the classes of the events.
+    * @param eventClasses the classes of the events.
     * @return
     */
   @SafeVarargs
   @varargs
-  def withRequiredOneOfEvents(newRequiredOneOfEvents: Class[_]*): Interaction = {
-    if (newRequiredOneOfEvents.nonEmpty && newRequiredOneOfEvents.size < 2)
+  def withRequiredOneOfEvents(eventClasses: Class[_]*): Interaction = {
+    if (eventClasses.nonEmpty && eventClasses.size < 2)
       throw new IllegalArgumentException("At least 2 events should be provided as 'requiredOneOfEvents'")
 
-    val newRequired: Set[Set[String]] = requiredOneOfEvents + newRequiredOneOfEvents.map(_.getSimpleName).toSet
+    val newRequired: Set[Set[String]] = requiredOneOfEvents + eventClasses.map(_.getSimpleName).toSet
 
     copy(requiredOneOfEvents = newRequired)
   }
