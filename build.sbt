@@ -55,10 +55,7 @@ lazy val bakertypes = project.in(file("bakertypes"))
   .settings(
     moduleName := "baker-types",
     libraryDependencies ++= compileDeps(
-      slf4jApi,
-      typeSafeConfig,
       objenisis,
-      scalapbRuntime,
       scalaReflect(scalaVersion.value)
     ) ++ testDeps(scalaTest, scalaCheck, logback, scalaCheck)
   )
