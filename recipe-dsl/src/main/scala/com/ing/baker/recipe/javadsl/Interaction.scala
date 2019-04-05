@@ -11,6 +11,89 @@ import org.reflections.Reflections
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
 
+object Interaction {
+
+  private val interactionMethodName: String = "apply"
+  
+  def reflect[T](interactionClass: Class[T]): Interaction = reflect(interactionClass, None)
+
+  def reflect[T](interactionClass: Class[T], name: String): Interaction = reflect(interactionClass, Some(name))
+
+  def reflect(interactionClass: Class[_], newName: Option[String]): Interaction = {
+
+    val name: String = interactionClass.getSimpleName
+
+    val applyMethod: Method = interactionClass.getDeclaredMethods
+      .find(_.getName == interactionMethodName)
+      .getOrElse(throw new IllegalStateException(
+        s"No method named '$interactionMethodName' defined on '${interactionClass.getName}'"))
+
+    val inputIngredients: Seq[Ingredient] =
+      applyMethod.getParameterNames.map(name =>
+        Ingredient(name,
+          ReflectionHelpers.parseType(
+            applyMethod.parameterTypeForName(name).get,
+            s"Unsupported type for ingredient '$name' on interaction '${interactionClass.getName}'")))
+
+    def getOutputClasses(): Seq[Class[_]] = {
+
+      def autoDetectOutput(): Seq[Class[_]] = {
+
+        import scala.collection.JavaConverters._
+
+        val returnType = applyMethod.getReturnType
+
+        if (classOf[Unit].equals(returnType) || classOf[java.lang.Void].equals(returnType))
+          Seq.empty
+
+        // in case the return type is an interface we find all implementations in the same package
+        else if (returnType.isInterface) {
+
+          val packageName = returnType.getPackage.getName
+
+          val reflections = new Reflections(packageName)
+
+          val classes = reflections.getSubTypesOf(returnType).asScala.toSeq
+
+          classes
+        }
+        // otherwise there is only a single return event
+        else {
+          Seq(returnType)
+        }
+      }
+
+      if (applyMethod.isAnnotationPresent(classOf[annotations.FiresEvent])) {
+
+        val outputEventClasses: Seq[Class[_]] = applyMethod.getAnnotation(classOf[annotations.FiresEvent]).oneOf()
+
+        if (outputEventClasses.isEmpty) {
+          autoDetectOutput()
+        }
+        else {
+          outputEventClasses.foreach {
+            eventClass =>
+              if (!applyMethod.getReturnType.isAssignableFrom(eventClass))
+                throw new RecipeValidationException(s"Interaction $name provides event '${eventClass.getName}' that is incompatible with it's return type")
+          }
+
+          outputEventClasses
+        }
+      }
+      else autoDetectOutput()
+    }
+
+    val output: Seq[Event] = getOutputClasses().map(javadsl.Event.reflect(_, None))
+
+    val originalName: Option[String] = newName match {
+      case None => Some(name)
+      case _    => None
+    }
+
+    Interaction(newName.getOrElse(name), inputIngredients, output, originalName, Set.empty, Set.empty, Map.empty, Map.empty, None, None, Map.empty)
+  }
+}
+
 case class Interaction(
       name: String,
       input: Seq[Ingredient],
@@ -235,87 +318,4 @@ case class Interaction(
 
   def withEventOutputTransformer(event: Event, newEventName: String, ingredientRenames: Map[String, String]): Interaction =
     copy(eventOutputTransformers = eventOutputTransformers + (event -> EventOutputTransformer(newEventName, ingredientRenames)))
-}
-
-object Interaction {
-
-  private val interactionMethodName: String = "apply"
-
-  def reflect(interactionClass: Class[_], newName: Option[String]): Interaction = {
-
-    val name: String = interactionClass.getSimpleName
-
-    val applyMethod: Method = interactionClass.getDeclaredMethods
-      .find(_.getName == interactionMethodName)
-      .getOrElse(throw new IllegalStateException(
-        s"No method named '$interactionMethodName' defined on '${interactionClass.getName}'"))
-
-    val inputIngredients: Seq[Ingredient] =
-      applyMethod.getParameterNames.map(name =>
-        Ingredient(name,
-          ReflectionHelpers.parseType(
-            applyMethod.parameterTypeForName(name).get,
-            s"Unsupported type for ingredient '$name' on interaction '${interactionClass.getName}'")))
-
-    def getOutputClasses(): Seq[Class[_]] = {
-
-      def autoDetectOutput(): Seq[Class[_]] = {
-
-        import scala.collection.JavaConverters._
-
-        val returnType = applyMethod.getReturnType
-
-        if (classOf[Unit].equals(returnType) || classOf[java.lang.Void].equals(returnType))
-          Seq.empty
-
-        // in case the return type is an interface we find all implementations in the same package
-        else if (returnType.isInterface) {
-
-          val packageName = returnType.getPackage.getName
-
-          val reflections = new Reflections(packageName)
-
-          val classes = reflections.getSubTypesOf(returnType).asScala.toSeq
-
-          classes
-        }
-        // otherwise there is only a single return event
-        else {
-          Seq(returnType)
-        }
-      }
-
-      if (applyMethod.isAnnotationPresent(classOf[annotations.FiresEvent])) {
-
-        val outputEventClasses: Seq[Class[_]] = applyMethod.getAnnotation(classOf[annotations.FiresEvent]).oneOf()
-
-        if (outputEventClasses.isEmpty) {
-          autoDetectOutput()
-        }
-        else {
-          outputEventClasses.foreach {
-            eventClass =>
-              if (!applyMethod.getReturnType.isAssignableFrom(eventClass))
-                throw new RecipeValidationException(s"Interaction $name provides event '${eventClass.getName}' that is incompatible with it's return type")
-          }
-
-          outputEventClasses
-        }
-      }
-      else autoDetectOutput()
-    }
-
-    val output: Seq[Event] = getOutputClasses().map(javadsl.Event.reflect(_, None))
-
-    val originalName: Option[String] = newName match {
-      case None => Some(name)
-      case _    => None
-    }
-
-    Interaction(newName.getOrElse(name), inputIngredients, output, originalName, Set.empty, Set.empty, Map.empty, Map.empty, None, None, Map.empty)
-  }
-
-  def reflect[T](interactionClass: Class[T]): Interaction = reflect(interactionClass, None)
-
-  def reflect[T](interactionClass: Class[T], name: String): Interaction = reflect(interactionClass, Some(name))
 }
