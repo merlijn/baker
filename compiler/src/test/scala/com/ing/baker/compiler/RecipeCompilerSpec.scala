@@ -3,7 +3,7 @@ package com.ing.baker.compiler
 import java.util.Optional
 
 import com.ing.baker.il.{CompiledRecipe, RecipeValidationSettings}
-import com.ing.baker.recipe.TestRecipe._
+import com.ing.baker.recipe.dsl.examples.TestRecipe._
 import com.ing.baker.recipe.dsl
 import com.ing.baker.recipe.dsl._
 import com.ing.baker.types.{NullValue, PrimitiveValue}

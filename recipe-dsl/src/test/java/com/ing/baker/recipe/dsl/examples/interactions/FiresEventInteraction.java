@@ -1,7 +1,7 @@
-package com.ing.baker.recipe.dsl.interactions;
+package com.ing.baker.recipe.dsl.examples.interactions;
 
 import com.ing.baker.recipe.annotations.FiresEvent;
-import com.ing.baker.recipe.dsl.events.InteractionProvidedEvent;
+import com.ing.baker.recipe.dsl.examples.events.InteractionProvidedEvent;
 
 import javax.inject.Named;
 

@@ -8,7 +8,7 @@ import akka.persistence.inmemory.extension.{InMemoryJournalStorage, StorageExten
 import akka.testkit.{TestDuration, TestKit, TestProbe}
 import com.ing.baker._
 import com.ing.baker.compiler.RecipeCompiler
-import com.ing.baker.recipe.TestRecipe._
+import com.ing.baker.recipe.dsl.examples.TestRecipe._
 import com.ing.baker.recipe.dsl.InteractionFailureStrategy.FireEventAfterFailure
 import com.ing.baker.recipe.dsl.{InteractionFailureStrategy, Recipe}
 import com.ing.baker.runtime.core.events.BakerEvent
@@ -273,22 +273,22 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       try {
 
-        import com.ing.baker.Webshop._
+        import com.ing.baker.recipe.dsl.examples.WebshopJava._
 
-        val recipe = Webshop.webshopRecipe
+        val recipe = webshopRecipe
 
         // test data
-        val customerInfo = new Webshop.CustomerInfo("klaas", "straat", "email")
+        val customerInfo = new CustomerInfo("klaas", "straat", "email")
         val processId = "backwards-compatible-process"
         val order = "123"
         val trackingId = "trackingId"
         val goods = "some goods"
 
         // mocks
-        val shipGoodsMock: ShipGoods = mock[Webshop.ShipGoods]
-        val sendInvoiceMock: SendInvoice = mock[Webshop.SendInvoice]
-        val manufactureGoodsMock: ManufactureGoods = mock[Webshop.ManufactureGoods]
-        val validateOrderMock: ValidateOrder = mock[Webshop.ValidateOrder]
+        val shipGoodsMock: ShipGoods = mock[ShipGoods]
+        val sendInvoiceMock: SendInvoice = mock[SendInvoice]
+        val manufactureGoodsMock: ManufactureGoods = mock[ManufactureGoods]
+        val validateOrderMock: ValidateOrder = mock[ValidateOrder]
 
         val implementations = Seq(shipGoodsMock, sendInvoiceMock, manufactureGoodsMock, validateOrderMock)
 

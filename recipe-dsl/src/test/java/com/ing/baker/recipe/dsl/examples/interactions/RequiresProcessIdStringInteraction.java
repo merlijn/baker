@@ -1,4 +1,4 @@
-package com.ing.baker.recipe.dsl.interactions;
+package com.ing.baker.recipe.dsl.examples.interactions;
 
 import com.ing.baker.recipe.annotations.ProcessId;
 

@@ -1,8 +1,7 @@
 package com.ing.baker.runtime.core
 
-import com.ing.baker.Webshop
 import com.ing.baker.compiler.RecipeCompiler
-import javax.script.Bindings
+import com.ing.baker.recipe.dsl.examples.Webshop
 import org.scalatest.{Matchers, WordSpec}
 
 class JavascriptSpec extends WordSpec with Matchers {
@@ -18,7 +17,7 @@ class JavascriptSpec extends WordSpec with Matchers {
           |
         """.stripMargin
 
-      val recipe = RecipeCompiler.compileRecipe(Webshop.webshopRecipe)
+      val recipe = RecipeCompiler.compileRecipe(Webshop.webShopRecipe)
 
       val i = recipe.interactionTransitions.find(_.originalName == "SendInvoice").get
 

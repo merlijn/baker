@@ -6,7 +6,7 @@ import akka.testkit.TestProbe
 import com.ing.baker._
 import com.ing.baker.compiler.RecipeCompiler
 import com.ing.baker.il.CompiledRecipe
-import com.ing.baker.recipe.TestRecipe.getRecipe
+import com.ing.baker.recipe.dsl.examples.TestRecipe.getRecipe
 import org.slf4j.LoggerFactory
 
 import scala.language.postfixOps

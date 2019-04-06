@@ -7,8 +7,8 @@ import akka.actor.ActorSystem
 import akka.testkit.TestKit
 import com.ing.baker.compiler.RecipeCompiler
 import com.ing.baker.il.CompiledRecipe
-import com.ing.baker.recipe.CaseClassIngredient
-import com.ing.baker.recipe.TestRecipe.{FireTwoEventsInteraction, _}
+import com.ing.baker.recipe.dsl.examples.CaseClassIngredient
+import com.ing.baker.recipe.dsl.examples.TestRecipe.{FireTwoEventsInteraction, _}
 import com.ing.baker.recipe.dsl.Recipe
 import com.ing.baker.runtime.core.{Baker, ProcessEvent}
 import com.ing.baker.types.Value

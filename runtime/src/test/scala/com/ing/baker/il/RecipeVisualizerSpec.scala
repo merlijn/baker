@@ -1,7 +1,7 @@
 package com.ing.baker.il
 
 import com.ing.baker.compiler.RecipeCompiler
-import com.ing.baker.recipe.TestRecipe._
+import com.ing.baker.recipe.dsl.examples.TestRecipe._
 import com.ing.baker.recipe.dsl.Recipe
 import org.scalatest.{Matchers, WordSpecLike}
 

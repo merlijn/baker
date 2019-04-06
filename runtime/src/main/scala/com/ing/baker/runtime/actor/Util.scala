@@ -18,37 +18,6 @@ import scala.util.{Failure, Success}
 
 object Util {
 
-  case object Ping extends NoSerializationVerificationNeeded
-  case object Pong extends NoSerializationVerificationNeeded
-
-  class AwaitPersistenceInit extends PersistentActor with ActorLogging {
-
-    override val persistenceId: String = s"persistenceInit-${UUID.randomUUID()}"
-
-    log.info("Starting PersistenceInit actor with id: {}", persistenceId)
-
-    // intentionally left empty
-    def receiveRecover: Receive = Map.empty
-
-    // intentionally left empty
-    def receiveCommand: Receive = {
-      case Ping =>
-        log.info("Received persistence init")
-        sender() ! Pong
-        context.self ! PoisonPill
-    }
-  }
-
-  // Executes the given function 'executeAfterInit' only after PersistenceInit actor initialises and returns response
-  def persistenceInit(journalInitializeTimeout: FiniteDuration)(implicit system: ActorSystem): Future[Unit] = {
-
-    import system.dispatcher
-
-    val persistenceInitActor = system.actorOf(Props(classOf[AwaitPersistenceInit]), s"persistenceInit-${UUID.randomUUID().toString}")
-
-    persistenceInitActor.ask(Ping)(Timeout(journalInitializeTimeout)).map(_ => ())
-  }
-
   private val sequenceTimeoutExtra = 10 seconds
 
   def collectFuturesWithin[T, M[X] <: scala.TraversableOnce[X]](futures: M[Future[T]], timeout: FiniteDuration, scheduler: akka.actor.Scheduler)(implicit ec: ExecutionContext): Seq[T] = {

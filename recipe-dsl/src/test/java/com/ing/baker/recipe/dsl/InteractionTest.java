@@ -1,11 +1,11 @@
 package com.ing.baker.recipe.dsl;
 
-import com.ing.baker.recipe.dsl.events.InteractionProvidedEvent;
-import com.ing.baker.recipe.dsl.events.InteractionProvidedEvent2;
-import com.ing.baker.recipe.dsl.events.SensoryEventWithIngredient;
-import com.ing.baker.recipe.dsl.events.SensoryEventWithoutIngredient;
-import com.ing.baker.recipe.dsl.interactions.FiresEventInteraction;
-import com.ing.baker.recipe.dsl.interactions.SimpleInteraction;
+import com.ing.baker.recipe.dsl.examples.events.InteractionProvidedEvent;
+import com.ing.baker.recipe.dsl.examples.events.InteractionProvidedEvent2;
+import com.ing.baker.recipe.dsl.examples.events.SensoryEventWithIngredient;
+import com.ing.baker.recipe.dsl.examples.events.SensoryEventWithoutIngredient;
+import com.ing.baker.recipe.dsl.examples.interactions.FiresEventInteraction;
+import com.ing.baker.recipe.dsl.examples.interactions.SimpleInteraction;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

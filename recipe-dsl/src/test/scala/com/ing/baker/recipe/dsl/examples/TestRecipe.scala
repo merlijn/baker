@@ -1,4 +1,4 @@
-package com.ing.baker.recipe
+package com.ing.baker.recipe.dsl.examples
 
 import java.util.Optional
 

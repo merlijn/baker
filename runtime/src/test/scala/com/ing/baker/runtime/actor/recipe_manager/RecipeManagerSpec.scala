@@ -6,7 +6,7 @@ import akka.actor.ActorRef
 import akka.pattern.ask
 import com.ing.baker.BakerRuntimeTestBase
 import com.ing.baker.compiler.RecipeCompiler
-import com.ing.baker.recipe.TestRecipe
+import com.ing.baker.recipe.dsl.examples.TestRecipe
 import com.ing.baker.runtime.actor.recipe_manager.RecipeManagerProtocol._
 import com.typesafe.config.{Config, ConfigFactory}
 import org.slf4j.LoggerFactory

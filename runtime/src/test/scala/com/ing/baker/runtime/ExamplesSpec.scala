@@ -8,7 +8,7 @@ class ExamplesSpec extends BakerRuntimeTestBase  {
 
   "The WebShop recipe" should {
 
-    import com.ing.baker.recipe.dsl.Examples.webshop._
+    import com.ing.baker.recipe.dsl.examples.Webshop._
 
     "compile without validation errors" in {
 
@@ -24,7 +24,7 @@ class ExamplesSpec extends BakerRuntimeTestBase  {
 
   "The open account recipe" should {
 
-    import com.ing.baker.recipe.dsl.Examples.open_account._
+    import com.ing.baker.recipe.dsl.examples.OpenAccount._
 
     "compile without validation errors" in {
 

@@ -38,15 +38,15 @@ class FireEventActorSpec extends TestKit(ActorSystem("ProcessApiSpec", FireEvent
 
   "The ProcessApi" should {
 
-    import com.ing.baker.recipe.dsl.Examples.webshop
+    import com.ing.baker.recipe.dsl.examples.Webshop
 
-    val webShopRecipe = RecipeCompiler.compileRecipe(webshop.webShopRecipe)
+    val webShopRecipe = RecipeCompiler.compileRecipe(Webshop.webShopRecipe)
 
     "return a source of FireTransition responses resulting from a TransitionFired command" in {
 
       val processProbe = TestProbe()
 
-      val processEventCmd = FireEvent("", ProcessEvent(webshop.orderPlaced.name, Seq.empty), None, true, 1 second)
+      val processEventCmd = FireEvent("", ProcessEvent(Webshop.orderPlaced.name, Seq.empty), None, true, 1 second)
 
       val source: Source[Any, NotUsed] = FireEventActor.fireEvent(processProbe.ref, webShopRecipe, processEventCmd)
 
@@ -66,7 +66,7 @@ class FireEventActorSpec extends TestKit(ActorSystem("ProcessApiSpec", FireEvent
 
       val processProbe = TestProbe()
 
-      val processEventCmd = FireEvent("", ProcessEvent(webshop.orderPlaced.name, Seq.empty), None, true, 1 second)
+      val processEventCmd = FireEvent("", ProcessEvent(Webshop.orderPlaced.name, Seq.empty), None, true, 1 second)
 
       val source: Source[Any, NotUsed] = FireEventActor.fireEvent(processProbe.ref, webShopRecipe, processEventCmd)
 
@@ -89,7 +89,7 @@ class FireEventActorSpec extends TestKit(ActorSystem("ProcessApiSpec", FireEvent
 
       def check(msg: Any) = {
         val processProbe = TestProbe()
-        val processEventCmd = FireEvent("", ProcessEvent(webshop.orderPlaced.name, Seq.empty), None, true, 1 second)
+        val processEventCmd = FireEvent("", ProcessEvent(Webshop.orderPlaced.name, Seq.empty), None, true, 1 second)
 
         val source: Source[Any, NotUsed] = FireEventActor.fireEvent(processProbe.ref, webShopRecipe, processEventCmd)
         val runSource: TestSubscriber.Probe[Any] = source.runWith(TestSink.probe)

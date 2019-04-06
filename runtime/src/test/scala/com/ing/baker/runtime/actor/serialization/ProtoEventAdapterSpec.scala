@@ -6,9 +6,10 @@ import akka.actor.ActorSystem
 import com.ing.baker.compiler.RecipeCompiler
 import com.ing.baker.il.CompiledRecipe
 import com.ing.baker.petrinet.api._
+import com.ing.baker.recipe.dsl.examples.AllTypeRecipe
 import com.ing.baker.runtime.actor.serialization.Encryption._
 import com.ing.baker.runtime.actor.serialization.ProtoEventAdapterSpec._
-import com.ing.baker.{AllTypeRecipe, types}
+import com.ing.baker.types
 import javax.crypto.BadPaddingException
 import org.scalacheck.Gen
 import org.scalacheck.Prop.{BooleanOperators, forAll}

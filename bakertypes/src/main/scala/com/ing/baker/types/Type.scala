@@ -49,6 +49,8 @@ sealed trait Type {
   def isEnum: Boolean = isInstanceOf[EnumType]
   def isMap: Boolean = isInstanceOf[MapType]
   def isRecord: Boolean = isInstanceOf[RecordType]
+
+  def metaData: Map[String, PrimitiveValue] = Map.empty
 }
 
 case class ListType(entryType: Type) extends Type

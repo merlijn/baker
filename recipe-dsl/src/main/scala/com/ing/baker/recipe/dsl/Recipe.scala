@@ -7,20 +7,22 @@ import scala.collection.JavaConverters._
 import scala.concurrent.duration
 import scala.concurrent.duration.{Duration, FiniteDuration}
 
-object Recipe {
-  def apply(name: String): Recipe = {
-    Recipe(name, Seq.empty, Seq.empty, InteractionFailureStrategy.BlockInteraction(), None, None)
-  }
-}
-
 case class Recipe(
     name: String,
-    interactions: Seq[Interaction],
-    sensoryEvents: Seq[Event],
+    interactions: Seq[Interaction] = Seq.empty,
+    sensoryEvents: Seq[Event]= Seq.empty,
     defaultFailureStrategy: InteractionFailureStrategy = InteractionFailureStrategy.BlockInteraction(),
     eventReceivePeriod: Option[FiniteDuration] = None,
     retentionPeriod: Option[FiniteDuration] = None) {
 
+  /**
+    * This constructor is for java usage:
+    *
+    * Recipe recipe = new Recipe("name").withEvents(...)
+    *
+    * @param name
+    * @return
+    */
   def this(name: String) = this(name, Seq.empty, Seq.empty, InteractionFailureStrategy.BlockInteraction(), None, None)
 
   def getInteractions: java.util.List[Interaction] = interactions.asJava
