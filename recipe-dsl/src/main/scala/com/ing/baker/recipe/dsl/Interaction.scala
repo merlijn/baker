@@ -6,14 +6,18 @@ import com.ing.baker.recipe.dsl.ReflectionHelpers._
 import com.ing.baker.recipe.{annotations, dsl}
 import com.ing.baker.types.Value
 import com.ing.baker.types.reflect.Reflect
+import com.ing.baker.types.reflect.Reflect.mirror
 import org.reflections.Reflections
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
+import scala.reflect.runtime.universe.TypeTag
 
 object Interaction {
 
   private val interactionMethodName: String = "apply"
+
+  def reflect[T : TypeTag]: Interaction = reflect(mirror.runtimeClass(mirror.typeOf[T]))
   
   def reflect[T](interactionClass: Class[T]): Interaction = reflect(interactionClass, None)
 

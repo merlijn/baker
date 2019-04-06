@@ -2,18 +2,128 @@ package com.ing.baker.recipe
 
 import java.util.Optional
 
+import com.ing.baker.recipe.annotations.ProcessId
 import com.ing.baker.recipe.dsl._
+import javax.inject.Named
 
 import scala.concurrent.duration._
 
-//By adding the dsl Ingredient tag the object will be serialized by Kryo
 class ComplexObjectIngredient(value: String)
 
 case class CaseClassIngredient(a: Int, b: String)
 
 object TestRecipe {
 
-  //inputIngredients = Seq as used in the recipe
+  case class InitialEvent(initialIngredient: String)
+
+  case class InitialEventExtendedName(initialIngredientExtendedName: String)
+
+  case class SecondEvent()
+
+  case class ThirdEvent()
+
+  case class FourthEvent()
+
+  case class NotUsedSensoryEvent()
+
+  case class Event1FromInteractionSeven(interactionSevenIngredient1: String)
+
+  case class Event2FromInteractionSeven(interactionSevenIngredient2: String)
+
+  case class EmptyEvent()
+
+  case class UnboxedProviderEvent(missingJavaOptional: String, initialIngredient: String, missingScalaOptional: String)
+
+  //Interactions used in the recipe & implementations (we use traits instead of case classes since we use mocks for the real implementations
+
+  case class InteractionOneSuccessful(interactionOneOriginalIngredient: String)
+
+  trait InteractionOne {
+    def apply(@ProcessId processId: String, @Named("initialIngredient") initialIngredient: String): InteractionOneSuccessful
+  }
+
+  case class EventFromInteractionTwo(interactionTwoIngredient: String)
+
+  trait InteractionTwo {
+    def apply(@Named("initialIngredientOld") initialIngredientOld: String): EventFromInteractionTwo
+  }
+
+  case class InteractionThreeSuccessful(interactionThreeIngredient: String)
+
+  trait InteractionThree {
+    def apply(@Named("interactionOneIngredient") interactionOneIngredient: String, @Named("interactionTwoIngredient") interactionTwoIngredient: String): InteractionThreeSuccessful
+  }
+
+  case class InteractionFourSuccessful(interactionFourIngredient: String)
+
+  trait InteractionFour {
+    def apply(): InteractionFourSuccessful
+  }
+
+  case class InteractionFiveSuccessful(interactionFiveIngredient: String)
+
+  trait InteractionFive {
+    def apply(@ProcessId processId: String, @Named("initialIngredient") initialIngredient: String, @Named("initialIngredientExtendedName") initialIngredientExtendedName: String): InteractionFiveSuccessful
+  }
+
+  case class InteractionSixSuccessful(interactionSixIngredient: String)
+
+  trait InteractionSix {
+    def apply(@Named("initialIngredientExtendedName") initialIngredientExtendedName: String): InteractionSixSuccessful
+  }
+
+  trait InteractionSeven {
+    def apply(@Named("initialIngredient") initialIngredient: String): String
+  }
+
+  trait InteractionEight {
+    def apply(@Named("interactionSevenIngredient1") interactionSevenIngredient1: String, @Named("interactionSevenIngredient2") interactionSevenIngredient2: String): Unit
+  }
+
+  trait FireTwoEventsInteraction {
+    def apply(@Named("initialIngredient") initialIngredient: String): Event1FromInteractionSeven
+  }
+
+  trait ProvidesNothingInteraction {
+    def apply(@Named("initialIngredient") initialIngredient: String): Unit
+  }
+
+  case class InteractionNineSuccessful(interactionNineIngredient: String)
+
+  trait InteractionNine {
+    def apply(@ProcessId processId: String, @Named("initialIngredient") initialIngredient: String): InteractionNineSuccessful
+  }
+
+  case class ComplexIngredientInteractionSuccessful(complexOjectIngredient: ComplexObjectIngredient)
+
+  trait ComplexIngredientInteraction {
+    def apply(@Named("initialIngredient") initialIngredient: String): ComplexIngredientInteractionSuccessful
+  }
+
+  case class CaseClassIngredientInteractionSuccessful(caseClassIngredient: CaseClassIngredient)
+
+  trait CaseClassIngredientInteraction {
+    def apply(@Named("initialIngredient") initialIngredient: String): CaseClassIngredientInteractionSuccessful
+  }
+
+  trait CaseClassIngredientInteraction2 {
+    def apply(@Named("caseClassIngredient") caseClassIngredient: CaseClassIngredient): EmptyEvent
+  }
+
+  trait NonMatchingReturnTypeInteraction {
+    def apply(@Named("initialIngredient") initialIngredient: String): EventFromInteractionTwo
+  }
+
+  trait OptionalIngredientInteraction {
+    def apply(@Named("missingJavaOptional") missingJavaOptional: Optional[String],
+              @Named("missingJavaOptional2") missingJavaOptional2: Optional[Integer],
+              @Named("missingScalaOptional") missingScalaOptional: Option[String],
+              @Named("missingScalaOptional2") missingScalaOptional2: Option[Integer],
+              @Named("initialIngredient") initialIngredient: String): Unit
+  }
+
+  // --- Ingredients
+
   val initialIngredientOld = Ingredient.reflect[String]("initialIngredientOld")
   val initialIngredient = Ingredient.reflect[String]("initialIngredient")
   val interactionOneOriginalIngredient = Ingredient.reflect[String]("interactionOneOriginalIngredient")
@@ -36,272 +146,41 @@ object TestRecipe {
   val missingScalaOptionalDirectString  = Ingredient.reflect[String]("missingScalaOptional")
   val missingScalaOptional2 = Ingredient.reflect[Option[Int]]("missingScalaOptional2")
 
-  case class InitialEvent(initialIngredient: String)
+  // --- Interactions
 
-  //Events as used in the recipe & objects used in runtime
+  val interactionOne = Interaction.reflect[InteractionOne]
+  val interactionTwo = Interaction.reflect[InteractionTwo]
+  val interactionThree = Interaction.reflect[InteractionThree]
+  val interactionFour = Interaction.reflect[InteractionFour]
+  val interactionFive = Interaction.reflect[InteractionFive]
+  val interactionSix = Interaction.reflect[InteractionSix]
+  val interactionSeven = Interaction.reflect[InteractionSeven]
+  val interactionEight = Interaction.reflect[InteractionEight]
+  val interactionNine = Interaction.reflect[InteractionNine]
+
+  val fireTwoEventsInteraction = Interaction.reflect[FireTwoEventsInteraction]
+  val providesNothingInteraction = Interaction.reflect[ProvidesNothingInteraction]
+  val complexIngredientInteraction = Interaction.reflect[ComplexIngredientInteraction]
+  val caseClassIngredientInteraction = Interaction.reflect[CaseClassIngredientInteraction]
+  val caseClassIngredientInteraction2 = Interaction.reflect[CaseClassIngredientInteraction2]
+  val NonMatchingReturnTypeInteraction = Interaction.reflect[NonMatchingReturnTypeInteraction]
+  val optionalIngredientInteraction = Interaction.reflect[OptionalIngredientInteraction]
+
+  // --- Events
+
   val initialEvent = Event("InitialEvent", Seq(initialIngredient), maxFiringLimit = None)
-
   val initialEventExtendedName = Event("InitialEventExtendedName", Seq(initialIngredientExtendedName))
-
-  case class InitialEventExtendedName(initialIngredientExtendedName: String)
-
   val secondEvent = Event("SecondEvent")
-
-  case class SecondEvent()
-
   val thirdEvent = Event("ThirdEvent")
-
-  case class ThirdEvent()
-
   val fourthEvent = Event("FourthEvent")
-
-  case class FourthEvent()
-
   val notUsedSensoryEvent = Event("NotUsedSensoryEvent")
-
-  case class NotUsedSensoryEvent()
-
   val eventFromInteractionTwo = Event("EventFromInteractionTwo", Seq(interactionTwoIngredient))
-
-  case class EventFromInteractionTwo(interactionTwoIngredient: String)
-
   val event1FromInteractionSeven = Event("Event1FromInteractionSeven", Seq(interactionSevenIngredient1))
-
-  case class Event1FromInteractionSeven(interactionSevenIngredient1: String)
-
   val event2FromInteractionSeven = Event("Event2FromInteractionSeven", Seq(interactionSevenIngredient2))
-
-  case class Event2FromInteractionSeven(interactionSevenIngredient2: String)
-
   val emptyEvent = Event("EmptyEvent", providedIngredients = Seq.empty)
-
-  case class EmptyEvent()
-
   val exhaustedEvent = Event("RetryExhausted", providedIngredients = Seq.empty)
-
   val unboxedProviderEvent = Event("UnboxedProviderEvent", Seq(missingJavaOptionalDirectString, initialIngredient, missingScalaOptionalDirectString))
-
-  case class UnboxedProviderEvent(missingJavaOptional: String, initialIngredient: String, missingScalaOptional: String)
-
-  case class InteractionOneSuccessful(interactionOneOriginalIngredient: String)
-
-  val interactionOneSuccessful: dsl.Event = Event.reflect[InteractionOneSuccessful]
-
-  //Interactions used in the recipe & implementations (we use traits instead of case classes since we use mocks for the real implementations
-  val interactionOne =
-    Interaction(
-      name = "InteractionOne",
-      input = Seq(processId, initialIngredient),
-      output = Seq(interactionOneSuccessful))
-
-  trait InteractionOne {
-    def name: String = "InteractionOne"
-
-    def apply(processId: String, initialIngredient: String): InteractionOneSuccessful
-  }
-
-  val interactionTwo =
-    Interaction(
-      name = "InteractionTwo",
-      input = Seq(initialIngredientOld),
-      output = Seq(eventFromInteractionTwo))
-
-  trait InteractionTwo {
-    val name: String = "InteractionTwo"
-
-    def apply(initialIngredientOld: String): EventFromInteractionTwo
-  }
-
-  case class InteractionThreeSuccessful(interactionThreeIngredient: String)
-
-  val interactionThree =
-    Interaction(
-      name = "InteractionThree",
-      input = Seq(interactionOneIngredient, interactionTwoIngredient),
-      output = Seq(Event.reflect[InteractionThreeSuccessful]))
-
-  trait InteractionThree {
-    val name: String = "InteractionThree"
-
-    def apply(interactionOneIngredient: String, interactionTwoIngredient: String): InteractionThreeSuccessful
-  }
-
-  case class InteractionFourSuccessful(interactionFourIngredient: String)
-
-  val interactionFour =
-    Interaction(
-      name = "InteractionFour",
-      input = Seq.empty,
-      output = Seq(Event.reflect[InteractionFourSuccessful]))
-
-  trait InteractionFour {
-    val name: String = "InteractionFour"
-
-    def apply(): InteractionFourSuccessful
-  }
-
-  case class InteractionFiveSuccessful(interactionFiveIngredient: String)
-
-  val interactionFive =
-    Interaction(
-      name = "InteractionFive",
-      input = Seq(processId, initialIngredient, initialIngredientExtendedName),
-      output = Seq(Event.reflect[InteractionFiveSuccessful]))
-
-  trait InteractionFive {
-    val name: String = "InteractionFive"
-
-    def apply(processId: String, initialIngredient: String, initialIngredientExtendedName: String): InteractionFiveSuccessful
-  }
-
-  case class InteractionSixSuccessful(interactionSixIngredient: String)
-
-  val interactionSix =
-    Interaction(
-      name = "InteractionSix",
-      input = Seq(initialIngredientExtendedName),
-      output = Seq(Event.reflect[InteractionSixSuccessful]))
-
-  trait InteractionSix {
-    val name: String = "InteractionSix"
-
-    def apply(initialIngredientExtendedName: String): InteractionSixSuccessful
-  }
-
-  val interactionSeven =
-    Interaction(
-      name = "InteractionSeven",
-      input = Seq(initialIngredient),
-      output = Seq(event1FromInteractionSeven, event2FromInteractionSeven))
-
-  trait InteractionSeven {
-    val name: String = "InteractionSeven"
-
-    def apply(initialIngredient: String): String
-  }
-
-  val interactionEight =
-    Interaction(
-      name = "InteractionEight",
-      input = Seq(interactionSevenIngredient1, interactionSevenIngredient2),
-      output = Seq.empty)
-
-  trait InteractionEight {
-    val name: String = "InteractionEight"
-
-    def apply(interactionSevenIngredient1: String, interactionSevenIngredient2: String): Unit
-  }
-
-  val fireTwoEventsInteraction =
-    Interaction(
-      name = "fireTwoEventsInteraction",
-      input = Seq(initialIngredient),
-      output = Seq(eventFromInteractionTwo, event1FromInteractionSeven))
-
-  trait fireTwoEventsInteraction {
-    val name: String = "fireTwoEventsInteraction"
-
-    def apply(initialIngredient: String): Event1FromInteractionSeven
-  }
-
-  val providesNothingInteraction =
-    Interaction(
-      name = "ProvidesNothingInteraction",
-      input = Seq(initialIngredient),
-      output = Seq.empty)
-
-  trait ProvidesNothingInteraction {
-    val name: String = "ProvidesNothingInteraction"
-
-    def apply(initialIngredient: String): Unit
-  }
-
-  case class InteractionNineSuccessful(interactionNineIngredient: String)
-
-  val interactionNine =
-    Interaction(
-      name = "InteractionNine",
-      input = Seq(processId, initialIngredient),
-      output = Seq(Event.reflect[InteractionNineSuccessful]))
-
-  trait InteractionNine {
-    val name: String = "InteractionNine"
-
-    def apply(processId: String, initialIngredient: String): InteractionNineSuccessful
-  }
-
-  case class ComplexIngredientInteractionSuccessful(complexOjectIngredient: ComplexObjectIngredient)
-
-  val complexIngredientInteraction =
-    Interaction(
-      name = "ComplexIngredientInteraction",
-      input = Seq(initialIngredient),
-      Seq(Event.reflect[ComplexIngredientInteractionSuccessful]))
-
-  trait ComplexIngredientInteraction {
-    val name: String = "ComplexIngredientInteraction"
-
-    def apply(initialIngredient: String): ComplexIngredientInteractionSuccessful
-  }
-
-  case class CaseClassIngredientInteractionSuccessful(caseClassIngredient: CaseClassIngredient)
-
-  val caseClassIngredientInteraction =
-    Interaction(
-      name = "CaseClassIngredientInteraction",
-      input = Seq(initialIngredient),
-      output = Seq(Event.reflect[CaseClassIngredientInteractionSuccessful]))
-
-  trait CaseClassIngredientInteraction {
-    val name: String = "CaseClassIngredientInteraction"
-
-    def apply(initialIngredient: String): CaseClassIngredientInteractionSuccessful
-  }
-
-  val caseClassIngredientInteraction2 =
-    Interaction(
-      name = "CaseClassIngredientInteraction2",
-      input = Seq(caseClassIngredient),
-      output = Seq(emptyEvent))
-
-  trait CaseClassIngredientInteraction2 {
-    val name: String = "CaseClassIngredientInteraction2"
-
-    def apply(caseClassIngredient: CaseClassIngredient): EmptyEvent
-  }
-
-  val NonMatchingReturnTypeInteraction =
-    Interaction(
-      name="NonMatchingReturnTypeInteraction",
-      input = Seq(initialIngredient),
-      output = Seq(eventFromInteractionTwo))
-
-  trait NonMatchingReturnTypeInteraction {
-    val name: String = "NonMatchingReturnTypeInteraction"
-
-    def apply(initialIngredient: String): EventFromInteractionTwo
-  }
-
-  val optionalIngredientInteraction =
-    Interaction(
-      name = "OptionalIngredientInteraction",
-      input = Seq(
-        missingJavaOptional,
-        missingJavaOptional2,
-        missingScalaOptional,
-        missingScalaOptional2,
-        initialIngredient),
-      output = Seq.empty)
-
-  trait OptionalIngredientInteraction {
-    val name: String = "OptionalIngredientInteraction"
-
-    def apply(missingJavaOptional: Optional[String],
-              missingJavaOptional2: Optional[Integer],
-              missingScalaOptional: Option[String],
-              missingScalaOptional2: Option[Integer],
-              initialIngredient: String)
-  }
+  val interactionOneSuccessful: Event = Event.reflect[InteractionOneSuccessful]
 
   def getRecipe(recipeName: String): Recipe =
     Recipe(recipeName)
