@@ -45,7 +45,7 @@ package object compiler {
           }
 
           (il.InteractionFailureStrategy.RetryWithIncrementalBackoff(initialTimeout, backoffFactor, maximumRetries, maxTimeBetweenRetries, exhaustedRetryEvent), exhaustedRetryEvent)
-        case dsl.InteractionFailureStrategy.BlockInteraction() => (
+        case dsl.InteractionFailureStrategy.BlockInteraction => (
 
           il.InteractionFailureStrategy.BlockInteraction, None)
         case dsl.InteractionFailureStrategy.FireEventAfterFailure(eventNameOption) =>

@@ -11,7 +11,7 @@ case class Recipe(
     name: String,
     interactions: Seq[Interaction] = Seq.empty,
     sensoryEvents: Seq[Event]= Seq.empty,
-    defaultFailureStrategy: InteractionFailureStrategy = InteractionFailureStrategy.BlockInteraction(),
+    defaultFailureStrategy: InteractionFailureStrategy = InteractionFailureStrategy.BlockInteraction,
     eventReceivePeriod: Option[FiniteDuration] = None,
     retentionPeriod: Option[FiniteDuration] = None) {
 
@@ -23,7 +23,7 @@ case class Recipe(
     * @param name
     * @return
     */
-  def this(name: String) = this(name, Seq.empty, Seq.empty, InteractionFailureStrategy.BlockInteraction(), None, None)
+  def this(name: String) = this(name, Seq.empty, Seq.empty, InteractionFailureStrategy.BlockInteraction, None, None)
 
   def getInteractions: java.util.List[Interaction] = interactions.asJava
 

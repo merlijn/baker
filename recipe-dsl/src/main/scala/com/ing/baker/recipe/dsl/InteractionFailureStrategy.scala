@@ -9,7 +9,7 @@ sealed trait InteractionFailureStrategy
 
 object InteractionFailureStrategy {
 
-  case class BlockInteraction() extends InteractionFailureStrategy
+  case object BlockInteraction extends InteractionFailureStrategy
 
   case class FireEventAfterFailure(eventName: Option[String] = None) extends InteractionFailureStrategy
 
@@ -113,10 +113,4 @@ object InteractionFailureStrategy {
       else calculateMaxRetries(nextDelay, backoffFactor, deadline, totalDelay + nextDelay, timesCounter + 1)
     }
   }
-
-  def fireEvent(): FireEventAfterFailure = FireEventAfterFailure(None)
-
-  def fireEvent(eventClass: Class[_]): FireEventAfterFailure = fireEvent(eventClass.getSimpleName)
-
-  def fireEvent(eventName: String): FireEventAfterFailure = FireEventAfterFailure(Some(eventName))
 }
