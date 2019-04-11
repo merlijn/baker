@@ -168,18 +168,18 @@ object TestRecipe {
 
   // --- Events
 
-  val initialEvent = Event("InitialEvent", Seq(initialIngredient), maxFiringLimit = None)
-  val initialEventExtendedName = Event("InitialEventExtendedName", Seq(initialIngredientExtendedName))
-  val secondEvent = Event("SecondEvent")
-  val thirdEvent = Event("ThirdEvent")
-  val fourthEvent = Event("FourthEvent")
-  val notUsedSensoryEvent = Event("NotUsedSensoryEvent")
-  val eventFromInteractionTwo = Event("EventFromInteractionTwo", Seq(interactionTwoIngredient))
-  val event1FromInteractionSeven = Event("Event1FromInteractionSeven", Seq(interactionSevenIngredient1))
-  val event2FromInteractionSeven = Event("Event2FromInteractionSeven", Seq(interactionSevenIngredient2))
-  val emptyEvent = Event("EmptyEvent", providedIngredients = Seq.empty)
-  val exhaustedEvent = Event("RetryExhausted", providedIngredients = Seq.empty)
-  val unboxedProviderEvent = Event("UnboxedProviderEvent", Seq(missingJavaOptionalDirectString, initialIngredient, missingScalaOptionalDirectString))
+  val initialEvent = Event.reflect[InitialEvent]
+  val initialEventExtendedName = Event.reflect[InitialEventExtendedName]
+  val secondEvent = Event.reflect[SecondEvent]
+  val thirdEvent = Event.reflect[ThirdEvent]
+  val fourthEvent = Event.reflect[FourthEvent]
+  val notUsedSensoryEvent = Event.reflect[NotUsedSensoryEvent]
+  val eventFromInteractionTwo = Event.reflect[EventFromInteractionTwo]
+  val event1FromInteractionSeven = Event.reflect[Event1FromInteractionSeven]
+  val event2FromInteractionSeven = Event.reflect[Event2FromInteractionSeven]
+  val emptyEvent = Event.reflect[EmptyEvent]
+//  val exhaustedEvent = Event("RetryExhausted", providedIngredients = Seq.empty)
+  val unboxedProviderEvent = Event.reflect[UnboxedProviderEvent]
   val interactionOneSuccessful: Event = Event.reflect[InteractionOneSuccessful]
 
   def getRecipe(recipeName: String): Recipe =

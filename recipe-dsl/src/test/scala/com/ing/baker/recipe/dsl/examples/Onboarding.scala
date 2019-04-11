@@ -36,7 +36,7 @@ object Onboarding {
     Recipe("newCustomerRecipe")
       .withInteractions(
         createCustomer
-          .withRequiredEvent(
+          .withRequiredEvents(
             agreementsAcceptedEvent)
           .withRequiredOneOfEvents(Set(
             automaticApprovedEvent,

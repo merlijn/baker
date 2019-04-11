@@ -104,7 +104,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
     "execute an interaction when its ingredient is provided" in {
       val recipe =
         Recipe("IngredientProvidedRecipe")
-          .withInteraction(interactionOne)
+          .withInteractions(interactionOne)
           .withSensoryEvent(initialEvent)
 
       val (baker, recipeId) = setupBakerWithRecipe(recipe, mockImplementations)
@@ -164,7 +164,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
     "only allow a sensory event be fired once if the max firing limit is set one" in {
       val recipe =
         Recipe("maxFiringLimitOfOneOnSensoryEventRecipe")
-          .withInteraction(interactionOne)
+          .withInteractions(interactionOne)
           .withSensoryEvent(initialEvent.withMaxFiringLimit(1))
 
       val (baker, recipeId) = setupBakerWithRecipe(recipe, mockImplementations)
@@ -187,7 +187,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
     "not allow a sensory event be fired twice with the same correlation id" in {
       val recipe =
         Recipe("correlationIdSensoryEventRecipe")
-          .withInteraction(interactionOne)
+          .withInteractions(interactionOne)
           .withSensoryEvent(initialEvent)
 
       val (baker, recipeId) = setupBakerWithRecipe(recipe, mockImplementations)
@@ -210,7 +210,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
     "only allow a sensory event be fired twice if the max firing limit is set two" in {
       val recipe =
         Recipe("maxFiringLimitOfTwoOnSensoryEventRecipe")
-          .withInteraction(interactionOne)
+          .withInteractions(interactionOne)
           .withSensoryEvent(initialEvent.withMaxFiringLimit(2))
 
       val (baker, recipeId) = setupBakerWithRecipe(recipe, mockImplementations)
@@ -344,7 +344,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val recipe =
         Recipe("IngredientProvidedRecipeWithEmptyOptionals")
-          .withInteraction(
+          .withInteractions(
             optionalIngredientInteraction
               .withPredefinedIngredients(("missingJavaOptional", ingredientValue)))
           .withSensoryEvent(initialEvent)
@@ -369,7 +369,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val recipe =
         Recipe("IngredientProvidedRecipeWithUnboxedOptionals")
-          .withInteraction(
+          .withInteractions(
             optionalIngredientInteraction)
           .withSensoryEvent(unboxedProviderEvent)
 
@@ -393,7 +393,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
 
       val recipe =
         Recipe("EventListenerRecipe")
-          .withInteraction(interactionOne)
+          .withInteractions(interactionOne)
           .withSensoryEvent(initialEvent)
 
       val (baker, recipeId) = setupBakerWithRecipe(recipe, mockImplementations)
@@ -433,7 +433,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
     "execute an interaction when its ingredient is provided and the interaction is renamed" in {
       val recipe =
         Recipe("IngredientProvidedRecipeWithRename")
-          .withInteraction(interactionOne.withName("interactionOneRenamed"))
+          .withInteractions(interactionOne.withName("interactionOneRenamed"))
           .withSensoryEvent(initialEvent)
 
       val (baker, recipeId) = setupBakerWithRecipe(recipe, mockImplementations)
@@ -844,7 +844,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
     "resolve a blocked interaction" in {
       val recipe =
         Recipe("ResolveBlockedInteractionRecipe")
-          .withInteraction(interactionOne)
+          .withInteractions(interactionOne)
           .withSensoryEvent(initialEvent)
 
       val (baker, recipeId) = setupBakerWithRecipe(recipe, mockImplementations)
@@ -871,7 +871,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
     "retry a blocked interaction" in {
       val recipe =
         Recipe("RetryBlockedInteractionRecipe")
-          .withInteraction(interactionOne)
+          .withInteractions(interactionOne)
           .withSensoryEvent(initialEvent)
 
       val (baker, recipeId) = setupBakerWithRecipe(recipe, mockImplementations)
@@ -1200,7 +1200,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
     "block interaction and log error message if a null ingredient is provided directly by a Interaction" in {
       val recipe =
         Recipe("NullIngredientRecipe")
-          .withInteraction(interactionOne)
+          .withInteractions(interactionOne)
           .withSensoryEvent(initialEvent)
 
       val (baker, recipeId) = setupBakerWithRecipe(recipe, mockImplementations)
@@ -1220,7 +1220,7 @@ class BakerExecutionSpec extends BakerRuntimeTestBase {
     "block interaction and log error message if a null ingredient is provided by an Event provided by a Interaction" in {
       val recipe =
         Recipe("NullIngredientFromEventRecipe")
-          .withInteraction(interactionTwo
+          .withInteractions(interactionTwo
             .withOverriddenIngredientName("initialIngredientOld", "initialIngredient"))
           .withSensoryEvent(initialEvent)
 

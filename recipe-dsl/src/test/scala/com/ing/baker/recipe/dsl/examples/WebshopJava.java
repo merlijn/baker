@@ -1,5 +1,6 @@
 package com.ing.baker.recipe.dsl.examples;
 
+import com.ing.baker.recipe.dsl.Event;
 import com.ing.baker.recipe.dsl.annotations.FiresEvent;
 import com.ing.baker.recipe.dsl.annotations.ProcessId;
 import com.ing.baker.recipe.dsl.Interaction;
@@ -91,15 +92,18 @@ public class WebshopJava {
 
     public final static Recipe webshopRecipe = new Recipe("webshop")
             .withSensoryEvents(
-                    OrderPlaced.class,
-                    CustomerInfoReceived.class,
-                    PaymentMade.class)
+                    Event.reflect(OrderPlaced.class),
+                    Event.reflect(CustomerInfoReceived.class),
+                    Event.reflect(PaymentMade.class))
             .withInteractions(
                     Interaction.reflect(ValidateOrder.class),
                     Interaction.reflect(ManufactureGoods.class)
-                            .withRequiredEvents(PaymentMade.class, ValidateOrder.Valid.class),
+                            .withRequiredEvents(
+                                    Event.reflect(PaymentMade.class),
+                                    Event.reflect(ValidateOrder.Valid.class)),
                     Interaction.reflect(SendInvoice.class)
-                            .withRequiredEvents(ShipGoods.GoodsShipped.class),
+                            .withRequiredEvents(
+                                    Event.reflect(ShipGoods.GoodsShipped.class)),
                     Interaction.reflect(ShipGoods.class))
             .withDefaultFailureStrategy(
                     new InteractionFailureStrategy.RetryWithIncrementalBackoffBuilder()

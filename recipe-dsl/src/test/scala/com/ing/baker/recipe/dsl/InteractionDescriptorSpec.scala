@@ -21,7 +21,7 @@ class InteractionDescriptorSpec extends WordSpecLike with Matchers {
 
     "requiredEvents called" should {
       "update the requiredEventsList" in {
-        val updated = createCustomer.withRequiredEvent(agreementsAcceptedEvent)
+        val updated = createCustomer.withRequiredEvents(agreementsAcceptedEvent)
         updated.requiredEvents shouldBe Set(agreementsAcceptedEvent.name)
       }
     }

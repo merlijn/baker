@@ -29,7 +29,7 @@ class RecipeVisualizerSpec extends WordSpecLike with Matchers {
 
     "should visualize missing events with a red color" in {
       val recipe: Recipe = Recipe("missingEvent")
-        .withInteraction(interactionOne.withRequiredEvent(secondEvent))
+        .withInteractions(interactionOne.withRequiredEvents(secondEvent))
         .withSensoryEvent(initialEvent)
       val compileRecipe: CompiledRecipe = RecipeCompiler.compileRecipe(recipe)
       val dot: String = RecipeVisualizer.visualizeRecipe(compileRecipe)
@@ -38,7 +38,7 @@ class RecipeVisualizerSpec extends WordSpecLike with Matchers {
 
     "should visualize missing ingredients with a red color" in {
       val recipe: Recipe = Recipe("missingEvent")
-        .withInteraction(interactionOne)
+        .withInteractions(interactionOne)
         .withSensoryEvent(secondEvent)
       val compileRecipe: CompiledRecipe = RecipeCompiler.compileRecipe(recipe)
       val dot: String = RecipeVisualizer.visualizeRecipe(compileRecipe)

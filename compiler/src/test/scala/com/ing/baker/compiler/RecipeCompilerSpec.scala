@@ -137,7 +137,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
       val recipe = Recipe("WrongGivenPredefinedIngredient")
         .withInteractions(
           interactionOne
-            .withRequiredEvent(initialEvent)
+            .withRequiredEvents(initialEvent)
             .withPredefinedIngredients(("initialIngredient", Integer.valueOf(12))))
         .withSensoryEvent(initialEvent)
 
@@ -180,7 +180,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
     "fail compilation for an empty or null named event" in {
       List("", null) foreach { name =>
         val invalidEvent = Event(name)
-        val recipe = Recipe("EventNameTest").withSensoryEvent(invalidEvent).withInteraction(interactionOne)
+        val recipe = Recipe("EventNameTest").withSensoryEvent(invalidEvent).withInteractions(interactionOne)
 
         intercept[IllegalArgumentException](RecipeCompiler.compileRecipe(recipe)) getMessage() shouldBe "Event with a null or empty name found"
       }
@@ -189,7 +189,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
     "fail compilation for an empty or null named ingredient" in {
       List("", null) foreach { name =>
         val invalidIngredient = Ingredient.reflect[String](name)
-        val recipe = Recipe("IngredientNameTest").withSensoryEvent(Event("someEvent", Seq(invalidIngredient))).withInteraction(interactionOne)
+        val recipe = Recipe("IngredientNameTest").withSensoryEvent(Event("someEvent", Seq(invalidIngredient))).withInteractions(interactionOne)
 
         intercept[IllegalArgumentException](RecipeCompiler.compileRecipe(recipe)) getMessage() shouldBe "Ingredient with a null or empty name found"
       }
@@ -205,7 +205,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
 
     "interactions with optional ingredients that are NOT provided SHOULD be provided as empty" in {
       val recipe: Recipe = Recipe("MissingOptionalRecipe")
-        .withInteraction(optionalIngredientInteraction)
+        .withInteractions(optionalIngredientInteraction)
         .withSensoryEvent(initialEvent)
 
       val compiledRecipe: CompiledRecipe = RecipeCompiler.compileRecipe(recipe)
@@ -225,7 +225,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
       val optionalProviderEvent = Event("optionalProviderEvent", Seq(missingJavaOptional))
 
       val recipe: Recipe = Recipe("MissingOptionalRecipe")
-        .withInteraction(optionalIngredientInteraction)
+        .withInteractions(optionalIngredientInteraction)
         .withSensoryEvents(Set(initialEvent, optionalProviderEvent))
 
       val compiledRecipe: CompiledRecipe = RecipeCompiler.compileRecipe(recipe)
@@ -253,9 +253,9 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
 
       val recipe = Recipe("interactionWithEventOutputTransformer")
         .withSensoryEvent(initialEvent)
-        .withInteraction(interactionWithOptionIngredient
+        .withInteractions(interactionWithOptionIngredient
           .withEventOutputTransformer(eventWithOptionIngredient, "RenamedEventWithOptionIngredient", Map("stringOptionIngredient" -> "renamedStringOptionIngredient")))
-        .withInteraction(secondInteraction)
+        .withInteractions(secondInteraction)
 
       val compiledRecipe = RecipeCompiler.compileRecipe(recipe)
 //      println(compiledRecipe.getRecipeVisualization)
@@ -269,7 +269,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
       val optionalProviderEvent = Event("optionalProviderEvent", Seq(missingJavaOptionalDirectString))
 
       val recipe: Recipe = Recipe("MissingOptionalRecipe")
-        .withInteraction(optionalIngredientInteraction)
+        .withInteractions(optionalIngredientInteraction)
         .withSensoryEvents(Set(initialEvent, optionalProviderEvent))
 
       val compiledRecipe: CompiledRecipe = RecipeCompiler.compileRecipe(recipe)
@@ -287,7 +287,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
     "interactions with optional ingredients that are predefined SHOULD NOT be provided as empty" in {
       val ingredientValue: Optional[String] = java.util.Optional.of("value")
       val recipe: Recipe = Recipe("MissingOptionalRecipe")
-        .withInteraction(
+        .withInteractions(
           optionalIngredientInteraction
             .withPredefinedIngredients(("missingJavaOptional", ingredientValue))
         )

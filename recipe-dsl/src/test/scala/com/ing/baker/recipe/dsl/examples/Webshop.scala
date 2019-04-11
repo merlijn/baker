@@ -61,7 +61,7 @@ object Webshop {
           .copy(requiredEvents = Set(valid.name, paymentMade.name)),
         shipGoods,
         sendInvoice
-          .withRequiredEvent(goodsShipped)
+          .withRequiredEvents(goodsShipped)
       )
       .withSensoryEvents(Set(
         customerInfoReceived,

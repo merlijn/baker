@@ -1,7 +1,5 @@
 package com.ing.baker.recipe.dsl
 
-import com.ing.baker.recipe.dsl
-
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
 import scala.concurrent.duration
@@ -30,26 +28,6 @@ case class Recipe(
   def getEvents: java.util.List[Event] = sensoryEvents.toList.asJava
 
   /**
-    * This adds all interactions of the recipe to this recipe
-    * Sensory Events are not added and are expected to be given by the recipe itself
-    *
-    * @param recipe
-    * @return
-    */
-  def withRecipe(recipe: Recipe) = {
-    copy(interactions = interactions ++ recipe.interactions)
-  }
-
-  /**
-    * Adds the interaction to the recipe.
-    *
-    * @param newInteraction the interaction to add
-    * @return
-    */
-  def withInteraction(newInteraction: Interaction): Recipe =
-    withInteractions(Seq(newInteraction): _*)
-
-  /**
     * Adds the interactions to the recipe.
     *
     * @param newInteractions The interactions to add
@@ -62,22 +40,13 @@ case class Recipe(
 
   /**
     * Adds the sensory event to the recipe
-    * The firing limit is set to 1 by default
-    * @param eventClass
-    * @return
-    */
-  def withSensoryEvent(eventClass: Class[_]): Recipe =
-    withSensoryEvents(eventClass)
-
-  /**
-    * Adds the sensory event to the recipe
     * The firing limit is set to what is given
     * @param eventClass
     * @param maxFiringLimit
     * @return
     */
-  def withSensoryEvent(eventClass: Class[_], maxFiringLimit: Int): Recipe =
-    copy(sensoryEvents = sensoryEvents :+ dsl.Event.reflect(eventClass, Some(maxFiringLimit)))
+  def withSensoryEvent(event: Event, maxFiringLimit: Int): Recipe =
+    copy(sensoryEvents = sensoryEvents :+ event.copy(maxFiringLimit = Some(maxFiringLimit)))
 
   /**
     * Adds the sensory events to the recipe with the firing limit set to 1
@@ -87,8 +56,8 @@ case class Recipe(
     */
   @SafeVarargs
   @varargs
-  def withSensoryEvents(eventClasses: Class[_]*): Recipe =
-    copy(sensoryEvents = sensoryEvents ++ eventClasses.map(dsl.Event.reflect(_, Some(1))))
+  def withSensoryEvents(eventClasses: Event*): Recipe =
+    copy(sensoryEvents = sensoryEvents ++ eventClasses.map(_.copy(maxFiringLimit = Some(1))))
 
   /**
     * Adds the sensory event to the recipe with firing limit set to unlimited
@@ -96,9 +65,8 @@ case class Recipe(
     * @param newEvent
     * @return
     */
-  def withSensoryEventNoFiringLimit(newEvent: Class[_]): Recipe =
-    withSensoryEventsNoFiringLimit(newEvent)
-
+  def withSensoryEventNoFiringLimit(event: Event): Recipe =
+    withSensoryEventsNoFiringLimit(event)
 
   /**
     * Adds the sensory events to the recipe with firing limit set to unlimited
@@ -108,8 +76,8 @@ case class Recipe(
     */
   @SafeVarargs
   @varargs
-  def withSensoryEventsNoFiringLimit(eventClasses: Class[_]*): Recipe =
-    copy(sensoryEvents = sensoryEvents ++ eventClasses.map(dsl.Event.reflect(_, None)))
+  def withSensoryEventsNoFiringLimit(eventClasses: Event*): Recipe =
+    copy(sensoryEvents = sensoryEvents ++ eventClasses.map(_.copy(maxFiringLimit = None)))
 
   /**
     * This set the failure strategy as default for this recipe.
@@ -127,7 +95,7 @@ case class Recipe(
     * @param recivePeriod The period
     * @return
     */
-  def withEventReceivePeriod(recivePeriod: java.time.Duration) =
+  def withEventReceivePeriod(recivePeriod: java.time.Duration): Recipe =
     copy(eventReceivePeriod = Some(Duration(recivePeriod.toMillis, duration.MILLISECONDS)))
 
   /**
@@ -136,7 +104,7 @@ case class Recipe(
     * @param retentionPeriod The retention period.
     * @return
     */
-  def withRetentionPeriod(retentionPeriod: java.time.Duration) =
+  def withRetentionPeriod(retentionPeriod: java.time.Duration): Recipe =
     copy(retentionPeriod = Some(Duration(retentionPeriod.toMillis, duration.MILLISECONDS)))
 
 

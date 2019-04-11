@@ -38,7 +38,7 @@ class BakerSetupSpec extends BakerRuntimeTestBase {
       "providing an implementation for a renamed interaction" in {
 
         val recipe = Recipe("simpleNameImplementationWithRename")
-          .withInteraction((interactionOne.withName("interactionOneRenamed")))
+          .withInteractions((interactionOne.withName("interactionOneRenamed")))
           .withSensoryEvent(initialEvent)
 
         val baker = new Baker()
@@ -51,7 +51,7 @@ class BakerSetupSpec extends BakerRuntimeTestBase {
       "providing an implementation with a name field" in {
 
         val recipe = Recipe("fieldNameImplementation")
-          .withInteraction(interactionOne)
+          .withInteractions(interactionOne)
           .withSensoryEvent(initialEvent)
 
         val baker = new Baker()
@@ -64,7 +64,7 @@ class BakerSetupSpec extends BakerRuntimeTestBase {
       "providing the implementation in a sequence with the interface its implementing with the correct name" in {
 
         val recipe = Recipe("interfaceImplementation")
-          .withInteraction(interactionOne)
+          .withInteractions(interactionOne)
           .withSensoryEvent(initialEvent)
 
         val baker = new Baker()
@@ -76,7 +76,7 @@ class BakerSetupSpec extends BakerRuntimeTestBase {
 
       "the recipe contains complex ingredients that are serializable" in {
         val recipe = Recipe("complexIngredientInteractionRecipe")
-          .withInteraction(complexIngredientInteraction)
+          .withInteractions(complexIngredientInteraction)
           .withSensoryEvent(initialEvent)
 
         val baker = new Baker()
@@ -91,7 +91,7 @@ class BakerSetupSpec extends BakerRuntimeTestBase {
       "an invalid recipe is given" in {
 
         val recipe = Recipe("NonProvidedIngredient")
-          .withInteraction(interactionOne)
+          .withInteractions(interactionOne)
           .withSensoryEvent(secondEvent)
 
         val baker = new Baker()
@@ -108,7 +108,7 @@ class BakerSetupSpec extends BakerRuntimeTestBase {
         val baker = new Baker()(actorSystem)
 
         val recipe = Recipe("MissingImplementation")
-          .withInteraction(interactionOne)
+          .withInteractions(interactionOne)
           .withSensoryEvent(initialEvent)
 
         intercept[IllegalStateException] {
@@ -120,7 +120,7 @@ class BakerSetupSpec extends BakerRuntimeTestBase {
       "a recipe provides an implementation for an interaction and does not comply to the Interaction" ignore {
 
         val recipe = Recipe("WrongImplementation")
-          .withInteraction(interactionOne)
+          .withInteractions(interactionOne)
           .withSensoryEvent(initialEvent)
 
         val baker = new Baker()

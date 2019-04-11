@@ -176,7 +176,7 @@ object AllTypeRecipe {
           .withOverriddenIngredientName("longIngredient", "renamedLongIngredient")
           .withRequiredOneOfEvents(Set(mapEvent, otherEvent)),
         interactionFive
-          .withRequiredEvent(byteArrayEvent)
+          .withRequiredEvents(byteArrayEvent)
           .withFailureStrategy(InteractionFailureStrategy.FireEventAfterFailure()),
         interactionSeven,
         allTypesInteraction.withPredefinedIngredients(

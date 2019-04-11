@@ -1,6 +1,7 @@
 package com.ing.baker.compiler;
 
 import com.ing.baker.il.CompiledRecipe;
+import com.ing.baker.recipe.dsl.Event;
 import com.ing.baker.recipe.dsl.annotations.FiresEvent;
 import com.ing.baker.recipe.dsl.annotations.ProcessId;
 import com.ing.baker.recipe.dsl.Interaction;
@@ -188,24 +189,24 @@ public class JavaCompiledRecipeTest {
 
     public static Recipe setupSimpleRecipe() {
         return new Recipe("TestRecipe")
-                .withInteraction(Interaction.reflect(InteractionOne.class)
-                        .withRequiredEvent(EventOne.class))
-                .withSensoryEvent(EventOne.class);
+                .withInteractions(Interaction.reflect(InteractionOne.class)
+                        .withRequiredEvents(Event.reflect(EventOne.class)))
+                .withSensoryEvent(Event.reflect(EventOne.class));
     }
 
     public static Recipe setupComplexRecipe() {
         return new Recipe("TestRecipe")
                 .withInteractions(
                         Interaction.reflect(InteractionOne.class)
-                                .withRequiredEvent(EventOne.class),
+                                .withRequiredEvents(Event.reflect(EventOne.class)),
                         Interaction.reflect(InteractionOne.class, "InteractionOneRenamed")
-                                .withRequiredEvent(EventOne.class),
+                                .withRequiredEvents(Event.reflect(EventOne.class)),
                         Interaction.reflect(InteractionTwo.class)
-                                .withRequiredEvent(EventTwo.class),
+                                .withRequiredEvents(Event.reflect(EventTwo.class)),
                         Interaction.reflect(InteractionThree.class))
                 .withSensoryEvents(
-                        EventOne.class,
-                        EventTwo.class,
-                        EventWithoutIngredientsNorPreconditions.class);
+                        Event.reflect(EventOne.class),
+                        Event.reflect(EventTwo.class),
+                        Event.reflect(EventWithoutIngredientsNorPreconditions.class));
     }
 }

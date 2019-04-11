@@ -8,6 +8,8 @@ object Event {
 
   def reflect[T : TypeTag]: Event = reflect(mirror.runtimeClass(mirror.typeOf[T]))
 
+  def reflect(eventClass: Class[_]): Event = reflect(eventClass, None)
+
   def reflect(eventClass: Class[_], maxFiringLimit: Option[Int] = None): Event = {
     val name = eventClass.getSimpleName
 

@@ -109,7 +109,7 @@ case class Interaction(
       renamedInputIngredients: Map[String, String] = Map.empty,
       maximumExecutionCount: Option[Int] = None,
       failureStrategy: Option[InteractionFailureStrategy] = None,
-      eventOutputTransformers: Map[String, EventRenamer] = Map.empty) {
+      eventRenames: Map[String, EventRenamer] = Map.empty) {
 
   /**
     * The retry exhausted event name
@@ -119,15 +119,6 @@ case class Interaction(
   def retryExhaustedEventName: String = name + exhaustedEventAppend
 
   /**
-    * This sets a requirement for this interaction that a specific event needs to have been fired before it can execute.
-    *
-    * @param eventClass the class of the events that needs to have been fired
-    * @return
-    */
-  def withRequiredEvent(eventClass: Class[_]): Interaction =
-    copy(requiredEvents = requiredEvents + eventClass.getSimpleName)
-
-  /**
     * This sets a requirement for this interaction that some specific events needs to have been fired before it can execute.
     *
     * @param eventClasses the classes of the events.
@@ -135,47 +126,8 @@ case class Interaction(
     */
   @SafeVarargs
   @varargs
-  def withRequiredEvents(eventClasses: Class[_]*): Interaction =
-    copy(requiredEvents = requiredEvents ++ eventClasses.map(_.getSimpleName))
-
-  /**
-    * This sets a requirement for this interaction that some specific events needs to have been fired before it can execute.
-    *
-    * @param eventClasses the classes of the event.
-    * @return
-    */
-  def withRequiredEvents(eventClasses: java.util.Set[Class[_]]): Interaction =
-    copy(requiredEvents = requiredEvents ++ eventClasses.asScala.map(_.getSimpleName))
-
-
-  /**
-    * This sets a requirement for this interaction that a specific event needs to have been fired before it can execute.
-    *
-    * @param eventName the name of the events that needs to have been fired
-    * @return
-    */
-  def withRequiredEventFromName(eventName: String): Interaction =
-    copy(requiredEvents = requiredEvents + eventName)
-
-  /**
-    * This sets a requirement for this interaction that some specific events needs to have been fired before it can execute.
-    *
-    * @param newRequiredEventNames the names of the events.
-    * @return
-    */
-  @SafeVarargs
-  @varargs
-  def withRequiredEventsFromName(newRequiredEventNames: String*): Interaction =
-    copy(requiredEvents = requiredEvents ++ newRequiredEventNames)
-
-  /**
-    * This sets a requirement for this interaction that some specific events needs to have been fired before it can execute.
-    *
-    * @param eventNames the names of the events.
-    * @return
-    */
-  def withRequiredEventsFromName(eventNames: java.util.Set[String]): Interaction =
-    copy(requiredEvents = requiredEvents ++ eventNames.asScala)
+  def withRequiredEvents(eventClasses: Event*): Interaction =
+    copy(requiredEvents = requiredEvents ++ eventClasses.map(_.name))
 
   /**
     * This sets a requirement for this interaction that one of the given events needs to have been fired before it can execute.
@@ -185,27 +137,11 @@ case class Interaction(
     */
   @SafeVarargs
   @varargs
-  def withRequiredOneOfEvents(eventClasses: Class[_]*): Interaction = {
+  def withRequiredOneOfEvents(eventClasses: Event*): Interaction = {
     if (eventClasses.nonEmpty && eventClasses.size < 2)
       throw new IllegalArgumentException("At least 2 events should be provided as 'requiredOneOfEvents'")
 
-    val newRequired: Set[Set[String]] = requiredOneOfEvents + eventClasses.map(_.getSimpleName).toSet
-
-    copy(requiredOneOfEvents = newRequired)
-  }
-
-  /**
-    * This sets a requirement for this interaction that one of the given events needs to have been fired before it can execute.
-    *
-    * @param newRequiredOneOfEvents the names of the events.
-    * @return
-    */
-  @SafeVarargs
-  @varargs
-  def withRequiredOneOfEventsFromName(newRequiredOneOfEvents: String*): Interaction = {
-    if (newRequiredOneOfEvents.nonEmpty && newRequiredOneOfEvents.size < 2)
-      throw new IllegalArgumentException("At least 2 events should be provided as 'requiredOneOfEvents'")
-    val newRequired: Set[Set[String]] = requiredOneOfEvents + newRequiredOneOfEvents.toSet
+    val newRequired: Set[Set[String]] = requiredOneOfEvents + eventClasses.map(_.name).toSet
 
     copy(requiredOneOfEvents = newRequired)
   }
@@ -254,30 +190,6 @@ case class Interaction(
     copy(renamedInputIngredients = renamedInputIngredients ++ newOverriddenIngredients.asScala.toMap)
   }
 
-  def withEventTransformation(eventClazz: Class[_],
-                              newEventName: String,
-                              ingredientRenames: java.util.Map[String, String]): Interaction = {
-    withEventTransformation(eventClazz, newEventName, ingredientRenames.asScala.toMap)
-  }
-
-  def withEventTransformation(eventClazz: Class[_],
-                              newEventName: String): Interaction = {
-    withEventTransformation(eventClazz, newEventName, Map.empty[String, String])
-  }
-
-  private def withEventTransformation(eventClazz: Class[_],
-                                      newEventName: String,
-                                      ingredientRenames: Map[String, String]): Interaction = {
-
-    val originalEvent: dsl.Event = dsl.Event.reflect(eventClazz, None)
-
-    if (!output.contains(originalEvent))
-      throw new RecipeValidationException(s"Event transformation given for Interaction $name but does not fire event ${originalEvent.name}")
-
-    val eventOutputTransformer = EventRenamer(newEventName, ingredientRenames)
-    this.copy(eventOutputTransformers = eventOutputTransformers + (originalEvent.name -> eventOutputTransformer))
-  }
-
   def withFailureStrategy(interactionFailureStrategy: InteractionFailureStrategy): Interaction = {
     this.copy(failureStrategy = Some(interactionFailureStrategy))
   }
@@ -294,8 +206,6 @@ case class Interaction(
 
   def withName(newName: String): Interaction = copy(name = newName, originalName = Some(originalName.getOrElse(name)))
 
-  def withRequiredEvent(event: Event): Interaction = copy(requiredEvents = requiredEvents + event.name)
-
   def withRequiredEvents(events: Set[Event]): Interaction = copy(requiredEvents = requiredEvents ++ events.map(_.name))
 
   def withRequiredOneOfEvents(newRequiredOneOfEvents: Set[Event]): Interaction = {
@@ -311,15 +221,15 @@ case class Interaction(
     withPredefinedIngredients(values.toMap)
 
   def withPredefinedIngredients(data: Map[String, Any]): Interaction =
-    copy(predefinedIngredients = predefinedIngredients ++ data.map{case (key, value) => key -> Reflect.toValue(value)})
+    copy(predefinedIngredients = predefinedIngredients ++ data.map { case (key, value) => key -> Reflect.toValue(value) })
 
   def withOverriddenIngredientName(oldIngredient: String,
                                    newIngredient: String): Interaction =
     copy(renamedInputIngredients = renamedInputIngredients + (oldIngredient -> newIngredient))
 
   def withEventOutputTransformer(event: Event, ingredientRenames: Map[String, String]): Interaction =
-    copy(eventOutputTransformers = eventOutputTransformers + (event.name -> EventRenamer(event.name, ingredientRenames)))
+    copy(eventRenames = eventRenames + (event.name -> EventRenamer(event.name, ingredientRenames)))
 
   def withEventOutputTransformer(event: Event, newEventName: String, ingredientRenames: Map[String, String]): Interaction =
-    copy(eventOutputTransformers = eventOutputTransformers + (event.name -> EventRenamer(newEventName, ingredientRenames)))
+    copy(eventRenames = eventRenames + (event.name -> EventRenamer(newEventName, ingredientRenames)))
 }

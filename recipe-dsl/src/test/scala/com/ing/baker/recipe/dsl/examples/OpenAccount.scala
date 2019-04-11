@@ -54,7 +54,7 @@ object OpenAccount {
   val openAccountRecipe = Recipe("OpenAccountRecipe")
     .withInteractions(
       assignAccount,
-      getAccount.withRequiredEvent(termsAndConditionsAccepted),
+      getAccount.withRequiredEvents(termsAndConditionsAccepted),
       registerIndividual)
     .withSensoryEvents(Set(
       termsAndConditionsAccepted,
