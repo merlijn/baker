@@ -2,8 +2,8 @@ package com.ing.baker.recipe.dsl.examples
 
 import java.util.Optional
 
-import com.ing.baker.recipe.annotations.ProcessId
 import com.ing.baker.recipe.dsl._
+import com.ing.baker.recipe.dsl.annotations.ProcessId
 import javax.inject.Named
 
 import scala.concurrent.duration._

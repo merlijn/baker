@@ -3,7 +3,6 @@ package com.ing.baker.recipe.dsl
 import java.lang.annotation.Annotation
 import java.lang.reflect.{Method, Type}
 
-import com.ing.baker.recipe.annotations
 import com.ing.baker.types.reflect.Reflect
 import com.thoughtworks.paranamer.AnnotationParanamer
 

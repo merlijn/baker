@@ -1,6 +1,6 @@
 package com.ing.baker.recipe.dsl.examples.interactions;
 
-import com.ing.baker.recipe.annotations.ProcessId;
+import com.ing.baker.recipe.dsl.annotations.ProcessId;
 
 import javax.inject.Named;
 

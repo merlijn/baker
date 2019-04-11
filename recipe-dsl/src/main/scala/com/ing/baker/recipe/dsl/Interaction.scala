@@ -2,8 +2,8 @@ package com.ing.baker.recipe.dsl
 
 import java.lang.reflect.Method
 
+import com.ing.baker.recipe.dsl
 import com.ing.baker.recipe.dsl.ReflectionHelpers._
-import com.ing.baker.recipe.{annotations, dsl}
 import com.ing.baker.types.Value
 import com.ing.baker.types.reflect.Reflect
 import com.ing.baker.types.reflect.Reflect.mirror
@@ -109,7 +109,7 @@ case class Interaction(
       renamedInputIngredients: Map[String, String] = Map.empty,
       maximumExecutionCount: Option[Int] = None,
       failureStrategy: Option[InteractionFailureStrategy] = None,
-      eventOutputTransformers: Map[String, EventOutputTransformer] = Map.empty) {
+      eventOutputTransformers: Map[String, EventRenamer] = Map.empty) {
 
   /**
     * The retry exhausted event name
@@ -274,7 +274,7 @@ case class Interaction(
     if (!output.contains(originalEvent))
       throw new RecipeValidationException(s"Event transformation given for Interaction $name but does not fire event ${originalEvent.name}")
 
-    val eventOutputTransformer = EventOutputTransformer(newEventName, ingredientRenames)
+    val eventOutputTransformer = EventRenamer(newEventName, ingredientRenames)
     this.copy(eventOutputTransformers = eventOutputTransformers + (originalEvent.name -> eventOutputTransformer))
   }
 
@@ -318,8 +318,8 @@ case class Interaction(
     copy(renamedInputIngredients = renamedInputIngredients + (oldIngredient -> newIngredient))
 
   def withEventOutputTransformer(event: Event, ingredientRenames: Map[String, String]): Interaction =
-    copy(eventOutputTransformers = eventOutputTransformers + (event.name -> EventOutputTransformer(event.name, ingredientRenames)))
+    copy(eventOutputTransformers = eventOutputTransformers + (event.name -> EventRenamer(event.name, ingredientRenames)))
 
   def withEventOutputTransformer(event: Event, newEventName: String, ingredientRenames: Map[String, String]): Interaction =
-    copy(eventOutputTransformers = eventOutputTransformers + (event.name -> EventOutputTransformer(newEventName, ingredientRenames)))
+    copy(eventOutputTransformers = eventOutputTransformers + (event.name -> EventRenamer(newEventName, ingredientRenames)))
 }

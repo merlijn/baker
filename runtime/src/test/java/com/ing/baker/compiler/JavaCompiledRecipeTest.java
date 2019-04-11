@@ -1,8 +1,8 @@
 package com.ing.baker.compiler;
 
 import com.ing.baker.il.CompiledRecipe;
-import com.ing.baker.recipe.annotations.FiresEvent;
-import com.ing.baker.recipe.annotations.ProcessId;
+import com.ing.baker.recipe.dsl.annotations.FiresEvent;
+import com.ing.baker.recipe.dsl.annotations.ProcessId;
 import com.ing.baker.recipe.dsl.Interaction;
 import com.ing.baker.recipe.dsl.Recipe;
 import org.junit.Assert;
