@@ -1,10 +1,9 @@
 package com.ing.baker.runtime
 
-import com.ing.baker.BakerRuntimeTestBase
 import com.ing.baker.compiler.RecipeCompiler
+import org.scalatest.{Matchers, WordSpecLike}
 
-class ExamplesSpec extends BakerRuntimeTestBase  {
-  override def actorSystemName = "ExamplesSpec"
+class ExamplesSpec extends  WordSpecLike with Matchers  {
 
   "The WebShop recipe" should {
 

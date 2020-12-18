@@ -22,7 +22,7 @@ object RecipeManagerSpec {
     """.stripMargin)
 }
 
-class RecipeManagerSpec  extends BakerRuntimeTestBase {
+class RecipeManagerSpec extends BakerRuntimeTestBase {
 
   override def actorSystemName = "RecipeManagerSpec"
 

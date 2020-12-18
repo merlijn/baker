@@ -1,16 +1,10 @@
 package com.ing.baker.runtime.actor
 
-import java.util.UUID
-import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.atomic.AtomicInteger
-
-import akka.actor.{ActorLogging, ActorSystem, NoSerializationVerificationNeeded, PoisonPill, Props}
 import akka.event.DiagnosticLoggingAdapter
 import akka.event.Logging.LogLevel
-import akka.pattern.ask
-import akka.persistence.PersistentActor
-import akka.util.Timeout
 
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.JavaConverters._
 import scala.concurrent._
 import scala.concurrent.duration.{FiniteDuration, _}

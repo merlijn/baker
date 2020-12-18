@@ -14,26 +14,4 @@ import scala.collection.JavaConverters._
   */
 case class ProcessState(processId: String,
                         ingredients: Map[String, Value],
-                        eventNames: List[String]) extends Serializable {
-
-  /**
-    * Returns the accumulated ingredients.
-    *
-    * @return The accumulated ingredients
-    */
-  def getIngredients(): java.util.Map[String, Value] = ingredients.asJava
-
-  /**
-    * Returns the names of the events occurred so far.
-    *
-    * @return The names of the events occurred so far
-    */
-  def getEventNames(): java.util.List[String] = eventNames.asJava
-
-  /**
-    * Returns the process identifier.
-    *
-    * @return The process identifier
-    */
-  def getProcessId(): String = processId
-}
+                        eventNames: List[String]) extends Serializable

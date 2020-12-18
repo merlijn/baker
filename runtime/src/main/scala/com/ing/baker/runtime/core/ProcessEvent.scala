@@ -32,14 +32,6 @@ object ProcessEvent {
 case class ProcessEvent(name: String,
                         providedIngredients: Map[String, Value]) {
 
-
-  /**
-    * Returns a java.util.Map of the ingredients provided by this event.
-    *
-    * @return a map of the provided ingredients.
-    */
-  def getProvidedIngredients: java.util.Map[String, Value] = providedIngredients.asJava
-
   /**
     * This checks if the runtime event is an instance of a event type.
     *

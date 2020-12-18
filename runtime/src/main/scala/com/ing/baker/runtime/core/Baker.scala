@@ -442,14 +442,6 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     implementations.foreach(addImplementationMethod)
 
   /**
-    * Adds an interaction implementation to baker.
-    *
-    * @param implementation An InteractionImplementation instance
-    */
-  def addImplementation(implementation: InteractionImplementation): Unit =
-    bakerActorApi.interactionManager.addImplementation(implementation)
-
-  /**
     * Adds a sequence of interaction implementations to baker.
     *
     * @param implementations A sequence of InteractionImplementation instances
