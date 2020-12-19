@@ -11,7 +11,7 @@ import net.ceedubs.ficus.Ficus._
 import scala.concurrent.duration.FiniteDuration
 
 
-trait BakerActorApi extends Extension {
+trait BakerAkka extends Extension {
 
   val interactionManager: InteractionManager = new InteractionManager()
 
@@ -31,7 +31,7 @@ trait BakerActorApi extends Extension {
 }
 
 object BakerActorApiExtension
-  extends ExtensionId[BakerActorApi] with ExtensionIdProvider {
+  extends ExtensionId[BakerAkka] with ExtensionIdProvider {
   //The lookup method is required by ExtensionIdProvider,
   // so we return ourselves here, this allows us
   // to configure our extension to be loaded when
@@ -40,7 +40,7 @@ object BakerActorApiExtension
 
   //This method will be called by Akka
   // to instantiate our Extension
-  override def createExtension(extendedSystem: ExtendedActorSystem): BakerActorApi = {
+  override def createExtension(extendedSystem: ExtendedActorSystem): BakerAkka = {
 
     val config = extendedSystem.settings.config
 
@@ -56,8 +56,8 @@ object BakerActorApiExtension
     }
 
     config.as[Option[String]]("akka.actor.provider") match {
-      case Some("local" | "akka.actor.LocalActorRefProvider")       => new LocalBakerActorApi(config, configuredEncryption)
-      case Some("cluster" | "akka.cluster.ClusterActorRefProvider") => new ClusterBakerActorApi(config, configuredEncryption)
+      case Some("local" | "akka.actor.LocalActorRefProvider")       => new BakerAkkaLocal(config, configuredEncryption)
+      case Some("cluster" | "akka.cluster.ClusterActorRefProvider") => new BakerAkkaCluster(config, configuredEncryption)
       case other                                                    => throw new IllegalArgumentException(s"Unsupported actor provider: $other")
     }
   }
@@ -65,5 +65,5 @@ object BakerActorApiExtension
   /**
     * Java API: retrieve the Count extension for the given system.
     */
-  override def get(system: ActorSystem): BakerActorApi = super.get(system)
+  override def get(system: ActorSystem): BakerAkka = super.get(system)
 }

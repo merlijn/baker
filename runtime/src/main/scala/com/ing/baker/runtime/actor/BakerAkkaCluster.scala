@@ -8,7 +8,7 @@ import akka.cluster.singleton.{ClusterSingletonManager, ClusterSingletonManagerS
 import akka.stream.Materializer
 import akka.util.Timeout
 import com.ing.baker.il.sha256HashCode
-import com.ing.baker.runtime.actor.ClusterBakerActorApi._
+import com.ing.baker.runtime.actor.BakerAkkaCluster._
 import com.ing.baker.runtime.actor.process_index.ProcessIndex.ActorMetadata
 import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol._
 import com.ing.baker.runtime.actor.process_index._
@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory
 import scala.concurrent.duration._
 import scala.concurrent.{Await, TimeoutException}
 
-object ClusterBakerActorApi {
+object BakerAkkaCluster {
 
   case class GetShardIndex(entityId: String) extends BakerProtoMessage
 
@@ -54,7 +54,7 @@ object ClusterBakerActorApi {
   val recipeManagerName = "RecipeManager"
 }
 
-class ClusterBakerActorApi(config: Config, override val configuredEncryption: Encryption)(implicit actorSystem: ActorSystem, materializer: Materializer) extends BakerActorApi {
+class BakerAkkaCluster(config: Config, override val configuredEncryption: Encryption)(implicit actorSystem: ActorSystem, materializer: Materializer) extends BakerAkka {
 
   private val nrOfShards = config.as[Int]("baker.actor.cluster.nr-of-shards")
   private val retentionCheckInterval = config.as[FiniteDuration]("baker.actor.retention-check-interval")
@@ -82,8 +82,8 @@ class ClusterBakerActorApi(config: Config, override val configuredEncryption: En
       typeName = "ProcessIndexActor",
       entityProps = ProcessIndex.props(actorIdleTimeout, Some(retentionCheckInterval), configuredEncryption, interactionManager, recipeManagerActor),
       settings = ClusterShardingSettings.create(actorSystem),
-      extractEntityId = ClusterBakerActorApi.entityIdExtractor(nrOfShards),
-      extractShardId = ClusterBakerActorApi.shardIdExtractor(nrOfShards)
+      extractEntityId = BakerAkkaCluster.entityIdExtractor(nrOfShards),
+      extractShardId = BakerAkkaCluster.shardIdExtractor(nrOfShards)
     )
   }
 

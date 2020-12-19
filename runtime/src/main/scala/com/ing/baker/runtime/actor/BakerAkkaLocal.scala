@@ -14,7 +14,7 @@ import net.ceedubs.ficus.Ficus._
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class LocalBakerActorApi(config: Config, override val configuredEncryption: Encryption)(implicit actorSystem: ActorSystem, materializer: Materializer) extends BakerActorApi {
+class BakerAkkaLocal(config: Config, override val configuredEncryption: Encryption)(implicit actorSystem: ActorSystem, materializer: Materializer) extends BakerAkka {
 
   private val retentionCheckInterval = config.as[FiniteDuration]("baker.actor.retention-check-interval")
   val actorIdleTimeout: Option[FiniteDuration] = config.as[Option[FiniteDuration]]("baker.actor.idle-timeout")
