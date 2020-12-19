@@ -122,7 +122,7 @@ class RecipeRuntime(recipe: CompiledRecipe, interactionManager: InteractionManag
     */
   override def isAutoFireable(instance: Instance[Place, Transition, ProcessState], t: Transition): Boolean = t match {
     case EventTransition(_, true, _) => false
-    case _ => true
+    case _                           => true
   }
 
   /**
@@ -132,8 +132,8 @@ class RecipeRuntime(recipe: CompiledRecipe, interactionManager: InteractionManag
     val edge = petriNet.findPTEdge(p, t).map(_.asInstanceOf[Edge]).get
 
     marking.get(p) match {
-      case None         ⇒ MultiSet.empty
-      case Some(tokens) ⇒ tokens.filter { case (e, _) ⇒ edge.isAllowed(e) }
+      case None         => MultiSet.empty
+      case Some(tokens) => tokens.filter { case (e, _) ⇒ edge.isTokenAllowed(e) }
     }
   }
 
@@ -159,9 +159,9 @@ class RecipeRuntime(recipe: CompiledRecipe, interactionManager: InteractionManag
 
           // translates the recipe failure strategy to a petri net failure strategy
           failureStrategyOutcome match {
-            case InteractionFailureStrategyOutcome.BlockTransition => BlockTransition
+            case InteractionFailureStrategyOutcome.BlockTransition       => BlockTransition
             case InteractionFailureStrategyOutcome.RetryWithDelay(delay) => RetryWithDelay(delay)
-            case InteractionFailureStrategyOutcome.Continue(eventName) => {
+            case InteractionFailureStrategyOutcome.Continue(eventName)   => {
               val event = ProcessEvent(eventName, Seq.empty)
               Continue(createProducedMarking(outMarking, Some(event)), event)
             }
@@ -173,9 +173,9 @@ class RecipeRuntime(recipe: CompiledRecipe, interactionManager: InteractionManag
 
   override def transitionTask(petriNet: PetriNet[Place, Transition], t: Transition)(marking: Marking[Place], state: ProcessState, input: Any): IO[(Marking[Place], ProcessEvent)] =
     t match {
-      case interaction: InteractionTransition => interactionTask(interaction, petriNet.outMarking(t), state)
-      case t: EventTransition                 => IO.pure(petriNet.outMarking(t).toMarking, input.asInstanceOf[ProcessEvent])
-      case t                                  => IO.pure(petriNet.outMarking(t).toMarking, null.asInstanceOf[ProcessEvent])
+      case i: InteractionTransition => interactionTask(i, petriNet.outMarking(t), state)
+      case e: EventTransition       => IO.pure(petriNet.outMarking(t).toMarking, input.asInstanceOf[ProcessEvent])
+      case t                        => IO.pure(petriNet.outMarking(t).toMarking, null.asInstanceOf[ProcessEvent])
     }
 
   def interactionTask(interaction: InteractionTransition,

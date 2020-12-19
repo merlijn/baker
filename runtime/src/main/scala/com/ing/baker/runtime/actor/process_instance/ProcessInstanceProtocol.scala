@@ -164,14 +164,7 @@ object ProcessInstanceProtocol {
       transitionId: Id,
       consumedMarking: Marking[Id],
       input: Any,
-      exceptionState: Option[ExceptionState]) {
-
-    def isActive: Boolean = exceptionState match {
-      case Some(ExceptionState(_, _, ExceptionStrategy.RetryWithDelay(_))) ⇒ true
-      case None                                          ⇒ true
-      case _                                             ⇒ false
-    }
-  }
+      exceptionState: Option[ExceptionState])
 
   /**
    * Response containing the state of the process.

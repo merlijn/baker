@@ -67,7 +67,7 @@ case class CompiledRecipe(name: String,
 
   def sensoryEvents: Set[EventDescriptor] = petriNet.transitions.collect {
     case EventTransition(eventDescriptor, true, _) => eventDescriptor
-  }.toSet
+  }
 
   def getValidationErrors: java.util.List[String] = validationErrors.toList.asJava
 

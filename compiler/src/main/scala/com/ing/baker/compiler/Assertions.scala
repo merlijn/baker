@@ -6,7 +6,7 @@ import com.ing.baker.recipe.dsl.{Event, Ingredient, Interaction, Recipe}
 import scala.collection.mutable
 
 object Assertions {
-  private def assertNoDuplicateElementsExist[T](compareIdentifier: T => Any, elements: Seq[T]) = {
+  def assertNoDuplicateElementsExist[T](compareIdentifier: T => Any, elements: Seq[T]) = {
 
     val mset: MultiSet[T] = MultiSet.copyOff(elements)
 
@@ -16,11 +16,11 @@ object Assertions {
     }
   }
 
-  private def assertValidNames[T](nameFunc: T => String, list: Iterable[T], typeName: String) = list.map(nameFunc).filter(name => name == null || name.isEmpty).foreach { _ =>
+  def assertValidNames[T](nameFunc: T => String, list: Iterable[T], typeName: String) = list.map(nameFunc).filter(name => name == null || name.isEmpty).foreach { _ =>
     throw new IllegalArgumentException(s"$typeName with a null or empty name found")
   }
 
-  private def assertNonEmptyRecipe(recipe: Recipe): Seq[String] = {
+  def assertNonEmptyRecipe(recipe: Recipe): Seq[String] = {
     val errors = mutable.MutableList.empty[String]
     if (recipe.sensoryEvents.isEmpty)
       errors += "No sensory events found."

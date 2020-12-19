@@ -94,7 +94,7 @@ class IntermediateLanguageModule extends ProtoEventAdapterModule {
         val from = nodeList.indexOf(e.source.value)
         val to = nodeList.indexOf(e.target.value)
 
-        Edge(Option(from), Option(to), Option(e.weight), edge.eventAllowed)
+        Edge(Option(from), Option(to), Option(e.weight), edge.allowedEventName)
       }
 
       val graph: Option[protobuf.PetriNet] = Some(protobuf.PetriNet(protoNodes, protoEdges))

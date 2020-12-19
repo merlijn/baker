@@ -86,6 +86,10 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
   private val updateCacheTimeout: FiniteDuration = context.system.settings.config.getDuration("baker.process-index-update-cache-timeout").toScala
   private val index: mutable.Map[String, ActorMetadata] = mutable.Map[String, ActorMetadata]()
   private val recipeCache: mutable.Map[String, (CompiledRecipe, Long)] = mutable.Map[String, (CompiledRecipe, Long)]()
+  private val processActorSettings = ProcessInstance.Settings(
+    executionContext = bakerExecutionContext,
+    encryption = configuredEncryption,
+    idleTTL = processIdleTimeout)
 
   // if there is a retention check interval defined we schedule a recurring message
   retentionCheckInterval.foreach { interval =>
@@ -123,16 +127,12 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
 
   // creates a ProcessInstanceActor, does not do any validation
   def createProcessActor(processId: String, compiledRecipe: CompiledRecipe): ActorRef = {
-    val runtime: ProcessInstanceRuntime[Place, Transition, ProcessState, ProcessEvent] =
-      new RecipeRuntime(compiledRecipe, interactionManager, context.system.eventStream)
 
-    val processActorProps =
-      ProcessInstance.props[Place, Transition, ProcessState, ProcessEvent](
-        compiledRecipe.name, compiledRecipe.petriNet, runtime,
-        ProcessInstance.Settings(
-          executionContext = bakerExecutionContext,
-          encryption = configuredEncryption,
-          idleTTL = processIdleTimeout))
+    val processActorProps = ProcessInstance.props(
+      processType = compiledRecipe.name,
+      petriNet = compiledRecipe.petriNet,
+      runtime = new RecipeRuntime(compiledRecipe, interactionManager, context.system.eventStream),
+      settings = processActorSettings)
 
     val processActor = context.actorOf(props = processActorProps, name = processId)
 
@@ -162,6 +162,7 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
 
   def getInteractionJob(processId: String, interactionName: String, processActor: ActorRef): OptionT[Future, (InteractionTransition, Id)] = {
     // we find which job correlates with the interaction
+    // TODO make a more convenient command to stop a transition without having to know the jobId
     for {
       recipe     <- OptionT.fromOption(getRecipe(index(processId).recipeId))
       transition <- OptionT.fromOption(recipe.interactionTransitions.find(_.name == interactionName))
@@ -265,10 +266,9 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
 
                 // otherwise the event is forwarded
                 case _ =>
-                  val source = FireEventActor.fireEvent(actorRef, recipe, cmd, waitForRetries)
-
-                  val sourceRef =
-                    source.runWith(StreamRefs.sourceRef().addAttributes(StreamRefAttributes.subscriptionTimeout(processEventTimout)))
+                  val sourceRef = FireEventActor
+                    .fireEvent(actorRef, recipe, cmd, waitForRetries)
+                    .runWith(StreamRefs.sourceRef().addAttributes(StreamRefAttributes.subscriptionTimeout(processEventTimout)))
 
                   sender() ! FireEventResponse(processId, sourceRef)
               }

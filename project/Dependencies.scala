@@ -23,14 +23,13 @@ object Dependencies {
   val akkaStream =                "com.typesafe.akka"          %% "akka-stream"                        % akkaVersion
   val akkaPersistence =           "com.typesafe.akka"          %% "akka-persistence"                   % akkaVersion
   val akkaPersistenceQuery =      "com.typesafe.akka"          %% "akka-persistence-query"             % akkaVersion
-  val akkaPersistenceCassandra =  "com.typesafe.akka"          %% "akka-persistence-cassandra"         % "0.58"
+  val akkaPersistenceCassandra =  "com.typesafe.akka"          %% "akka-persistence-cassandra"         % "1.0.4"
   val akkaCluster =               "com.typesafe.akka"          %% "akka-cluster"                       % akkaVersion
   val akkaClusterSharding =       "com.typesafe.akka"          %% "akka-cluster-sharding"              % akkaVersion
   val akkaSlf4j =                 "com.typesafe.akka"          %% "akka-slf4j"                         % akkaVersion
   val akkaTestKit =               "com.typesafe.akka"          %% "akka-testkit"                       % akkaVersion
   val akkaStreamTestKit =         "com.typesafe.akka"          %% "akka-stream-testkit"                % akkaVersion
   val akkaMultiNodeTestkit =      "com.typesafe.akka"          %% "akka-multi-node-testkit"            % akkaVersion
-  val akkaHttp =                  "com.typesafe.akka"          %% "akka-http"                          % "10.0.10"
   val levelDB   =                 "org.iq80.leveldb"           %  "leveldb"                            % "0.7"
   val levelDBJni =                "org.fusesource.leveldbjni"  %  "leveldbjni-all"                     % "1.8"
 
@@ -41,8 +40,8 @@ object Dependencies {
   val scalaGraphDot =             "org.scala-graph"            %% "graph-dot"                          % "1.11.5"
   val graphvizJava =              "guru.nidi"                  %  "graphviz-java"                      % "0.8.0"
 
-  val catsEffect =                "org.typelevel"              %% "cats-effect"                        % "1.2.0"
-  val catsCore =                  "org.typelevel"              %% "cats-core"                          % "1.5.0"
+  val catsEffect =                "org.typelevel"              %% "cats-effect"                        % "2.3.1"
+  val catsCore =                  "org.typelevel"              %% "cats-core"                          % "2.3.1"
 
   def scalaReflect(scalaV: String): ModuleID = "org.scala-lang"%  "scala-reflect"                      % scalaV
   val javaxInject =               "javax.inject"               %  "javax.inject"                       % "1"
@@ -66,7 +65,7 @@ object Dependencies {
   val objenisis =                 "org.objenesis"              %  "objenesis"                          % "2.5.1"
 
   val jodaTime =                  "joda-time"                  %  "joda-time"                          % "2.9.9"
-  val slf4jApi =                  "org.slf4j"                  %  "slf4j-api"                          % "1.7.25"
+  val slf4jApi =                  "org.slf4j"                  %  "slf4j-api"                          % "1.7.30"
   val scalaCheck =                "org.scalacheck"             %% "scalacheck"                         % "1.13.4"
 
   def scopeDeps(scope: String, modules: Seq[ModuleID]) =  modules.map(m => m % scope)

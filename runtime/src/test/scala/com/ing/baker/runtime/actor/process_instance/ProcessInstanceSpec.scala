@@ -54,10 +54,9 @@ object ProcessInstanceSpec {
     encryption = NoEncryption
   )
 
-  def processInstanceProps[S, E](
-                                  topology: PetriNet[Place, Transition],
-                                  runtime: ProcessInstanceRuntime[Place, Transition, S, E],
-                                  settings: Settings): Props =
+  def processInstanceProps[S, E](topology: PetriNet[Place, Transition],
+                                 runtime: ProcessInstanceRuntime[Place, Transition, S, E],
+                                 settings: Settings): Props =
 
     Props(new ProcessInstance[Place, Transition, S, E](
       "test",

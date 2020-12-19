@@ -34,6 +34,6 @@ trait StateTransitionNet[S, E] {
   def constantTransition[I, O](id: Long, label: Option[String] = None, automated: Boolean = false, constant: O): StateTransition[I, O] =
     StateTransition[I, O](id, label.getOrElse(s"t$id"), automated, (_, _, _) ⇒ BlockTransition, _ ⇒ IO.pure(constant))
 
-  def nullTransition[O](id: Long, label: Option[String] = None, automated: Boolean = false): Transition =
+  def nullTransition[O](id: Long, label: Option[String] = None, automated: Boolean): Transition =
     constantTransition[Unit, O](id, label, automated, ().asInstanceOf[O])
 }

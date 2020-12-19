@@ -16,7 +16,7 @@ case class TransitionBehaviour[S, E](
 /**
   * Wrapper for a simple sequence petri net:
   *
-  * p1 -> t1 -> p2 -> t2 -> ... -> tn -> pn+1
+  * (place 1) -> [transition 1] -> (place 2] -> [transition 2] -> ... -> [transition n] -> (place n+1)
   *
   * The net starts with a place and ends with a place.
   */
