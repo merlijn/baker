@@ -61,18 +61,13 @@ class BakerInquireSpec extends BakerRuntimeTestBase {
       val recipeId2 = baker.addRecipe(RecipeCompiler.compileRecipe(getRecipe("returnHealthAllRecipe2")))
       val recipeInformations: Map[String, RecipeInformation] = baker.getAllRecipes()
       recipeInformations.size shouldBe 2
-      recipeInformations.get(recipeId)
-        .map(_ should have(
-          'recipeId (recipeId),
-          'errors (Set.empty)
-        )
-      )
-      recipeInformations.get(recipeId2)
-        .map(_ should have(
-          'recipeId (recipeId2),
-          'errors (Set.empty)
-        )
-      )
+      recipeInformations.get(recipeId) should matchPattern {
+        case Some(RecipeInformation(recipe, _, errors)) if errors.isEmpty && recipe.recipeId == recipeId =>
+      }
+
+      recipeInformations.get(recipeId2) should matchPattern {
+        case Some(RecipeInformation(recipe, _, errors)) if errors.isEmpty && recipe.recipeId == recipeId2 =>
+      }
     }
   }
 }
