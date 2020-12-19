@@ -1,7 +1,7 @@
 package com.ing.baker.runtime.actor
 
 import akka.actor.{ActorRef, ActorSystem, ExtendedActorSystem, Extension, ExtensionId, ExtensionIdProvider}
-import akka.stream.ActorMaterializer
+import akka.stream.Materializer
 import com.ing.baker.runtime.actor.process_index.ProcessIndex.ActorMetadata
 import com.ing.baker.runtime.actor.serialization.Encryption
 import com.ing.baker.runtime.actor.serialization.Encryption.NoEncryption
@@ -45,7 +45,6 @@ object BakerActorApiExtension
     val config = extendedSystem.settings.config
 
     implicit val actorSystem: ActorSystem = extendedSystem
-    implicit val materializer: ActorMaterializer = ActorMaterializer()
 
     val configuredEncryption: Encryption = {
       if (config.as[Boolean]("baker.encryption.enabled")) {

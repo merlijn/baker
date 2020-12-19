@@ -77,8 +77,6 @@ class ProcessIndexSpec extends TestKit(ActorSystem("ProcessIndexSpec", ProcessIn
     }
   }))
 
-  implicit val materializer: Materializer = ActorMaterializer()
-
   def expectProcessEventReply(reply: Any): Unit = {
 
     expectMsgType[FireEventResponse]

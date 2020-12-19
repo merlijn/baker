@@ -8,7 +8,6 @@ import akka.pattern.ask
 import akka.persistence.query.PersistenceQuery
 import akka.persistence.query.scaladsl._
 import akka.stream.scaladsl.{Sink, Source}
-import akka.stream.{ActorMaterializer, SourceRef}
 import akka.util.Timeout
 import com.ing.baker.il._
 import com.ing.baker.il.petrinet._
@@ -52,8 +51,6 @@ class Baker()(implicit val actorSystem: ActorSystem) {
   private val defaultInquireTimeout = config.as[FiniteDuration]("baker.process-inquire-timeout")
   private val defaultAddRecipeTimeout = config.as[FiniteDuration]("baker.add-recipe-timeout")
   private val readJournalIdentifier = config.as[String]("baker.actor.read-journal-plugin")
-
-  private implicit val materializer: ActorMaterializer = ActorMaterializer()
 
   private val readJournal = PersistenceQuery(actorSystem)
     .readJournalFor[CurrentEventsByPersistenceIdQuery with PersistenceIdsQuery with CurrentPersistenceIdsQuery](readJournalIdentifier)
@@ -211,7 +208,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
       .mapTo[FireEventResponse]
 
     // obtain the source (stream) of responses
-    Source.fromFuture(response).flatMapConcat(_.sourceRef)
+    Source.future(response).flatMapConcat(_.sourceRef)
   }
 
   /**
@@ -268,7 +265,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
 
     val futureResult = bakerActorApi.processIndexActor.ask(GetCompiledRecipe(processId))(defaultInquireTimeout)
 
-    Source.fromFuture(futureResult).flatMapConcat {
+    Source.future(futureResult).flatMapConcat {
       case RecipeFound(compiledRecipe, _) =>
         ProcessInstanceEventSourcing
           .eventsForInstance[Place, Transition, ProcessState, ProcessEvent](compiledRecipe.name, processId, compiledRecipe.petriNet, bakerActorApi.configuredEncryption, readJournal, RecipeRuntime.recipeEventSourceFn)

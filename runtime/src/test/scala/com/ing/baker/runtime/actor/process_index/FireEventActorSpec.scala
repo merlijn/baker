@@ -30,7 +30,6 @@ object FireEventActorSpec {
 
 class FireEventActorSpec extends TestKit(ActorSystem("ProcessApiSpec", FireEventActorSpec.config)) with WordSpecLike {
 
-  implicit val materializer = ActorMaterializer()
   implicit val ec: ExecutionContext = system.dispatcher
 
   // Using dilated timeout to take into account the akka.test.timefactor config

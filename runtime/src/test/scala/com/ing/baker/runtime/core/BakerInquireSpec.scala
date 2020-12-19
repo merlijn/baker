@@ -49,10 +49,9 @@ class BakerInquireSpec extends BakerRuntimeTestBase {
     "return no errors of a recipe with no errors if asked" in {
       val (baker, recipeId) = setupBakerWithRecipe("returnHealthRecipe", false)
       val recipeInformation: RecipeInformation = baker.getRecipeInformation(recipeId)
-      recipeInformation should have(
-        'recipeId (recipeId),
-        'errors (Set.empty)
-      )
+
+      recipeInformation.errors.size shouldBe 0
+      recipeInformation.recipe.recipeId shouldBe recipeId
     }
 
     "return no errors of all recipes if none contain errors if asked" in {

@@ -171,13 +171,13 @@ trait BakerRuntimeTestBase
        |  actor.provider = "akka.cluster.ClusterActorRefProvider"
        |
        |  remote {
-       |    netty.tcp {
-       |      hostname = localhost
-       |      port = $port
+       |    artery {
+       |      canonical.hostname = "localhost"
+       |      canonical.port = $port
        |    }
        |  }
        |
-       |  cluster.seed-nodes = ["akka.tcp://$actorSystemName@localhost:$port"]
+       |  cluster.seed-nodes = ["akka://$actorSystemName@localhost:$port"]
        |}
     """.stripMargin).withFallback(localLevelDBConfig(actorSystemName, journalInitializeTimeout, journalPath, snapshotsPath))
 

@@ -1,11 +1,12 @@
 package com.ing.baker.runtime.actor.process_index
 
+import akka.NotUsed
 import akka.actor.{ActorRef, NoSerializationVerificationNeeded, Props, Terminated}
 import akka.event.{DiagnosticLoggingAdapter, Logging}
 import akka.pattern.{ask, pipe}
 import akka.persistence.{PersistentActor, RecoveryCompleted}
 import akka.stream.scaladsl.{Source, StreamRefs}
-import akka.stream.{Materializer, StreamRefAttributes}
+import akka.stream.{Materializer, SourceRef, StreamRefAttributes}
 import akka.util.Timeout
 import com.ing.baker.il.CompiledRecipe
 import com.ing.baker.il.petrinet.{InteractionTransition, Place, Transition}
@@ -28,7 +29,6 @@ import scala.util.{Failure, Success}
 import cats.data.OptionT
 import cats.instances.future._
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol.ExceptionStrategy.{BlockTransition, Continue, RetryWithDelay}
-import com.ing.baker.runtime.core
 
 object ProcessIndex {
 
@@ -89,7 +89,7 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
 
   // if there is a retention check interval defined we schedule a recurring message
   retentionCheckInterval.foreach { interval =>
-    context.system.scheduler.schedule(interval, interval, context.self, CheckForProcessesToBeDeleted)
+    context.system.scheduler.scheduleAtFixedRate(interval, interval, context.self, CheckForProcessesToBeDeleted)
   }
 
   def updateCache() = {
@@ -237,7 +237,9 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
 
       def rejectWith(msg: Any, rejectReason: RejectReason): Unit = {
         context.system.eventStream.publish(events.EventRejected(System.currentTimeMillis(), cmd.processId, cmd.correlationId, cmd.event, rejectReason))
-        Source.single(msg).runWith(StreamRefs.sourceRef()).map(FireEventResponse(processId, _)).pipeTo(sender())
+
+        val sourceRef = Source.single(msg).runWith(StreamRefs.sourceRef())
+        sender() ! FireEventResponse(processId, sourceRef)
       }
 
       def forwardEvent(actorRef: ActorRef, recipe: CompiledRecipe): Unit = {
@@ -252,6 +254,9 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
               rejectWith(InvalidEvent(processId, s"Invalid event: " + eventValidationErrors.mkString(",")), RejectReason.InvalidEvent)
             else {
 
+              implicit val timeout = processEventTimout
+              import context.system
+
               recipe.eventReceivePeriod match {
 
                 // if the receive period is expired the event is rejected
@@ -260,10 +265,12 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
 
                 // otherwise the event is forwarded
                 case _ =>
-                  val source = FireEventActor.fireEvent(actorRef, recipe, cmd, waitForRetries)(processEventTimout, context.system, materializer)
-                  val sourceRef = source.runWith(StreamRefs.sourceRef().addAttributes(StreamRefAttributes.subscriptionTimeout(processEventTimout)))
+                  val source = FireEventActor.fireEvent(actorRef, recipe, cmd, waitForRetries)
 
-                  sourceRef.map(FireEventResponse(processId, _)).pipeTo(sender())
+                  val sourceRef =
+                    source.runWith(StreamRefs.sourceRef().addAttributes(StreamRefAttributes.subscriptionTimeout(processEventTimout)))
+
+                  sender() ! FireEventResponse(processId, sourceRef)
               }
             }
         }
