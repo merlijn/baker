@@ -1,24 +1,25 @@
 package com.ing.baker.recipe.dsl
 
-import org.scalatest.{Matchers, WordSpecLike}
+import org.scalatest._
+import org.scalatest.matchers._
 
 
-class InteractionSpec extends WordSpecLike with Matchers {
+class InteractionSpec extends wordspec.AnyWordSpec with should.Matchers {
   "an Interaction" when {
     "calling the Equals method" should {
       "return true if same interaction instance" in {
-        val customerName = Ingredient.reflect[String]("customerName")
+        val customerName = Ingredient[String]("customerName")
         val createCustomer = Interaction(
           name = "CreateCustomer",
           input = Seq(customerName),
           output = Seq()
         )
-        createCustomer.equals(createCustomer) shouldBe true
+        createCustomer.equals(createCustomer) should be(true)
       }
 
       "return true if different interaction instance with same signature" in {
-        val customerName = Ingredient.reflect[String]("customerName")
-        val customerId = Ingredient.reflect[String]("customerId")
+        val customerName = Ingredient[String]("customerName")
+        val customerId = Ingredient[String]("customerId")
         val CreateCustomer = Interaction(
           name = "CreateCustomer",
           input = Seq(customerName),
@@ -29,12 +30,12 @@ class InteractionSpec extends WordSpecLike with Matchers {
           input = Seq(customerName),
           output = Seq()
         )
-        CreateCustomer.equals(CreateCustomer2) shouldBe true
+        CreateCustomer.equals(CreateCustomer2) should be(true)
       }
 
       "return false if different interaction instance with different name" in {
-        val customerName = Ingredient.reflect[String]("customerName")
-        val customerId = Ingredient.reflect[String]("customerId")
+        val customerName = Ingredient[String]("customerName")
+        val customerId = Ingredient[String]("customerId")
         val CreateCustomer = Interaction(
           name = "CreateCustomer",
           input = Seq(customerName),
@@ -45,19 +46,19 @@ class InteractionSpec extends WordSpecLike with Matchers {
           input = Seq(customerName),
           output = Seq()
         )
-        CreateCustomer.equals(CreateCustomer2) shouldBe false
+        CreateCustomer.equals(CreateCustomer2) should be(false)
       }
 
       "return false if different object" in {
-        val customerName = Ingredient.reflect[String]("customerName")
-        val customerId = Ingredient.reflect[String]("customerId")
+        val customerName = Ingredient[String]("customerName")
+        val customerId = Ingredient[String]("customerId")
         val CreateCustomer = Interaction(
           name = "CreateCustomer",
           input = Seq(customerName),
           output = Seq()
         )
         val otherObject = ""
-        CreateCustomer.equals(otherObject) shouldBe false
+        CreateCustomer.equals(otherObject) should be(false)
       }
     }
   }

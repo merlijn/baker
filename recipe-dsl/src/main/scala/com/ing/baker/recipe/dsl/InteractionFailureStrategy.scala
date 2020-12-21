@@ -28,6 +28,21 @@ object InteractionFailureStrategy {
     require(maximumRetries >= 1, "maximum retries must be greater or equal to 1")
   }
 
+  @tailrec
+  def calculateMaxRetries(lastDelay: Duration,
+                          backoffFactor: Double,
+                          deadline: Duration,
+                          totalDelay: Duration,
+                          maxTimeBetweenRetries: Option[Duration],
+                          timesCounter: Int): Int = {
+
+    val newDelay = lastDelay * backoffFactor
+    val nextDelay = maxTimeBetweenRetries.getOrElse(newDelay).min(newDelay) // get the minimum of two
+
+    if ((totalDelay + nextDelay) > deadline) timesCounter
+    else calculateMaxRetries(nextDelay, backoffFactor, deadline, totalDelay + nextDelay, maxTimeBetweenRetries, timesCounter + 1)
+  }
+
 
   sealed trait Until
 
@@ -83,6 +98,7 @@ object InteractionFailureStrategy {
               backoffFactor,
               deadline = duration,
               totalDelay = initialDelayValue,
+              maxTimeBetweenRetries,
               timesCounter = 1),
             maxTimeBetweenRetries,
             fireRetryExhaustedEvent)
@@ -97,20 +113,6 @@ object InteractionFailureStrategy {
 
         case None => throw new IllegalArgumentException("Either deadline of maximum retries need to be set")
       }
-    }
-
-    @tailrec
-    private def calculateMaxRetries(lastDelay: Duration,
-                                    backoffFactor: Double,
-                                    deadline: Duration,
-                                    totalDelay: Duration,
-                                    timesCounter: Int): Int = {
-
-      val newDelay = lastDelay * backoffFactor
-      val nextDelay = maxTimeBetweenRetries.getOrElse(newDelay).min(newDelay) // get the minimum of two
-
-      if ((totalDelay + nextDelay) > deadline) timesCounter
-      else calculateMaxRetries(nextDelay, backoffFactor, deadline, totalDelay + nextDelay, timesCounter + 1)
     }
   }
 }

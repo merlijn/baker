@@ -1,25 +1,48 @@
 package com.ing.baker.petrinet.api
 
+
+case class Edge[P, T](source: Either[P, T], target: Either[P, T], weight: Int, label: Option[Any])
+
 /**
  * Petri net class.
   *
  * Backed by a graph object from scala-graph (https://github.com/scala-graph/scala-graph)
  */
-class PetriNet[P, T](val innerGraph: PetriNetGraph[P, T]) {
+case class PetriNet[P, T](places: Set[P], transitions: Set[T], edges: Set[Edge[P, T]]) {
+  
+  def removePlace(p: P): PetriNet[P, T] = {
+    
+    val newEdges = edges.filter {
+      case Edge(_, Left(p), _, _) => true
+      case Edge(Left(p), _, _, _) => true
+      case _ => false
+    }
 
-  /**
-    * The set of places of the petri net
-    *
-    * @return The set of places
-    */
-  val places: Set[P] = innerGraph.nodes.collect { case n if n.isPlace ⇒ n.asPlace }.toSet
+    PetriNet[P, T](places - p, transitions, edges)
+  }
+  
+  def removeTransition(t: T): PetriNet[P, T] = {
+    
+    val newEdges = edges.filter {
+      case Edge(Right(t), _, _, _) => true
+      case Edge(_, Right(t), _, _) => true
+      case _ => false
+    }
+    
+    PetriNet[P, T](places, transitions - t, edges)
+  }
+  
+  def removeTransitions(transitions: Iterable[T]) = transitions.foldLeft(this) {
+    case (pn, t) => pn.removeTransition(t)
+  }
 
-  /**
-    * The set of transitions of the petri net
-    *
-    * @return The set of transitions.
-    */
-  val transitions: Set[T] = innerGraph.nodes.collect { case n if n.isTransition ⇒ n.asTransition }.toSet
+  def removePlaces(places: Iterable[P]) = places.foldLeft(this) {
+    case (pn, p) => pn.removePlace(p)
+  }
+  
+  def isConnected():Boolean = ???
+  
+  def findCycles(): Seq[Either[P, T]] = ???
 
   /**
     * The out-adjecent places of a transition.
@@ -27,7 +50,7 @@ class PetriNet[P, T](val innerGraph: PetriNetGraph[P, T]) {
     * @param t transition
     * @return
     */
-  def outgoingPlaces(t: T): Set[P] = innerGraph.get(Right(t)).outgoingPlaces
+  def outgoingPlaces(t: T): Set[P] = outMarking(t).keySet
 
   /**
     * The out-adjacent transitions of a place.
@@ -35,7 +58,9 @@ class PetriNet[P, T](val innerGraph: PetriNetGraph[P, T]) {
     * @param p place
     * @return
     */
-  def outgoingTransitions(p: P): Set[T] = innerGraph.get(Left(p)).outgoingTransitions
+  def outgoingTransitions(p: P): Set[T] = edges.collect {
+    case Edge(Left(`p`), Right(t), _, _) => t 
+  }.toSet
 
   /**
     * The in-adjacent places of a transition.
@@ -43,7 +68,7 @@ class PetriNet[P, T](val innerGraph: PetriNetGraph[P, T]) {
     * @param t transition
     * @return
     */
-  def incomingPlaces(t: T): Set[P] = innerGraph.get(Right(t)).incomingPlaces
+  def incomingPlaces(t: T): Set[P] = inMarking(t).keySet
 
   /**
     * The in-adjacent transitions of a place.
@@ -51,14 +76,17 @@ class PetriNet[P, T](val innerGraph: PetriNetGraph[P, T]) {
     * @param p place
     * @return
     */
-  def incomingTransitions(p: P): Set[T] = innerGraph.get(Left(p)).incomingTransitions
+  def incomingTransitions(p: P): Set[T] = edges.collect {
+    case Edge(Right(t), Left(`p`), _, _) => t
+  }.toSet
 
   /**
     * The set of nodes (places + transitions) in the petri net.
     *
     * @return The set of nodes.
     */
-  def nodes: scala.collection.Set[Either[P, T]] = innerGraph.nodes.map(_.value)
+  def nodes: scala.collection.Set[Either[P, T]] = 
+    transitions.map[Either[P, T]](Right(_)) ++ places.map[Either[P, T]](Left(_))
 
   /**
     * Returns the in-marking of a transition. That is; a map of place -> arc weight
@@ -66,7 +94,9 @@ class PetriNet[P, T](val innerGraph: PetriNetGraph[P, T]) {
     * @param t transition
     * @return
     */
-  def inMarking(t: T): MultiSet[P] = innerGraph.get(Right(t)).incoming.map(e ⇒ e.source.asPlace -> e.weight.toInt).toMap
+  def inMarking(t: T): MultiSet[P] = edges.collect {
+    case Edge(Left(p), Right(`t`), weight, _) => p -> weight
+  }.toMap
 
   /**
     * The out marking of a transition. That is; a map of place -> arc weight
@@ -74,7 +104,9 @@ class PetriNet[P, T](val innerGraph: PetriNetGraph[P, T]) {
     * @param t transition
     * @return
     */
-  def outMarking(t: T): MultiSet[P] = innerGraph.get(Right(t)).outgoing.map(e ⇒ e.target.asPlace -> e.weight.toInt).toMap
+  def outMarking(t: T): MultiSet[P] = edges.collect {
+    case Edge(Right(`t`), Left(p), weight, _) => p -> weight
+  }.toMap
 
   /**
     * Returns the (optional) edge for a given place -> transition pair.
@@ -83,8 +115,9 @@ class PetriNet[P, T](val innerGraph: PetriNetGraph[P, T]) {
     * @param to The target transition.
     * @return
     */
-  def findPTEdge(from: P, to: T): Option[Any] =
-    innerGraph.get(Left(from)).outgoing.find(_.target.value == Right(to)).map(_.toOuter.label)
+  def findPTEdge(from: P, to: T): Option[Any] = edges.collectFirst {
+    case Edge(Left(`from`), Right(`to`), _, label) => label
+  }
 
   /**
     * Returns the (optional) edge for a given transition -> place pair.
@@ -93,23 +126,7 @@ class PetriNet[P, T](val innerGraph: PetriNetGraph[P, T]) {
     * @param to The target place.
     * @return
     */
-  def findTPEdge(from: T, to: P): Option[Any] =
-    innerGraph.get(Right(from)).outgoing.find(_.target.value == Left(to)).map(_.toOuter.label)
-
-  /**
-    * We override the hashCode function since the scalax.collections.Graph hashCode is non deterministic
-    */
-  override val hashCode = {
-
-    innerGraph.edges.map(e => (e.source.value, e.target.value, e.weight, e.label)).toSet.hashCode
-  }
-
-  override def equals(obj: Any) = {
-
-    obj match {
-      case null => false
-      case pn: PetriNet[_, _] => pn.innerGraph.equals(innerGraph)
-      case _ => false
-    }
+  def findTPEdge(from: T, to: P): Option[Any] = edges.collectFirst {
+    case Edge(Left(`from`), Right(`to`), _, label) => label
   }
 }

@@ -37,12 +37,7 @@ object CompiledRecipe {
         }
       }.toString
 
-      val recipeString = StringBuilder.newBuilder +
-        name +
-        petriNetId +
-        initMarkingId +
-        validationErrors.mkString +
-        eventReceivePeriod.toString + retentionPeriod
+      val recipeString: String = name + petriNetId + initMarkingId + validationErrors.mkString + eventReceivePeriod.toString + retentionPeriod
 
       // truncate to 64 bits = 16 hex chars
       zeroPaddedSHA256(recipeString).substring(0, 16)
@@ -69,15 +64,12 @@ case class CompiledRecipe(name: String,
     case EventTransition(eventDescriptor, true, _) => eventDescriptor
   }
 
-  def getValidationErrors: java.util.List[String] = validationErrors.toList.asJava
-
   /**
     * Visualise the compiled recipe in DOT format
     *
     * @return
     */
-  def getRecipeVisualization: String =
-    RecipeVisualizer.visualizeRecipe(this)
+  def getRecipeVisualization: String = ??? //RecipeVisualizer.visualizeRecipe(this)
 
   /**
     * Visualise the compiled recipe in DOT format
@@ -85,12 +77,10 @@ case class CompiledRecipe(name: String,
     * @param filterFunc
     * @return
     */
-  def getFilteredRecipeVisualization(filterFunc: String => Boolean): String =
-    RecipeVisualizer.visualizeRecipe(this, filter = filterFunc)
+  def getFilteredRecipeVisualization(filterFunc: String => Boolean): String = ??? // RecipeVisualizer.visualizeRecipe(this, filter = filterFunc)
 
 
-  def getFilteredRecipeVisualization(filter: String): String =
-    getFilteredRecipeVisualization(x => !x.contains(filter))
+  def getFilteredRecipeVisualization(filter: String): String = ??? // getFilteredRecipeVisualization(x => !x.contains(filter))
 
   /**
     * Returns a DOT (http://www.graphviz.org/) representation of the recipe.
@@ -99,15 +89,14 @@ case class CompiledRecipe(name: String,
     * @param filters
     * @return
     */
-  def getFilteredRecipeVisualization(filters: Array[String]): String =
-    getFilteredRecipeVisualization((current) => filters.forall(filter => !current.contains(filter)))
+  def getFilteredRecipeVisualization(filters: Array[String]): String = ??? // getFilteredRecipeVisualization((current) => filters.forall(filter => !current.contains(filter)))
 
   /**
     * Visualises the underlying petri net in DOT format
     *
     * @return
     */
-  def getPetriNetVisualization: String = RecipeVisualizer.visualizePetriNet(petriNet.innerGraph)
+  def getPetriNetVisualization: String = ??? //RecipeVisualizer.visualizePetriNet(petriNet.innerGraph)
 
   val interactionTransitions: Set[InteractionTransition] = petriNet.transitions.collect {
     case t: InteractionTransition => t
@@ -116,12 +105,8 @@ case class CompiledRecipe(name: String,
   val interactionEvents: Set[EventDescriptor] = interactionTransitions flatMap (it => it.events)
 
   val allEvents: Set[EventDescriptor] = sensoryEvents ++ interactionEvents
-
-  def getAllEvents: java.util.Set[EventDescriptor] = allEvents.asJava
-
+  
   val allIngredients: Set[IngredientDescriptor] = allEvents.flatMap {
     events => events.ingredients
   }
-
-  def getAllIngredients: java.util.Set[IngredientDescriptor] = allIngredients.asJava
 }

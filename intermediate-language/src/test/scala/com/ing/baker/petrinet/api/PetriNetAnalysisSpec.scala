@@ -1,7 +1,8 @@
 package com.ing.baker.petrinet.api
 
 import com.ing.baker.petrinet.api.DSL._
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should
+import org.scalatest.{Matchers, WordSpec, wordspec}
 import scalax.collection.edge.WLDiEdge
 import scalax.collection.immutable.Graph
 
@@ -68,7 +69,7 @@ object DSL {
   }
 }
 
-class PetriNetAnalysisSpec extends WordSpec with Matchers {
+class PetriNetAnalysisSpec extends wordspec.AnyWordSpec with should.Matchers {
 
   "The PetriNetAnalysis class" should {
 
@@ -86,11 +87,11 @@ class PetriNetAnalysisSpec extends WordSpec with Matchers {
 
       val tree = PetriNetAnalysis.calculateCoverabilityTree(boundedNet, initialMarking)
 
-      tree.isCoverable(Map(2 -> 1, 3 -> 1, 4 -> 1)) shouldBe false
-      tree.isCoverable(Map(4 -> 1)) shouldBe true
-      tree.isCoverable(Map(5 -> 1)) shouldBe true
-      tree.isCoverable(Map(6 -> 1)) shouldBe true
-      tree.isCoverable(Map(6 -> 1, 1 -> 1)) shouldBe false
+      tree.isCoverable(Map(2 -> 1, 3 -> 1, 4 -> 1)) should be(false)
+      tree.isCoverable(Map(4 -> 1)) should be(true)
+      tree.isCoverable(Map(5 -> 1)) should be(true)
+      tree.isCoverable(Map(6 -> 1)) should be(true)
+      tree.isCoverable(Map(6 -> 1, 1 -> 1)) should be(false)
     }
 
     "be able to create the coverability tree" in {
@@ -101,7 +102,7 @@ class PetriNetAnalysisSpec extends WordSpec with Matchers {
 
       val tree = PetriNetAnalysis.calculateCoverabilityTree(unboundedNet, Map(1 -> 1))
 
-      tree.isCoverable(Map(1 -> 1, 2 -> 10)) shouldBe true
+      tree.isCoverable(Map(1 -> 1, 2 -> 10)) should be(true)
     }
   }
 }

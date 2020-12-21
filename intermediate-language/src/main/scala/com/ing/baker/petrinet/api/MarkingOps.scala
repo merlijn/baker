@@ -5,10 +5,10 @@ trait MarkingOps {
   /**
    * Some convenience method additions to work with Markings.
    */
-  implicit class MarkingFunctions[P](marking: Marking[P]) {
+  extension[P](marking: Marking[P]) {
 
     // Note: extra .map(identity) is a needed to workaround the scala Map serialization bug: https://issues.scala-lang.org/browse/SI-7005
-    def multiplicities: MultiSet[P] = marking.mapValues(_.multisetSize).map(identity)
+    def multiplicities: MultiSet[P] = marking.view.mapValues(_.multisetSize).toMap
 
     def add(p: P, value: Any, count: Int = 1): Marking[P] = {
       val newTokens = marking.getOrElse(p, MultiSet.empty).multisetIncrement(value, count)
@@ -41,7 +41,7 @@ trait MarkingOps {
     }
   }
 
-  implicit class IterableToMarking[P](i: Iterable[(P, MultiSet[Any])]) {
+  extension [P](i: Iterable[(P, MultiSet[Any])]) {
     def toMarking: Marking[P] = i.toMap[P, MultiSet[Any]]
   }
 
@@ -53,7 +53,7 @@ trait MarkingOps {
     * @tparam P Place type parameter
     * @return Marking (state of the petrinet) with 'null' token values
     */
-  implicit class MultiSetToMarking[P](mset: MultiSet[P]) {
+  extension[P](mset: MultiSet[P]) {
     def toMarking: Marking[P] = mset.map { case (p, n) ⇒ p -> Map[Any, Int](Tuple2(null, n)) }.toMarking
   }
 }

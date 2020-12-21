@@ -1,12 +1,13 @@
 package com.ing.baker.recipe.dsl
 
-import org.scalatest.{Matchers, WordSpecLike}
+import org.scalatest._
+import org.scalatest.matchers._
 
 import InteractionDescriptorSpec._
 
 object InteractionDescriptorSpec {
-  val customerName = Ingredient.reflect[String]("customerName")
-  val customerId = Ingredient.reflect[String]("customerId")
+  val customerName = Ingredient[String]("customerName")
+  val customerId = Ingredient[String]("customerId")
   val createCustomer = Interaction(
     name = "CreateCustomer",
     input = Seq(customerName),
@@ -16,24 +17,24 @@ object InteractionDescriptorSpec {
   val anOtherEvent = Event("anOtherEvent",  providedIngredients = Seq.empty)
 }
 
-class InteractionDescriptorSpec extends WordSpecLike with Matchers {
+class InteractionDescriptorSpec extends wordspec.AnyWordSpec with should.Matchers {
   "an InteractionDescriptor" when {
 
     "requiredEvents called" should {
       "update the requiredEventsList" in {
         val updated = createCustomer.withRequiredEvents(agreementsAcceptedEvent)
-        updated.requiredEvents shouldBe Set(agreementsAcceptedEvent.name)
+        updated.requiredEvents should be(Set(agreementsAcceptedEvent.name))
       }
     }
 
     "requiredOneOfEvents called" should {
       "updates the requiredOneOfEventsList" in {
         val updated = createCustomer.withRequiredOneOfEvents(Set(agreementsAcceptedEvent, anOtherEvent))
-        updated.requiredOneOfEvents.head shouldBe Set(agreementsAcceptedEvent.name, anOtherEvent.name)
+        updated.requiredOneOfEvents.head should be (Set(agreementsAcceptedEvent.name, anOtherEvent.name))
       }
 
       "throws IllegalArgumentException if nr of events is less than 2" in {
-        intercept[IllegalArgumentException] {
+        assertThrows[IllegalArgumentException] {
           createCustomer.withRequiredOneOfEvents(Set(agreementsAcceptedEvent))
         }
       }

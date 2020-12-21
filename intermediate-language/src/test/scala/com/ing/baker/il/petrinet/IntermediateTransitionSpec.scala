@@ -1,11 +1,14 @@
 package com.ing.baker.il.petrinet
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.matchers.should
+import org.scalatest.{FunSuite, Matchers, wordspec}
 
-class IntermediateTransitionSpec extends FunSuite with Matchers {
-
-  test("id is computed") {
-    IntermediateTransition("testTransition").id shouldBe -401713565417492236l
+class IntermediateTransitionSpec extends wordspec.AnyWordSpec with should.Matchers {
+  
+  "IntermediateTransitionSpec" should {
+    
+    "correctly compute it's id" in {
+      IntermediateTransition("testTransition").id should be(-401713565417492236l)  
+    }
   }
-
 }

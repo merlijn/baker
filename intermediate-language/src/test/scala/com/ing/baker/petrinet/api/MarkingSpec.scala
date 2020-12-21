@@ -1,9 +1,10 @@
 package com.ing.baker.petrinet.api
 
 import org.scalatest.Matchers._
-import org.scalatest.WordSpec
+import org.scalatest.{WordSpec, wordspec}
+import org.scalatest.matchers.should
 
-class MarkingSpec extends WordSpec {
+class MarkingSpec extends wordspec.AnyWordSpec with should.Matchers {
 
   case class Person(name: String, age: Int)
 
@@ -22,7 +23,7 @@ class MarkingSpec extends WordSpec {
         p1 -> MultiSet(1, 2),
         p2 -> MultiSet("foo", "bar"))
 
-      m.multiplicities shouldBe Map(p1 -> 2, p2 -> 2)
+      m.multiplicities should be(Map(p1 -> 2, p2 -> 2))
     }
 
     "have correct produce semantics" in {
@@ -31,7 +32,7 @@ class MarkingSpec extends WordSpec {
         p1 -> MultiSet(1, 2),
         p2 -> MultiSet("foo", "bar"))
 
-      m1 |+| Marking.empty shouldBe m1
+      m1 |+| Marking.empty should be(m1)
 
       val m2: Marking[Place] = Map(
         p1 -> MultiSet(3),
@@ -43,7 +44,7 @@ class MarkingSpec extends WordSpec {
         p2 -> MultiSet("baz", "foo", "bar"),
         p3 -> MultiSet(1d))
 
-      m1 |+| m2 shouldBe expected
+      m1 |+| m2 should be(expected)
     }
 
     "have correct consume semantics" in {
@@ -53,7 +54,7 @@ class MarkingSpec extends WordSpec {
         p2 -> MultiSet("foo", "bar"),
         p4 -> MultiSet(Person("Joe", 42)))
 
-      m1 |-| Marking.empty shouldBe m1
+      m1 |-| Marking.empty should be(m1)
 
       val m2: Marking[Place] = Map(
         p1 -> MultiSet(2),
@@ -63,7 +64,7 @@ class MarkingSpec extends WordSpec {
         p1 -> MultiSet(1, 3),
         p2 -> MultiSet("foo", "bar"))
 
-      m1 |-| m2 shouldBe expected
+      m1 |-| m2 should be(expected)
     }
 
     "in case of token value equality only consume tokens equal to the multiplicity" in {
@@ -71,7 +72,7 @@ class MarkingSpec extends WordSpec {
       val m1: Marking[Place] = Map(p1 -> MultiSet(1, 1, 1, 1, 1))
       val m2: Marking[Place] = Map(p1 -> MultiSet(1, 1))
 
-      m1 |-| m2 shouldBe Map(p1 -> MultiSet(1, 1, 1))
+      m1 |-| m2 should be(Map(p1 -> MultiSet(1, 1, 1)))
     }
   }
 }

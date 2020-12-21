@@ -5,10 +5,10 @@ import com.ing.baker.recipe.dsl.{Event, Ingredient, Interaction, Recipe}
 object Onboarding {
 
   //Ingredients
-  val customerName = Ingredient.reflect[String]("customerName")
-  val customerId = Ingredient.reflect[String]("customerId")
-  val accountId = Ingredient.reflect[Integer]("accountId")
-  val accountName = Ingredient.reflect[Integer]("accountName")
+  val customerName = Ingredient[String]("customerName")
+  val customerId = Ingredient[String]("customerId")
+  val accountId = Ingredient[Integer]("accountId")
+  val accountName = Ingredient[Integer]("accountName")
 
   //Events
   val agreementsAcceptedEvent = Event(name = "agreementsAccepted", providedIngredients = Seq.empty)

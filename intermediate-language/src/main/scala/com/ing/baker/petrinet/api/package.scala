@@ -1,8 +1,5 @@
 package com.ing.baker.petrinet
 
-import scalax.collection.Graph
-import scalax.collection.GraphPredef._
-import scalax.collection.edge.WLDiEdge
 
 package object api extends MultiSetOps with MarkingOps {
 
@@ -26,59 +23,28 @@ package object api extends MultiSetOps with MarkingOps {
     */
   type Marking[P] = Map[P, MultiSet[Any]]
 
-  /**
-    * Type alias for a petri net graph.
-    *
-    * See also: scala-graph (https://github.com/scala-graph/scala-graph
-    */
-  type PetriNetGraph[P, T] = Graph[Either[P, T], WLDiEdge]
-
-  implicit class IdentifiableOps[T : Identifiable](e: T) {
+  extension [T : Identifiable](e: T) {
 
     def getId: Id = implicitly[Identifiable[T]].apply(e)
   }
 
-  implicit class IdentifiableSeqOps[T : Identifiable](seq: Iterable[T]) {
+  extension [T : Identifiable](seq: Iterable[T]) {
 
-    def findById(id: Id): Option[T] = seq.find(e ⇒ implicitly[Identifiable[T]].apply(e) == id)
+    def findById(id: Id): Option[T] = seq.find(e ⇒ summon[Identifiable[T]].apply(e) == id)
 
     def getById(id: Id, name: String = "element"): T = findById(id).getOrElse { throw new IllegalStateException(s"No $name found with id: $id") }
   }
 
-  implicit class MarkingMarshall[P : Identifiable](marking: Marking[P]) {
+  extension [P : Identifiable](marking: Marking[P]) {
 
-    def marshall: Marking[Id] = translateMapKeys(marking, (p: P) => implicitly[Identifiable[P]].apply(p))
+    def marshall: Marking[Id] = translateMapKeys(marking, (p: P) => summon[Identifiable[P]].apply(p))
   }
 
-  implicit class MarkingUnMarshall(marking: Marking[Id]) {
-
-    def unmarshall[P : Identifiable](places: Iterable[P]): Marking[P] = translateMapKeys(marking, (id: Id) => places.getById(id, "place in petrinet"))
-  }
+//  extension (marking: Marking[Id]) {
+//
+//    def unmarshall[P : Identifiable](places: Iterable[P]): Marking[P] = translateMapKeys(marking, (id: Id) => places.getById(id, "place in petrinet"))
+//  }
 
   def translateMapKeys[K1, K2, V](map: Map[K1, V], fn: K1 => K2): Map[K2, V] = map.map { case (key, value) ⇒ fn(key) -> value }
-
-  implicit class PetriNetGraphNodeOps[P, T](val node: PetriNetGraph[P, T]#NodeT) {
-
-    def asPlace: P = node.value match {
-      case Left(p) ⇒ p
-      case _       ⇒ throw new IllegalStateException(s"node $node is not a place!")
-    }
-
-    def asTransition: T = node.value match {
-      case Right(t) ⇒ t
-      case _        ⇒ throw new IllegalStateException(s"node $node is not a transition!")
-    }
-
-    def incomingNodes: Set[Either[P, T]] = node.incoming.map(_.source.value)
-    def incomingPlaces: Set[P] = incomingNodes.collect { case Left(place) => place }
-    def incomingTransitions: Set[T] = incomingNodes.collect { case Right(transition) => transition }
-
-    def outgoingNodes: Set[Either[P, T]] = node.outgoing.map(_.target.value)
-    def outgoingPlaces: Set[P] = outgoingNodes.collect { case Left(place) => place }
-    def outgoingTransitions: Set[T] = outgoingNodes.collect { case Right(transition) => transition }
-
-    def isPlace: Boolean = node.value.isLeft
-    def isTransition: Boolean = node.value.isRight
-  }
 }
 

@@ -2,7 +2,7 @@ package com.ing.baker.petrinet.api
 
 trait MultiSetOps {
 
-  implicit class MultiSetFunctions[T](mset: MultiSet[T]) {
+  extension [T](mset: MultiSet[T]) {
     def multisetDifference(other: MultiSet[T]): MultiSet[T] =
       other.foldLeft(mset) {
         case (result, (p, count)) ⇒ result.get(p) match {

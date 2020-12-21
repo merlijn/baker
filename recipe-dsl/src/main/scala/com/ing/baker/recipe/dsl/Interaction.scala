@@ -3,109 +3,19 @@ package com.ing.baker.recipe.dsl
 import java.lang.reflect.Method
 
 import com.ing.baker.recipe.dsl
-import com.ing.baker.recipe.dsl.ReflectionHelpers._
-import com.ing.baker.types.Value
-import com.ing.baker.types.reflect.Reflect
-import com.ing.baker.types.reflect.Reflect.mirror
 import org.reflections.Reflections
 
 import scala.annotation.varargs
 import scala.collection.JavaConverters._
-import scala.reflect.runtime.universe.TypeTag
-
-object Interaction {
-
-  private val interactionMethodName: String = "apply"
-
-  def reflect[T : TypeTag]: Interaction = reflect(mirror.runtimeClass(mirror.typeOf[T]))
-  
-  def reflect[T](interactionClass: Class[T]): Interaction = reflect(interactionClass, None)
-
-  def reflect[T](interactionClass: Class[T], name: String): Interaction = reflect(interactionClass, Some(name))
-
-  def reflect(interactionClass: Class[_], newName: Option[String]): Interaction = {
-
-    val name: String = interactionClass.getSimpleName
-
-    val applyMethod: Method = interactionClass.getDeclaredMethods
-      .find(_.getName == interactionMethodName)
-      .getOrElse(throw new IllegalStateException(
-        s"No method named '$interactionMethodName' defined on '${interactionClass.getName}'"))
-
-    val inputIngredients: Seq[Ingredient] =
-      applyMethod.getParameterNames.map(name =>
-        Ingredient(name,
-          ReflectionHelpers.parseType(
-            applyMethod.parameterTypeForName(name).get,
-            s"Unsupported type for ingredient '$name' on interaction '${interactionClass.getName}'")))
-
-    def getOutputClasses(): Seq[Class[_]] = {
-
-      def autoDetectOutput(): Seq[Class[_]] = {
-
-        import scala.collection.JavaConverters._
-
-        val returnType = applyMethod.getReturnType
-
-        if (classOf[Unit].equals(returnType) || classOf[java.lang.Void].equals(returnType))
-          Seq.empty
-
-        // in case the return type is an interface we find all implementations in the same package
-        else if (returnType.isInterface) {
-
-          val packageName = returnType.getPackage.getName
-
-          val reflections = new Reflections(packageName)
-
-          val classes = reflections.getSubTypesOf(returnType).asScala.toSeq
-
-          classes
-        }
-        // otherwise there is only a single return event
-        else {
-          Seq(returnType)
-        }
-      }
-
-      if (applyMethod.isAnnotationPresent(classOf[annotations.FiresEvent])) {
-
-        val outputEventClasses: Seq[Class[_]] = applyMethod.getAnnotation(classOf[annotations.FiresEvent]).oneOf()
-
-        if (outputEventClasses.isEmpty) {
-          autoDetectOutput()
-        }
-        else {
-          outputEventClasses.foreach {
-            eventClass =>
-              if (!applyMethod.getReturnType.isAssignableFrom(eventClass))
-                throw new RecipeValidationException(s"Interaction $name provides event '${eventClass.getName}' that is incompatible with it's return type")
-          }
-
-          outputEventClasses
-        }
-      }
-      else autoDetectOutput()
-    }
-
-    val output: Seq[Event] = getOutputClasses().map(dsl.Event.reflect(_, None))
-
-    val originalName: Option[String] = newName match {
-      case None => Some(name)
-      case _    => None
-    }
-
-    Interaction(newName.getOrElse(name), inputIngredients, output, originalName, Set.empty, Set.empty, Map.empty, Map.empty, None, None, Map.empty)
-  }
-}
 
 case class Interaction(
       name: String,
-      input: Seq[Ingredient],
+      input: Seq[Ingredient[_]],
       output: Seq[Event],
       originalName: Option[String] = None,
       requiredEvents: Set[String] = Set.empty,
       requiredOneOfEvents: Set[Set[String]] = Set.empty,
-      predefinedIngredients: Map[String, Value] = Map.empty,
+      predefinedIngredients: Map[String, Any] = Map.empty,
       renamedInputIngredients: Map[String, String] = Map.empty,
       maximumExecutionCount: Option[Int] = None,
       failureStrategy: Option[InteractionFailureStrategy] = None,
@@ -116,7 +26,7 @@ case class Interaction(
     *
     * @return
     */
-  def retryExhaustedEventName: String = name + exhaustedEventAppend
+  def retryExhaustedEventName: String = name + Constants.exhaustedEventAppend
 
   /**
     * This sets a requirement for this interaction that some specific events needs to have been fired before it can execute.
@@ -124,8 +34,6 @@ case class Interaction(
     * @param eventClasses the classes of the events.
     * @return
     */
-  @SafeVarargs
-  @varargs
   def withRequiredEvents(eventClasses: Event*): Interaction =
     copy(requiredEvents = requiredEvents ++ eventClasses.map(_.name))
 
@@ -135,8 +43,6 @@ case class Interaction(
     * @param eventClasses the classes of the events.
     * @return
     */
-  @SafeVarargs
-  @varargs
   def withRequiredOneOfEvents(eventClasses: Event*): Interaction = {
     if (eventClasses.nonEmpty && eventClasses.size < 2)
       throw new IllegalArgumentException("At least 2 events should be provided as 'requiredOneOfEvents'")
@@ -166,8 +72,8 @@ case class Interaction(
   def withPredefinedIngredients(newPredefinedIngredients: java.util.Map[String, AnyRef]): Interaction =
     addPredefinedIngredient(newPredefinedIngredients.asScala.toMap)
 
-  private def addPredefinedIngredient(params: Map[String, AnyRef]): Interaction =
-    copy(predefinedIngredients = predefinedIngredients ++ params.map{case (key, value) => key -> Reflect.toValue(value)})
+  private def addPredefinedIngredient(params: Map[String, Any]): Interaction =
+    copy(predefinedIngredients = predefinedIngredients ++ params)
 
   /**
     * This renames a input ingredient
@@ -176,8 +82,7 @@ case class Interaction(
     * @param toName the new name for the ouput ingredient
     * @return
     */
-  def renameRequiredIngredient(name: String,
-                               toName: String): Interaction =
+  def renameRequiredIngredient(name: String, toName: String): Interaction =
     copy(renamedInputIngredients = renamedInputIngredients + (name -> toName))
 
   /**
@@ -220,8 +125,7 @@ case class Interaction(
   def withPredefinedIngredients(values: (String, Any)*): Interaction =
     withPredefinedIngredients(values.toMap)
 
-  def withPredefinedIngredients(data: Map[String, Any]): Interaction =
-    copy(predefinedIngredients = predefinedIngredients ++ data.map { case (key, value) => key -> Reflect.toValue(value) })
+  def withPredefinedIngredients(data: Map[String, Any]): Interaction = copy(predefinedIngredients = predefinedIngredients ++ data)
 
   def withOverriddenIngredientName(oldIngredient: String,
                                    newIngredient: String): Interaction =

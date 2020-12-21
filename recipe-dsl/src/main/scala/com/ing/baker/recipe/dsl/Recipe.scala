@@ -23,18 +23,12 @@ case class Recipe(
     */
   def this(name: String) = this(name, Seq.empty, Seq.empty, InteractionFailureStrategy.BlockInteraction, None, None)
 
-  def getInteractions: java.util.List[Interaction] = interactions.asJava
-
-  def getEvents: java.util.List[Event] = sensoryEvents.toList.asJava
-
   /**
     * Adds the interactions to the recipe.
     *
     * @param newInteractions The interactions to add
     * @return
     */
-  @SafeVarargs
-  @varargs
   def withInteractions(newInteractions: Interaction*): Recipe =
     copy(interactions = interactions ++ newInteractions)
 
@@ -54,8 +48,6 @@ case class Recipe(
     * @param eventClasses
     * @return
     */
-  @SafeVarargs
-  @varargs
   def withSensoryEvents(eventClasses: Event*): Recipe =
     copy(sensoryEvents = sensoryEvents ++ eventClasses.map(_.copy(maxFiringLimit = Some(1))))
 
@@ -75,7 +67,6 @@ case class Recipe(
     * @return
     */
   @SafeVarargs
-  @varargs
   def withSensoryEventsNoFiringLimit(eventClasses: Event*): Recipe =
     copy(sensoryEvents = sensoryEvents ++ eventClasses.map(_.copy(maxFiringLimit = None)))
 

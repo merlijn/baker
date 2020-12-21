@@ -1,12 +1,13 @@
 package com.ing.baker.recipe.dsl
 
 import com.ing.baker.recipe.dsl.InteractionFailureStrategy.RetryWithIncrementalBackoff
-import org.scalatest.{Matchers, WordSpecLike}
+import org.scalatest._
+import org.scalatest.matchers._
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-class InteractionFailureStrategySpec extends WordSpecLike with Matchers {
+class InteractionFailureStrategySpec extends wordspec.AnyWordSpec with should.Matchers {
 
   "RetryWithIncrementalBackoff " should {
 
@@ -27,7 +28,7 @@ class InteractionFailureStrategySpec extends WordSpecLike with Matchers {
         .withMaximumRetries(15)
         .build()
 
-      actual shouldEqual expected
+      actual should be(expected)
     }
 
     "derive the correct parameters when deadline is specified2" in {
@@ -48,7 +49,7 @@ class InteractionFailureStrategySpec extends WordSpecLike with Matchers {
         .withMaximumRetries(4)
         .build()
 
-      actual shouldEqual expected
+      actual should be(expected)
     }
 
     "derive the correct parameters when deadline is specified and max time between retries set" in {
@@ -72,7 +73,7 @@ class InteractionFailureStrategySpec extends WordSpecLike with Matchers {
         .withMaximumRetries(6)
         .build()
 
-      actual shouldEqual expected
+      actual should be(expected)
     }
 
     "verify that deadline is greater than initial delay" in {
@@ -80,7 +81,7 @@ class InteractionFailureStrategySpec extends WordSpecLike with Matchers {
       val deadline = 1 seconds
       val initialDelay = 2 seconds
 
-      intercept[IllegalArgumentException] {
+      assertThrows[IllegalArgumentException] {
         RetryWithIncrementalBackoff.builder()
           .withInitialDelay(initialDelay)
           .withDeadline(deadline)
@@ -104,7 +105,7 @@ class InteractionFailureStrategySpec extends WordSpecLike with Matchers {
         .withMaximumRetries(1)
         .build()
 
-      actual shouldEqual expected
+      actual should be(expected)
     }
 
     "retry 3 times before deadline is due" in {
@@ -124,7 +125,7 @@ class InteractionFailureStrategySpec extends WordSpecLike with Matchers {
         .withMaximumRetries(3)
         .build()
 
-      actual shouldEqual expected
+      actual should be(expected)
     }
   }
 }

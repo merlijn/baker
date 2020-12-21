@@ -16,15 +16,6 @@ object PetriNetAnalysis {
     }
   }
 
-  implicit class PetriNetOps[P, T](petriNet: PetriNet[P, T]) {
-    def removeTransitions(transitions: Iterable[T]): PetriNet[P, T] = {
-      val graph = transitions.foldLeft(petriNet.innerGraph) {
-        case (acc, t) ⇒ acc.-(Right(t))
-      }
-      new PetriNet(graph)
-    }
-  }
-
   /**
    * A node in the coverability tree
    */

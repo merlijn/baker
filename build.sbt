@@ -1,4 +1,4 @@
-import Dependencies.{scalaGraph, _}
+import Dependencies._
 import sbt.Keys._
 
 def testScope(project: ProjectReference) = project % "test->test;test->compile"
@@ -53,21 +53,6 @@ lazy val defaultModuleSettings = commonSettings ++ dependencyOverrideSettings ++
 
 lazy val scalaPBSettings = Seq(PB.targets in Compile := Seq(scalapb.gen() -> (sourceManaged in Compile).value))
 
-lazy val bakerTypes = project
-  .in(file("bakertypes"))
-  .settings(defaultModuleSettings)
-  .settings(
-    moduleName := "baker-types",
-    fork := false,
-    libraryDependencies ++= Seq(
-        objenisis,
-//        scalaReflect(scalaVersion.value),
-        (scalaTest % "test").withDottyCompat(scalaVersion.value),
-        (scalaCheck % "test").withDottyCompat(scalaVersion.value),
-        logback % "test"
-    )
-  )
-
 lazy val recipeDsl = project
   .in(file("recipe-dsl"))
   .settings(defaultModuleSettings)
@@ -80,13 +65,13 @@ lazy val recipeDsl = project
           javaxInject,
           paranamer,
           reflections,
-          (scalaTest % "test").withDottyCompat(scalaVersion.value),
           (scalaCheck % "test").withDottyCompat(scalaVersion.value),
+          scalaTest % "test",
           junitInterface % "test",
           slf4jApi % "test",
           logback % "test"
         )
-  ).dependsOn(bakerTypes)
+  )
 
 lazy val intermediateLanguage = project.in(file("intermediate-language"))
   .settings(defaultModuleSettings)
@@ -96,12 +81,11 @@ lazy val intermediateLanguage = project.in(file("intermediate-language"))
       slf4jApi,
       objenisis,
       typeSafeConfig,
-      scalaGraph.withDottyCompat(scalaVersion.value),
-      scalaGraphDot.withDottyCompat(scalaVersion.value),
+//      scalaGraphDot.withDottyCompat(scalaVersion.value),
       (scalaTest % "test").withDottyCompat(scalaVersion.value),
       (scalaCheck % "test").withDottyCompat(scalaVersion.value),
       logback % "test")
-  ).dependsOn(bakerTypes)
+  )
 
 
 lazy val runtime = project.in(file("runtime"))
@@ -112,7 +96,7 @@ lazy val runtime = project.in(file("runtime"))
     // we have to exclude the sources because of a compiler bug: https://issues.scala-lang.org/browse/SI-10134
     sources in (Compile, doc) := Seq.empty,
     libraryDependencies ++=
-      compileDeps(
+      Seq(
         akkaActor.withDottyCompat(scalaVersion.value),
         akkaPersistence.withDottyCompat(scalaVersion.value),
         akkaPersistenceQuery.withDottyCompat(scalaVersion.value),
@@ -147,7 +131,7 @@ lazy val runtime = project.in(file("runtime"))
         mockito % "test",
         logback % "test")
   )
-  .dependsOn(intermediateLanguage, testScope(recipeDsl), testScope(recipeCompiler), testScope(bakerTypes))
+  .dependsOn(intermediateLanguage, testScope(recipeDsl), testScope(recipeCompiler))
 
 lazy val recipeCompiler = project.in(file("compiler"))
   .settings(defaultModuleSettings)
@@ -165,4 +149,4 @@ lazy val baker = project
   .in(file("."))
   .settings(defaultModuleSettings)
   .settings(noPublishSettings)
-  .aggregate(bakerTypes, recipeDsl, intermediateLanguage, recipeCompiler, runtime)
+  .aggregate(recipeDsl, intermediateLanguage) //, recipeCompiler) //, runtime)

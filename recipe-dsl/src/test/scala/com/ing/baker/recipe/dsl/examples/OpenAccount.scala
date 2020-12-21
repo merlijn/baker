@@ -6,14 +6,14 @@ object OpenAccount {
 
   // ingredients
 
-  val iban = Ingredient.reflect[String]("iban")
-  val name = Ingredient.reflect[String]("name")
-  val address = Ingredient.reflect[String]("address")
-  val customerId = Ingredient.reflect[String]("customerId")
+  val iban = Ingredient[String]("iban")
+  val name = Ingredient[String]("name")
+  val address = Ingredient[String]("address")
+  val customerId = Ingredient[String]("customerId")
 
-  val getAccountFailedReason = Ingredient.reflect[String]("getAccountFailedReason")
-  val registerIndividualFailedReason = Ingredient.reflect[String]("registerIndividualFailedReason")
-  val assignAccountFailedReason = Ingredient.reflect[String]("registerIndividualFailedReason")
+  val getAccountFailedReason = Ingredient[String]("getAccountFailedReason")
+  val registerIndividualFailedReason = Ingredient[String]("registerIndividualFailedReason")
+  val assignAccountFailedReason = Ingredient[String]("registerIndividualFailedReason")
 
   // events
 

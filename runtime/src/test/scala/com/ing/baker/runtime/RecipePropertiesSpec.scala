@@ -111,9 +111,9 @@ object RecipePropertiesSpec {
 
   val nameGen: Gen[String] = Gen.listOfN(8, Gen.alphaNumChar).map(_.mkString)
 
-  val ingredientGen: Gen[Ingredient] = for {
+  val ingredientGen: Gen[Ingredient[String]] = for {
     name <- nameGen
-  } yield Ingredient.reflect[String](name)
+  } yield Ingredient[String](name)
 
   val eventGen: Gen[Event] = for {
     name <- nameGen

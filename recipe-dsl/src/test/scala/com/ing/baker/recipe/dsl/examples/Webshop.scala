@@ -8,13 +8,13 @@ object Webshop {
 
   // ingredients
 
-  val customerInfo = Ingredient.reflect[CustomerInfo]("customerInfo")
-  val goods = Ingredient.reflect[String]("goods")
-  val trackingId = Ingredient.reflect[String]("trackingId")
-  val order = Ingredient.reflect[String]("order")
-  val name = Ingredient.reflect[String]("name")
-  val address = Ingredient.reflect[String]("address")
-  val email = Ingredient.reflect[String]("email")
+  val customerInfo = Ingredient[CustomerInfo]("customerInfo")
+  val goods = Ingredient[String]("goods")
+  val trackingId = Ingredient[String]("trackingId")
+  val order = Ingredient[String]("order")
+  val name = Ingredient[String]("name")
+  val address = Ingredient[String]("address")
+  val email = Ingredient[String]("email")
 
   // events
 
