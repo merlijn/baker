@@ -52,13 +52,13 @@ object ProcessInstanceEventSourcing {
   case class InitializedEvent(marking: Marking[Id],
                               state: Any) extends Event
 
-  def apply[P : Identifiable, T : Identifiable, S, E](sourceFn: T ⇒ (S ⇒ E ⇒ S)): Instance[P, T, S] ⇒ Event ⇒ Instance[P, T, S] = instance ⇒ {
-    case InitializedEvent(initial, initialState) ⇒
+  def apply[P : Identifiable, T : Identifiable, S, E](sourceFn: T => (S => E => S)): Instance[P, T, S] => Event => Instance[P, T, S] = instance => {
+    case InitializedEvent(initial, initialState) =>
 
       val initialMarking: Marking[P] = initial.unmarshall(instance.petriNet.places)
 
       Instance[P, T, S](instance.petriNet, 1, initialMarking, initialState.asInstanceOf[S], Map.empty, Set.empty)
-    case e: TransitionFiredEvent ⇒
+    case e: TransitionFiredEvent =>
 
       val transition = instance.petriNet.transitions.getById(e.transitionId)
       val newState = sourceFn(transition)(instance.state)(e.output.asInstanceOf[E])
@@ -72,7 +72,7 @@ object ProcessInstanceEventSourcing {
         state = newState,
         jobs = instance.jobs - e.jobId
       )
-    case e: TransitionFailedEvent ⇒
+    case e: TransitionFailedEvent =>
       val transition = instance.petriNet.transitions.getById(e.transitionId)
 
       val consumed: Marking[P] = e.consume.unmarshall(instance.petriNet.places)
@@ -91,7 +91,7 @@ object ProcessInstanceEventSourcing {
       topology: PetriNet[P, T],
       encryption: Encryption = NoEncryption,
       readJournal: CurrentEventsByPersistenceIdQuery,
-      eventSourceFn: T ⇒ (S ⇒ E ⇒ S))(implicit actorSystem: ActorSystem): Source[(Instance[P, T, S], Event), NotUsed] = {
+      eventSourceFn: T => (S => E => S))(implicit actorSystem: ActorSystem): Source[(Instance[P, T, S], Event), NotUsed] = {
 
     val protoEventAdapter = new ProtoEventAdapterImpl(SerializationExtension.get(actorSystem), encryption)
     val serializer = new ProcessInstanceSerialization[P, T, S, E](protoEventAdapter)
@@ -101,7 +101,7 @@ object ProcessInstanceEventSourcing {
     val eventSource = ProcessInstanceEventSourcing.apply[P, T, S, E](eventSourceFn)
 
     src.scan[(Instance[P, T, S], Event)]((Instance.uninitialized[P, T, S](topology), null.asInstanceOf[Event])) {
-      case ((instance, _), e) ⇒
+      case ((instance, _), e) =>
         val serializedEvent = e.event.asInstanceOf[AnyRef]
         val deserializedEvent = serializer.deserializeEvent(serializedEvent)(instance)
         val updatedInstance = eventSource.apply(instance)(deserializedEvent)
@@ -137,10 +137,10 @@ abstract class ProcessInstanceEventSourcing[P : Identifiable, T : Identifiable, 
   }
 
   override def receiveRecover: Receive = {
-    case e: protobuf.Initialized      ⇒ applyToRecoveringState(e)
-    case e: protobuf.TransitionFired  ⇒ applyToRecoveringState(e)
-    case e: protobuf.TransitionFailed ⇒ applyToRecoveringState(e)
-    case RecoveryCompleted ⇒
+    case e: protobuf.Initialized      => applyToRecoveringState(e)
+    case e: protobuf.TransitionFired  => applyToRecoveringState(e)
+    case e: protobuf.TransitionFailed => applyToRecoveringState(e)
+    case RecoveryCompleted =>
       if (recoveringState.sequenceNr > 0)
         onRecoveryCompleted(recoveringState)
   }

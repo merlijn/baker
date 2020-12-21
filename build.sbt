@@ -82,7 +82,7 @@ lazy val intermediateLanguage = project.in(file("intermediate-language"))
       objenisis,
       typeSafeConfig,
 //      scalaGraphDot.withDottyCompat(scalaVersion.value),
-      (scalaTest % "test").withDottyCompat(scalaVersion.value),
+      scalaTest % "test",
       (scalaCheck % "test").withDottyCompat(scalaVersion.value),
       logback % "test")
   )

@@ -49,7 +49,7 @@ class ProtoEventAdapterImpl(private val serialization: Serialization, encryption
 
   def toDomainObject(serializedMessage: GeneratedMessage): AnyRef = serializedMessage match {
 
-    case SerializedData(Some(serializerId), Some(manifest), Some(bytes)) ⇒
+    case SerializedData(Some(serializerId), Some(manifest), Some(bytes)) =>
 
       val serializer = serialization.serializerByIdentity.getOrElse(serializerId,
         throw new IllegalStateException(s"No serializer found with id $serializerId")
@@ -58,8 +58,8 @@ class ProtoEventAdapterImpl(private val serialization: Serialization, encryption
       val decryptedBytes = encryption.decrypt(bytes.toByteArray)
 
       serializer match {
-        case s: SerializerWithStringManifest ⇒ s.fromBinary(decryptedBytes, manifest)
-        case _                               ⇒
+        case s: SerializerWithStringManifest => s.fromBinary(decryptedBytes, manifest)
+        case _                               =>
           val optionalClass = Try { Class.forName(manifest) }.toOption
           serializer.fromBinary(decryptedBytes, optionalClass)
       }
@@ -76,8 +76,8 @@ class ProtoEventAdapterImpl(private val serialization: Serialization, encryption
     val bytes = encryption.encrypt(serializer.toBinary(obj))
 
     val manifest = serializer match {
-      case s: SerializerWithStringManifest ⇒ s.manifest(obj)
-      case _                               ⇒ if (obj != null) obj.getClass.getName else ""
+      case s: SerializerWithStringManifest => s.manifest(obj)
+      case _                               => if (obj != null) obj.getClass.getName else ""
     }
 
     // we should not have to copy the bytes

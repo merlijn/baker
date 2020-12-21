@@ -101,8 +101,8 @@ class IntermediateLanguageModule extends ProtoEventAdapterModule {
 
       // from InitialMarking to Seq[ProducedToken]
       val producedTokens: Seq[ProducedToken] = initialMarking.toSeq.flatMap {
-        case (place, tokens) ⇒ tokens.toSeq.map {
-          case (value, count) ⇒ ProducedToken(
+        case (place, tokens) => tokens.toSeq.map {
+          case (value, count) => ProducedToken(
             placeId = Option(place.id),
             tokenId = Option(tokenIdentifier(value)),
             count = Option(count),
@@ -227,11 +227,11 @@ class IntermediateLanguageModule extends ProtoEventAdapterModule {
       val graph = ctx.toDomain[scalax.collection.immutable.Graph[Node, WLDiEdge]](graphMsg)
       val petriNet: RecipePetriNet = new com.ing.baker.petrinet.api.PetriNet(graph)
       val initialMarking = producedTokens.foldLeft(Marking.empty[il.petrinet.Place]) {
-        case (accumulated, protobuf.ProducedToken(Some(placeId), Some(_), Some(count), _)) ⇒ // Option[SerializedData] is always None, and we don't use it here.
+        case (accumulated, protobuf.ProducedToken(Some(placeId), Some(_), Some(count), _)) => // Option[SerializedData] is always None, and we don't use it here.
           val place = petriNet.places.getById(placeId, "place in petrinet")
           val value = null // Values are not serialized (not interested in) in the serialized recipe
           accumulated.add(place, value, count)
-        case _ ⇒ throw new IllegalStateException("Missing data in persisted ProducedToken")
+        case _ => throw new IllegalStateException("Missing data in persisted ProducedToken")
       }
 
       optionalRecipeId.map { recipeId =>

@@ -26,7 +26,7 @@ object FireEventActor {
                (implicit timeout: FiniteDuration, actorSystem: ActorSystem, materializer: Materializer): Source[Any, NotUsed] = {
 
     implicit val akkaTimeout: Timeout = timeout
-    Source.queue[Any](100, OverflowStrategy.fail).mapMaterializedValue { queue ⇒
+    Source.queue[Any](100, OverflowStrategy.fail).mapMaterializedValue { queue =>
       val sender = actorSystem.actorOf(Props(new FireEventActor(cmd, recipe, queue, waitForRetries)(timeout, actorSystem)))
 
       require(cmd.event != null, "Event can not be null")
@@ -68,14 +68,14 @@ class FireEventActor(cmd: FireEvent, recipe: CompiledRecipe, queue: SourceQueueW
     case msg: TransitionNotEnabled =>
       rejectedWith(msg, RejectReason.FiringLimitMet)
 
-    case msg: AlreadyReceived ⇒
+    case msg: AlreadyReceived =>
       rejectedWith(msg, RejectReason.AlreadyReceived)
 
-    case msg: Uninitialized ⇒
+    case msg: Uninitialized =>
       rejectedWith(msg, RejectReason.NoSuchProcess)
 
     //Messages from the ProcessInstances
-    case e: TransitionFired ⇒
+    case e: TransitionFired =>
       queue.offer(e)
 
       if (!firstReceived)
@@ -87,20 +87,20 @@ class FireEventActor(cmd: FireEvent, recipe: CompiledRecipe, queue: SourceQueueW
 
       stopActorIfDone()
 
-    case msg @ TransitionFailed(_, _, _, _, _, _, RetryWithDelay(_)) if waitForRetries ⇒
+    case msg @ TransitionFailed(_, _, _, _, _, _, RetryWithDelay(_)) if waitForRetries =>
       queue.offer(msg)
 
-    case msg @ TransitionFailed(jobId, _,  _, _, _, _, _) ⇒
+    case msg @ TransitionFailed(jobId, _,  _, _, _, _, _) =>
       runningJobs = runningJobs - jobId
       queue.offer(msg)
       stopActorIfDone()
 
     //Akka default cases
-    case ReceiveTimeout ⇒
+    case ReceiveTimeout =>
       queue.fail(new TimeoutException(s"Timeout, no message received in: $timeout"))
       stopActor()
 
-    case msg @ _ ⇒
+    case msg @ _ =>
       queue.fail(new IllegalStateException(s"Unexpected message: $msg"))
       stopActor()
   }

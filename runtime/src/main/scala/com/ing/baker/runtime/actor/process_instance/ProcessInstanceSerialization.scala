@@ -43,20 +43,20 @@ class ProcessInstanceSerialization[P : Identifiable, T : Identifiable, S, E](ser
     * De-serializes a persistence.protobuf.Event to a EvenSourcing.Event. An Instance is required to 'wire' or 'reference'
     * the message back into context.
     */
-  def deserializeEvent(event: AnyRef): Instance[P, T, S] ⇒ ProcessInstanceEventSourcing.Event = event match {
-    case e: protobuf.Initialized ⇒ deserializeInitialized(e)
-    case e: protobuf.TransitionFired ⇒ deserializeTransitionFired(e)
-    case e: protobuf.TransitionFailed ⇒ deserializeTransitionFailed(e)
+  def deserializeEvent(event: AnyRef): Instance[P, T, S] => ProcessInstanceEventSourcing.Event = event match {
+    case e: protobuf.Initialized => deserializeInitialized(e)
+    case e: protobuf.TransitionFired => deserializeTransitionFired(e)
+    case e: protobuf.TransitionFailed => deserializeTransitionFailed(e)
   }
 
   /**
     * Serializes an EventSourcing.Event to a persistence.protobuf.Event.
     */
-  def serializeEvent(e: ProcessInstanceEventSourcing.Event): Instance[P, T, S] ⇒ AnyRef =
-    _ ⇒ e match {
-      case e: InitializedEvent ⇒ serializeInitialized(e)
-      case e: TransitionFiredEvent ⇒ serializeTransitionFired(e)
-      case e: TransitionFailedEvent ⇒ serializeTransitionFailed(e)
+  def serializeEvent(e: ProcessInstanceEventSourcing.Event): Instance[P, T, S] => AnyRef =
+    _ => e match {
+      case e: InitializedEvent => serializeInitialized(e)
+      case e: TransitionFiredEvent => serializeTransitionFired(e)
+      case e: TransitionFailedEvent => serializeTransitionFailed(e)
     }
 
   private def missingFieldException(field: String) = throw new IllegalStateException(s"Missing field in serialized data: $field")
@@ -73,17 +73,17 @@ class ProcessInstanceSerialization[P : Identifiable, T : Identifiable, S, E](ser
 
   private def deserializeProducedMarking(instance: Instance[P, T, S], produced: Seq[ProducedToken]): Marking[Id] = {
     produced.foldLeft(Marking.empty[Long]) {
-      case (accumulated, ProducedToken(Some(placeId), Some(_), Some(count), data)) ⇒
+      case (accumulated, ProducedToken(Some(placeId), Some(_), Some(count), data)) =>
         val value = data.map(deserializeObject).orNull // In the colored petrinet, tokens have values and they could be null.
         accumulated.add(placeId, value, count)
-      case _ ⇒ throw new IllegalStateException("Missing data in persisted ProducedToken")
+      case _ => throw new IllegalStateException("Missing data in persisted ProducedToken")
     }
   }
 
   private def serializeProducedMarking(produced: Marking[Id]): Seq[ProducedToken] = {
     produced.toSeq.flatMap {
-      case (placeId, tokens) ⇒ tokens.toSeq.map {
-        case (value, count) ⇒ ProducedToken(
+      case (placeId, tokens) => tokens.toSeq.map {
+        case (value, count) => ProducedToken(
           placeId = Some(placeId),
           tokenId = Some(tokenIdentifier(value)),
           count = Some(count),
@@ -95,8 +95,8 @@ class ProcessInstanceSerialization[P : Identifiable, T : Identifiable, S, E](ser
 
   private def serializeConsumedMarking(m: Marking[Id]): Seq[protobuf.ConsumedToken] =
     m.toSeq.flatMap {
-      case (placeId, tokens) ⇒ tokens.toSeq.map {
-        case (value, count) ⇒ protobuf.ConsumedToken(
+      case (placeId, tokens) => tokens.toSeq.map {
+        case (value, count) => protobuf.ConsumedToken(
           placeId = Some(placeId),
           tokenId = Some(tokenIdentifier(value)),
           count = Some(count)
@@ -106,11 +106,11 @@ class ProcessInstanceSerialization[P : Identifiable, T : Identifiable, S, E](ser
 
   private def deserializeConsumedMarking(instance: Instance[P, T, S], persisted: Seq[protobuf.ConsumedToken]): Marking[Id] = {
     persisted.foldLeft(Marking.empty[Long]) {
-      case (accumulated, protobuf.ConsumedToken(Some(placeId), Some(tokenId), Some(count))) ⇒
+      case (accumulated, protobuf.ConsumedToken(Some(placeId), Some(tokenId), Some(count))) =>
         val place = instance.petriNet.places.getById(placeId, "place in the petrinet")
-        val value = instance.marking(place).keySet.find(e ⇒ tokenIdentifier(e) == tokenId).get
+        val value = instance.marking(place).keySet.find(e => tokenIdentifier(e) == tokenId).get
         accumulated.add(placeId, value, count)
-      case _ ⇒ throw new IllegalStateException("Missing data in persisted ConsumedToken")
+      case _ => throw new IllegalStateException("Missing data in persisted ConsumedToken")
     }
   }
 
@@ -127,8 +127,8 @@ class ProcessInstanceSerialization[P : Identifiable, T : Identifiable, S, E](ser
     protobuf.Initialized(initialMarking, initialState)
   }
 
-  private def deserializeTransitionFailed(e: protobuf.TransitionFailed): Instance[P, T, S] ⇒ TransitionFailedEvent = {
-    instance ⇒
+  private def deserializeTransitionFailed(e: protobuf.TransitionFailed): Instance[P, T, S] => TransitionFailedEvent = {
+    instance =>
 
       val jobId = e.jobId.getOrElse(missingFieldException("job_id"))
       val transitionId = e.transitionId.getOrElse(missingFieldException("transition_id"))
@@ -138,9 +138,9 @@ class ProcessInstanceSerialization[P : Identifiable, T : Identifiable, S, E](ser
       val failureReason = e.failureReason.getOrElse("")
       val consumed = deserializeConsumedMarking(instance, e.consumed)
       val failureStrategy = e.failureStrategy.getOrElse(missingFieldException("time_failed")) match {
-        case FailureStrategy(Some(StrategyType.BLOCK_TRANSITION), _) ⇒ BlockTransition
-        case FailureStrategy(Some(StrategyType.RETRY), Some(delay)) ⇒ RetryWithDelay(delay)
-        case other@_ ⇒ throw new IllegalStateException(s"Invalid failure strategy: $other")
+        case FailureStrategy(Some(StrategyType.BLOCK_TRANSITION), _) => BlockTransition
+        case FailureStrategy(Some(StrategyType.RETRY), Some(delay)) => RetryWithDelay(delay)
+        case other@_ => throw new IllegalStateException(s"Invalid failure strategy: $other")
       }
 
       TransitionFailedEvent(jobId, transitionId, e.correlationId, timeStarted, timeFailed, consumed, input, failureReason, failureStrategy)
@@ -149,8 +149,8 @@ class ProcessInstanceSerialization[P : Identifiable, T : Identifiable, S, E](ser
   private def serializeTransitionFailed(e: TransitionFailedEvent): protobuf.TransitionFailed = {
 
     val strategy = e.exceptionStrategy match {
-      case BlockTransition ⇒ FailureStrategy(Some(StrategyType.BLOCK_TRANSITION))
-      case RetryWithDelay(delay) ⇒ FailureStrategy(Some(StrategyType.RETRY), Some(delay))
+      case BlockTransition => FailureStrategy(Some(StrategyType.BLOCK_TRANSITION))
+      case RetryWithDelay(delay) => FailureStrategy(Some(StrategyType.RETRY), Some(delay))
       case _ => throw new IllegalArgumentException("Unsupported exception strategy")
     }
 
@@ -182,7 +182,7 @@ class ProcessInstanceSerialization[P : Identifiable, T : Identifiable, S, E](ser
     )
   }
 
-  private def deserializeTransitionFired(e: protobuf.TransitionFired): Instance[P, T, S] ⇒ TransitionFiredEvent = instance ⇒ {
+  private def deserializeTransitionFired(e: protobuf.TransitionFired): Instance[P, T, S] => TransitionFiredEvent = instance => {
 
     val consumed: Marking[Id] = deserializeConsumedMarking(instance, e.consumed)
     val produced: Marking[Id] = deserializeProducedMarking(instance, e.produced)

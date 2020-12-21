@@ -11,7 +11,7 @@ package object api extends MultiSetOps with MarkingOps {
   /**
     * Type alias for something that is identifiable.
     */
-  type Identifiable[T] = T ⇒ Id
+  type Identifiable[T] = T => Id
 
   /**
     * Type alias for a multi set.
@@ -30,7 +30,7 @@ package object api extends MultiSetOps with MarkingOps {
 
   extension [T : Identifiable](seq: Iterable[T]) {
 
-    def findById(id: Id): Option[T] = seq.find(e ⇒ summon[Identifiable[T]].apply(e) == id)
+    def findById(id: Id): Option[T] = seq.find(e => summon[Identifiable[T]].apply(e) == id)
 
     def getById(id: Id, name: String = "element"): T = findById(id).getOrElse { throw new IllegalStateException(s"No $name found with id: $id") }
   }
@@ -40,11 +40,6 @@ package object api extends MultiSetOps with MarkingOps {
     def marshall: Marking[Id] = translateMapKeys(marking, (p: P) => summon[Identifiable[P]].apply(p))
   }
 
-//  extension (marking: Marking[Id]) {
-//
-//    def unmarshall[P : Identifiable](places: Iterable[P]): Marking[P] = translateMapKeys(marking, (id: Id) => places.getById(id, "place in petrinet"))
-//  }
-
-  def translateMapKeys[K1, K2, V](map: Map[K1, V], fn: K1 => K2): Map[K2, V] = map.map { case (key, value) ⇒ fn(key) -> value }
+  def translateMapKeys[K1, K2, V](map: Map[K1, V], fn: K1 => K2): Map[K2, V] = map.map { case (key, value) => fn(key) -> value }
 }
 

@@ -4,7 +4,7 @@ import com.ing.baker.il.InteractionFailureStrategy.RetryWithIncrementalBackoff
 import com.ing.baker.il.InteractionFailureStrategyOutcome.{BlockTransition, RetryWithDelay}
 
 import org.scalatest._
-import org.scalatest.matchers.should
+import org.scalatest.matchers._
 
 import scala.concurrent.duration._
 

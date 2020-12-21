@@ -11,14 +11,14 @@ class IngredientSpec extends wordspec.AnyWordSpec with should.Matchers {
       "correctly derive the type" in {
 
         val ingredient = Ingredient[String]("foo")
-        ingredient.name shouldBe "foo"
+        ingredient.name should be ("foo")
 //        ingredient.ingredientType shouldBe types.CharArray
       }
 
       "correctly derive a higher kinded type" in {
 
         val ingredient = Ingredient[Option[String]]("foo")
-        ingredient.name shouldBe "foo"
+        ingredient.name should be ("foo")
 //        ingredient.ingredientType shouldBe OptionType(types.CharArray)
       }
     }

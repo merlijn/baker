@@ -18,7 +18,7 @@ case class PetriNet[P, T](places: Set[P], transitions: Set[T], edges: Set[Edge[P
       case _ => false
     }
 
-    PetriNet[P, T](places - p, transitions, edges)
+    PetriNet[P, T](places - p, transitions, newEdges)
   }
   
   def removeTransition(t: T): PetriNet[P, T] = {
@@ -29,7 +29,7 @@ case class PetriNet[P, T](places: Set[P], transitions: Set[T], edges: Set[Edge[P
       case _ => false
     }
     
-    PetriNet[P, T](places, transitions - t, edges)
+    PetriNet[P, T](places, transitions - t, newEdges)
   }
   
   def removeTransitions(transitions: Iterable[T]) = transitions.foldLeft(this) {

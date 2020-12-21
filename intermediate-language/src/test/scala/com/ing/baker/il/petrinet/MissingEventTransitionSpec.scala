@@ -1,7 +1,7 @@
 package com.ing.baker.il.petrinet
 
-import org.scalatest.matchers.should
-import org.scalatest.{FunSuite, Matchers, wordspec}
+import org.scalatest._
+import org.scalatest.matchers._
 
 class MissingEventTransitionSpec extends wordspec.AnyWordSpec with should.Matchers {
 
