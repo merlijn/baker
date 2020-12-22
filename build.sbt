@@ -3,7 +3,8 @@ import sbt.Keys._
 
 def testScope(project: ProjectReference) = project % "test->test;test->compile"
 
-val dottyVersion = "3.0.0-M1"
+val dottyVersion = "3.0.0-M3"
+val scalaPbVersion = "0.11.0-M4+31-fbaaafae+20201222-1006-SNAPSHOT"
 
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
   organization := "com.ing.baker",
@@ -23,8 +24,7 @@ val commonSettings = Defaults.coreDefaultSettings ++ Seq(
     "-language:existentials",
     "-language:implicitConversions",
     "-language:postfixOps",
-    "-encoding", "utf8",
-    s"-target:jvm-$jvmV"
+    "-encoding", "utf8"
   ),
   packageOptions in (Compile, packageBin) +=
     Package.ManifestAttributes(
@@ -65,8 +65,8 @@ lazy val recipeDsl = project
           javaxInject,
           paranamer,
           reflections,
-          (scalaCheck % "test").withDottyCompat(scalaVersion.value),
           scalaTest % "test",
+          scalaTestCheck % "test",
           junitInterface % "test",
           slf4jApi % "test",
           logback % "test"
@@ -81,9 +81,9 @@ lazy val intermediateLanguage = project.in(file("intermediate-language"))
       slf4jApi,
       objenisis,
       typeSafeConfig,
-//      scalaGraphDot.withDottyCompat(scalaVersion.value),
       scalaTest % "test",
-      (scalaCheck % "test").withDottyCompat(scalaVersion.value),
+      scalaTestCheck % "test",
+      scalaCheck % "test",
       logback % "test")
   )
 
@@ -106,10 +106,11 @@ lazy val runtime = project.in(file("runtime"))
         akkaStream.withDottyCompat(scalaVersion.value),
         chill.withDottyCompat(scalaVersion.value),
         ficusConfig.withDottyCompat(scalaVersion.value),
-        ("com.thesamet.scalapb" %% "scalapb-runtime" % "0.10.9" % "protobuf").withDottyCompat(scalaVersion.value),
-        ("com.thesamet.scalapb" %% "compilerplugin" % "0.10.9").withDottyCompat(scalaVersion.value),
         catsCore.withDottyCompat(scalaVersion.value),
         catsEffect.withDottyCompat(scalaVersion.value),
+        
+        "com.thesamet.scalapb" %% "compilerplugin" % scalaPbVersion,
+        "com.thesamet.scalapb" %% "scalapb-runtime" % scalaPbVersion % "protobuf",
         guava,
         objenisis,
         protobufJava,
@@ -121,8 +122,8 @@ lazy val runtime = project.in(file("runtime"))
         akkaStreamTestKit.withDottyCompat(scalaVersion.value) % "test",
         akkaInmemoryJournal.withDottyCompat(scalaVersion.value) % "test",
         akkaPersistenceCassandra.withDottyCompat(scalaVersion.value) % "test",
-        scalaTest.withDottyCompat(scalaVersion.value) % "test",
-        scalaCheck.withDottyCompat(scalaVersion.value) % "test",
+        scalaTest % "test",
+        scalaCheck % "test",
         levelDB % "test",
         levelDBJni % "test",
         betterFiles.withDottyCompat(scalaVersion.value) % "test",

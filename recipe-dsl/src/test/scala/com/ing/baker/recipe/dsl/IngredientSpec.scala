@@ -6,23 +6,6 @@ import org.scalatest.matchers._
 class IngredientSpec extends wordspec.AnyWordSpec with should.Matchers {
   "an Ingredient" when {
 
-    "constructed" should {
-
-      "correctly derive the type" in {
-
-        val ingredient = Ingredient[String]("foo")
-        ingredient.name should be ("foo")
-//        ingredient.ingredientType shouldBe types.CharArray
-      }
-
-      "correctly derive a higher kinded type" in {
-
-        val ingredient = Ingredient[Option[String]]("foo")
-        ingredient.name should be ("foo")
-//        ingredient.ingredientType shouldBe OptionType(types.CharArray)
-      }
-    }
-
     "calling the Equals method" should {
 
       "return true if same ingredient instance" in {
@@ -42,11 +25,12 @@ class IngredientSpec extends wordspec.AnyWordSpec with should.Matchers {
         customerName.equals(agreementName) should be (false)
       }
 
-      "return false if different ingredient with same name and different type" in {
-        val customerName = Ingredient[String]("customerName")
-        val customerName2 = Ingredient[Integer]("customerName")
-        customerName.equals(customerName2) should be (false)
-      }
+// TODO This can be checked at compile time in the dsl 
+//      "return false if different ingredient with same name and different type" in {
+//        val customerName = Ingredient[String]("customerName")
+//        val customerName2 = Ingredient[Integer]("customerName")
+//        customerName.equals(customerName2) should be (false)
+//      }
 
       "return false if different ingredient with different name and different type" in {
         val customerName = Ingredient[String]("customerName")

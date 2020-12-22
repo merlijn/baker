@@ -62,7 +62,8 @@ object Dependencies {
 
   val slf4jApi =                  "org.slf4j"                  %  "slf4j-api"                          % "1.7.30"
   val scalaTest =                 "org.scalatest"              %% "scalatest"                          % "3.2.3"
-  val scalaCheck =                "org.scalacheck"             %% "scalacheck"                         % "1.14.1"
+  val scalaCheck =                "org.scalacheck"             %% "scalacheck"                         % "1.15.2"
+  val scalaTestCheck =            "org.scalatestplus"          %% "scalacheck-1-15"                    % "3.2.3.0"
 
   def scopeDeps(scope: String, modules: Seq[ModuleID]) =  modules.map(m => m % scope)
   def compileDeps(modules: ModuleID*) = modules.toSeq
