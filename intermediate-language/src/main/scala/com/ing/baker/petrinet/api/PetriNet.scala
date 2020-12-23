@@ -1,14 +1,33 @@
 package com.ing.baker.petrinet.api
 
+import PetriNet.Edge
 
-case class Edge[P, T](source: Either[P, T], target: Either[P, T], weight: Int, label: Option[Any])
+object PetriNet {
+  
+  type Weighted[T] = T => Int
+
+  case class Edge[P, T](source: Either[P, T], target: Either[P, T], weight: Int, label: Option[Any])
+  
+  def apply[P, T](edges: Set[Edge[P, T]]): PetriNet[P, T] = {
+    
+    val places = edges.collect {
+      case Edge(_, Left(p), _, _) => p
+      case Edge(Left(p), _, _, _) => p
+    }
+    
+    val transitions = edges.collect {
+      case Edge(Right(t), _, _, _) => t
+      case Edge(_, Right(t), _, _) => t
+    }
+    
+    PetriNet[P, T](places.toSet, transitions.toSet, edges)
+  }
+}
 
 /**
  * Petri net class.
-  *
- * Backed by a graph object from scala-graph (https://github.com/scala-graph/scala-graph)
  */
-case class PetriNet[P, T](places: Set[P], transitions: Set[T], edges: Set[Edge[P, T]]) {
+case class PetriNet[P, T](places: Set[P], transitions: Set[T], edges: Set[Edge[P, T]]) extends DiGraph[Either[P, T], PetriNet.Edge[P, T]] {
   
   def removePlace(p: P): PetriNet[P, T] = {
     
@@ -43,6 +62,25 @@ case class PetriNet[P, T](places: Set[P], transitions: Set[T], edges: Set[Edge[P
   def isConnected():Boolean = ???
   
   def findCycles(): Seq[Either[P, T]] = ???
+
+  override def incomingNodes(n: Either[P, T]): Set[Either[P, T]] = ???
+
+  override def outgoingNodes(n: Either[P, T]): Set[Either[P, T]] = ???
+
+  override def removeNode(n: Either[P, T]): PetriNet[P, T] = {
+
+    val newEdges = edges.filter {
+      case Edge(_, `n`, _, _) => true
+      case Edge(`n`, _, _, _) => true
+      case _ => false
+    }
+    
+    PetriNet[P, T](places, transitions, newEdges)
+  }
+
+  override def add(source: Either[P, T], target: Either[P, T], e: Edge[P, T]): PetriNet[P, T] = {
+    this
+  }
 
   /**
     * The out-adjecent places of a transition.
@@ -85,7 +123,7 @@ case class PetriNet[P, T](places: Set[P], transitions: Set[T], edges: Set[Edge[P
     *
     * @return The set of nodes.
     */
-  def nodes: scala.collection.Set[Either[P, T]] = 
+  override def nodes: Set[Either[P, T]] = 
     transitions.map[Either[P, T]](Right(_)) ++ places.map[Either[P, T]](Left(_))
 
   /**

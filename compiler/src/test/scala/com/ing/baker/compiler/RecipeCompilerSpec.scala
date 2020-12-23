@@ -3,16 +3,15 @@ package com.ing.baker.compiler
 import java.util.Optional
 
 import com.ing.baker.il.{CompiledRecipe, RecipeValidationSettings}
-import com.ing.baker.recipe.dsl.examples.TestRecipe._
-import com.ing.baker.recipe.dsl
 import com.ing.baker.recipe.dsl._
-import com.ing.baker.types.{NullValue, PrimitiveValue}
-import org.scalatest.{Matchers, WordSpecLike}
+
+import org.scalatest._
+import org.scalatest.matchers._
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-class RecipeCompilerSpec extends WordSpecLike with Matchers {
+class RecipeCompilerSpec extends wordspec.AnyWordSpec with should.Matchers {
 
   "The RecipeCompiler should" should {
 
@@ -61,7 +60,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
       val wrongProcessIdInteraction =
         Interaction(
           name = "wrongProcessIdInteraction",
-          input = Seq(Ingredient.reflect[Int](dsl.processIdName), initialIngredient),
+          input = Seq(Ingredient[Int](dsl.processIdName), initialIngredient),
           output = Seq.empty)
 
       val recipe = Recipe("NonProvidedIngredient")
@@ -73,7 +72,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
     }
 
     "give a list of wrong ingredients if an ingredient is of the wrong type" in {
-      val initialIngredientInt = Ingredient.reflect[Int]("initialIngredient")
+      val initialIngredientInt = Ingredient[Int]("initialIngredient")
       val initialEventInt = Event("InitialEvent", Seq(initialIngredientInt), None)
 
       val recipe = Recipe("WrongTypedIngredient")
@@ -86,10 +85,10 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
     }
 
     "give a list of wrong ingredients if an Optional ingredient is of the wrong Optional type" in {
-      val initialIngredientOptionalInt = Ingredient.reflect[Optional[Int]]("initialIngredientOptionalInt")
-      val initialIngredientOptionalString = Ingredient.reflect[Optional[String]]("initialIngredientOptionalInt")
-      val initialIngredientOptionInt = Ingredient.reflect[Option[List[Int]]]("initialIngredientOptionInt")
-      val initialIngredientOptionString = Ingredient.reflect[Option[List[String]]]("initialIngredientOptionInt")
+      val initialIngredientOptionalInt = Ingredient[Optional[Int]]("initialIngredientOptionalInt")
+      val initialIngredientOptionalString = Ingredient[Optional[String]]("initialIngredientOptionalInt")
+      val initialIngredientOptionInt = Ingredient[Option[List[Int]]]("initialIngredientOptionInt")
+      val initialIngredientOptionString = Ingredient[Option[List[String]]]("initialIngredientOptionInt")
       val initialEventIntOptional = Event("initialEventIntOptional", Seq(initialIngredientOptionalString), None)
       val initialEventIntOption = Event("initialEventIntOption", Seq(initialIngredientOptionString), None)
       val interactionOptional =
@@ -116,7 +115,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
     }
 
     "give no errors if an Optional ingredient is of the correct Optional type" in {
-      val initialIngredientInt = Ingredient.reflect[Optional[List[Int]]]("initialIngredient")
+      val initialIngredientInt = Ingredient[Optional[List[Int]]]("initialIngredient")
       val initialEventInt = Event("InitialEvent", Seq(initialIngredientInt), None)
       val interactionOptional =
         Interaction(
@@ -125,8 +124,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
           output = Seq.empty)
 
       val recipe = Recipe("CorrectTypedOptionalIngredient")
-        .withInteractions(
-          interactionOptional)
+        .withInteractions(interactionOptional)
         .withSensoryEvent(initialEventInt)
 
       val compiledRecipe: CompiledRecipe = RecipeCompiler.compileRecipe(recipe)
@@ -188,7 +186,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
 
     "fail compilation for an empty or null named ingredient" in {
       List("", null) foreach { name =>
-        val invalidIngredient = Ingredient.reflect[String](name)
+        val invalidIngredient = Ingredient[String](name)
         val recipe = Recipe("IngredientNameTest").withSensoryEvent(Event("someEvent", Seq(invalidIngredient))).withInteractions(interactionOne)
 
         intercept[IllegalArgumentException](RecipeCompiler.compileRecipe(recipe)) getMessage() shouldBe "Ingredient with a null or empty name found"
@@ -214,10 +212,10 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
         .map(it =>
           if (it.name.equals("OptionalIngredientInteraction")) {
             it.predefinedIngredients.size shouldBe 4
-            it.predefinedIngredients("missingJavaOptional") shouldBe NullValue
-            it.predefinedIngredients("missingJavaOptional2") shouldBe NullValue
-            it.predefinedIngredients("missingScalaOptional") shouldBe NullValue
-            it.predefinedIngredients("missingScalaOptional2") shouldBe NullValue
+            it.predefinedIngredients("missingJavaOptional") should be(null)
+            it.predefinedIngredients("missingJavaOptional2") should be(null)
+            it.predefinedIngredients("missingScalaOptional") should be(null)
+            it.predefinedIngredients("missingScalaOptional2") should be(null)
           })
     }
 
@@ -234,16 +232,16 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
         .map(it =>
           if (it.name.equals("OptionalIngredientInteraction")) {
             it.predefinedIngredients.size shouldBe 3
-            it.predefinedIngredients("missingJavaOptional2") shouldBe NullValue
-            it.predefinedIngredients("missingScalaOptional") shouldBe NullValue
-            it.predefinedIngredients("missingScalaOptional2") shouldBe NullValue
+            it.predefinedIngredients("missingJavaOptional2") should be(null)
+            it.predefinedIngredients("missingScalaOptional") should be(null)
+            it.predefinedIngredients("missingScalaOptional2") should be(null)
           })
 
     }
 
     "interactions with RENAMED optional ingredients via events that ARE provided SHOULD NOT be provided as empty" in {
-      val stringOptionIngredient = Ingredient.reflect[Option[String]]("stringOptionIngredient")
-      val renamedStringOptionIngredient = Ingredient.reflect[Option[String]]("renamedStringOptionIngredient")
+      val stringOptionIngredient = Ingredient[Option[String]]("stringOptionIngredient")
+      val renamedStringOptionIngredient = Ingredient[Option[String]]("renamedStringOptionIngredient")
 
       val eventWithOptionIngredient = Event("eventWithOptionIngredient", Seq(stringOptionIngredient))
 
@@ -278,9 +276,9 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
         .map(it =>
           if (it.name.equals("OptionalIngredientInteraction")) {
             it.predefinedIngredients.size shouldBe 3
-            it.predefinedIngredients("missingJavaOptional2") shouldBe NullValue
-            it.predefinedIngredients("missingScalaOptional") shouldBe NullValue
-            it.predefinedIngredients("missingScalaOptional2") shouldBe NullValue
+            it.predefinedIngredients("missingJavaOptional2") should be(null)
+            it.predefinedIngredients("missingScalaOptional") should be(null)
+            it.predefinedIngredients("missingScalaOptional2") should be(null)
           })
     }
 
@@ -289,7 +287,7 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
       val recipe: Recipe = Recipe("MissingOptionalRecipe")
         .withInteractions(
           optionalIngredientInteraction
-            .withPredefinedIngredients(("missingJavaOptional", ingredientValue))
+            .withPredefinedIngredients(("missingJavaOptional", java.util.Optional.of("value")))
         )
         .withSensoryEvents(Set(initialEvent))
 
@@ -299,10 +297,10 @@ class RecipeCompilerSpec extends WordSpecLike with Matchers {
         .map(it =>
           if (it.name.equals("OptionalIngredientInteraction")) {
             it.predefinedIngredients.size shouldBe 4
-            it.predefinedIngredients("missingJavaOptional") shouldBe PrimitiveValue("value")
-            it.predefinedIngredients("missingJavaOptional2") shouldBe NullValue
-            it.predefinedIngredients("missingScalaOptional") shouldBe NullValue
-            it.predefinedIngredients("missingScalaOptional2") shouldBe NullValue
+            it.predefinedIngredients("missingJavaOptional") shouldBe java.util.Optional.of("value")
+            it.predefinedIngredients("missingJavaOptional2") should be(null)
+            it.predefinedIngredients("missingScalaOptional") should be(null)
+            it.predefinedIngredients("missingScalaOptional2") should be(null)
           })
     }
   }

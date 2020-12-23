@@ -16,27 +16,38 @@ object Assertions {
     }
   }
 
-  def assertValidNames[T](nameFunc: T => String, list: Iterable[T], typeName: String) = list.map(nameFunc).filter(name => name == null || name.isEmpty).foreach { _ =>
-    throw new IllegalArgumentException(s"$typeName with a null or empty name found")
+  def assertValidNames[T](nameFunc: T => String, list: Iterable[T], typeName: String) = 
+    list.map(nameFunc)
+        .filter(name => name == null || name.isEmpty)
+        .foreach { _ => throw new IllegalArgumentException(s"$typeName with a null or empty name found")
   }
 
-  def assertNonEmptyRecipe(recipe: Recipe): Seq[String] = {
-    val errors = mutable.MutableList.empty[String]
-    if (recipe.sensoryEvents.isEmpty)
-      errors += "No sensory events found."
-    if (recipe.interactions.size == 0)
-      errors += "No interactions found."
-    errors
+  // TODO move to better place as extension method
+  def toOpt[T](bool: Boolean)(e: T): Option[T] = {
+    if (bool) Some(e)
+    else      None
+  }
+  
+  def assertNonEmptyRecipe(recipe: Recipe): Iterable[String] = {
+    
+    val noEvents = toOpt(recipe.sensoryEvents.isEmpty)("No sensory events found.")
+    val noInteractions = toOpt(recipe.interactions.size == 0)("No interactions found.")
+    
+    noEvents ++ noInteractions
   }
 
-  def preCompileAssertions(recipe: Recipe): Seq[String] = {
+  def preCompileAssertions(recipe: Recipe): Unit = {
+    
     assertValidNames[Recipe](_.name, Seq(recipe), "Recipe")
     assertValidNames[Interaction](_.name, recipe.interactions, "Interaction")
     assertValidNames[Event](_.name, recipe.sensoryEvents, "Event")
-    val allIngredients = recipe.sensoryEvents.flatMap(_.providedIngredients) ++ recipe.interactions.flatMap(_.input)
-    assertValidNames[Ingredient](_.name, allIngredients, "Ingredient")
+    val allIngredients: Iterable[Ingredient[_]] = recipe.sensoryEvents.flatMap(_.providedIngredients) ++ recipe.interactions.flatMap(_.input)
+    
+    assertValidNames[Ingredient[_]](_.name, allIngredients, "Ingredient")
     assertNoDuplicateElementsExist[Interaction](_.name, recipe.interactions)
     assertNoDuplicateElementsExist[Event](_.name, recipe.sensoryEvents)
+    
+    // TODO this does not assert anything
     assertNonEmptyRecipe(recipe)
   }
 }

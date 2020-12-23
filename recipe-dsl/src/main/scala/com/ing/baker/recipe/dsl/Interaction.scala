@@ -125,7 +125,8 @@ case class Interaction(
   def withPredefinedIngredients(values: (String, Any)*): Interaction =
     withPredefinedIngredients(values.toMap)
 
-  def withPredefinedIngredients(data: Map[String, Any]): Interaction = copy(predefinedIngredients = predefinedIngredients ++ data)
+  def withPredefinedIngredients(data: Map[String, Any]): Interaction = 
+    copy(predefinedIngredients = predefinedIngredients ++ data)
 
   def withOverriddenIngredientName(oldIngredient: String,
                                    newIngredient: String): Interaction =

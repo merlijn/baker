@@ -7,12 +7,12 @@ import com.ing.baker.il.petrinet._
 import com.ing.baker.il.{CompiledRecipe, EventDescriptor, RecipeValidationSettings}
 import com.ing.baker.petrinet.api._
 import com.ing.baker.recipe.dsl.{Interaction, Recipe}
-import scalax.collection.edge.WLDiEdge
-import scalax.collection.immutable.Graph
 
 import scala.language.postfixOps
 
 object RecipeCompiler {
+  
+  type Arc = PetriNet.Edge[Place, Transition]
 
   implicit class TupleSeqOps[A, B](seq: Seq[(Seq[A], Seq[B])]) {
     def unzipFlatten: (Seq[A], Seq[B]) = seq.unzip match {
@@ -50,11 +50,11 @@ object RecipeCompiler {
     ingredientsWithMultipleConsumers
   }
 
-  def arc(t: Transition, p: Place, weight: Long): Arc = WLDiEdge[Node, Edge](Right(t), Left(p))(weight, Edge(None))
+  def arc(t: Transition, p: Place, weight: Int): Arc = 
+    PetriNet.Edge(Right(t), Left(p), weight, Some(Edge(None)))
 
-  def arc(p: Place, t: Transition, weight: Long, eventFilter: Option[String] = None): Arc = {
-    WLDiEdge[Node, Edge](Left(p), Right(t))(weight, Edge(eventFilter))
-  }
+  def arc(p: Place, t: Transition, weight: Int, eventFilter: Option[String] = None): Arc =
+    PetriNet.Edge(Left(p), Right(t), weight, Some(Edge(eventFilter)))
 
   /**
     * Creates a transition for a missing event in the recipe.
@@ -120,7 +120,7 @@ object RecipeCompiler {
                                          eventTransitions: Seq[EventTransition]): Seq[Arc] = {
     val resultPlace = Place(label = interaction.label, placeType = InteractionEventOutputPlace)
     if (interaction.events.nonEmpty) {
-      val eventArcs = interaction.events.flatMap { event: EventDescriptor =>
+      val eventArcs = interaction.events.flatMap { (event: EventDescriptor) =>
         //Get the correct event transition
         val eventTransition = eventTransitions.find(_.event.name == event.name).get
         //Decide if there are multiple interactions that fire this transition,
@@ -201,7 +201,8 @@ object RecipeCompiler {
   def compileRecipe(recipe: Recipe,
                     validationSettings: RecipeValidationSettings): CompiledRecipe = {
 
-    val precompileErrors: Seq[String] = Assertions.preCompileAssertions(recipe)
+    // this throws an exception in case of any failed assertions 
+    Assertions.preCompileAssertions(recipe)
 
     val sensoryEventIngredients = recipe.sensoryEvents.flatMap(e => e.providedIngredients.map(_.name))
 
@@ -320,13 +321,13 @@ object RecipeCompiler {
       ++ internalEventArcs
       ++ multipleOutputFacilitatorArcs)
 
-    val petriNet: PetriNet[Place, Transition] = new PetriNet(Graph(arcs: _*))
+    val petriNet: PetriNet[Place, Transition] = PetriNet(arcs.toSet)
 
     val initialMarking: Marking[Place] = petriNet.places.collect {
       case p @ Place(_, FiringLimiterPlace(n)) => p -> Map[Any, Int]((null, n))
     }.toMarking
 
-    val errors = preconditionORErrors ++ preconditionANDErrors ++ precompileErrors
+    val errors = preconditionORErrors ++ preconditionANDErrors
 
     val compiledRecipe = CompiledRecipe(
       name = recipe.name,

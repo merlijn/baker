@@ -140,8 +140,9 @@ lazy val recipeCompiler = project.in(file("compiler"))
     moduleName := "baker-compiler",
     libraryDependencies ++= Seq(
       slf4jApi,
-      scalaTest.withDottyCompat(scalaVersion.value) % "test",
-      scalaCheck.withDottyCompat(scalaVersion.value) % "test",
+      scalaTest % "test",
+      scalaTestCheck % "test",
+      scalaCheck % "test",
       logback % "test")
   )
   .dependsOn(recipeDsl, intermediateLanguage, testScope(recipeDsl))
@@ -150,4 +151,4 @@ lazy val baker = project
   .in(file("."))
   .settings(defaultModuleSettings)
   .settings(noPublishSettings)
-  .aggregate(recipeDsl, intermediateLanguage) //, recipeCompiler) //, runtime)
+  .aggregate(recipeDsl, intermediateLanguage, recipeCompiler) //, runtime)
