@@ -25,7 +25,7 @@ package object api extends MultiSetOps with MarkingOps {
 
   extension [T : Identifiable](e: T) {
 
-    def getId: Id = implicitly[Identifiable[T]].apply(e)
+    def getId: Id = summon[Identifiable[T]].apply(e)
   }
 
   extension [T : Identifiable](seq: Iterable[T]) {

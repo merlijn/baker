@@ -1,10 +1,9 @@
 package com.ing.baker.compiler
 
 import java.util.Optional
-
 import com.ing.baker.il.{CompiledRecipe, RecipeValidationSettings}
 import com.ing.baker.recipe.dsl._
-
+import com.ing.baker.recipe.dsl.examples.Webshop
 import org.scalatest._
 import org.scalatest.matchers._
 
@@ -16,7 +15,7 @@ class RecipeCompilerSpec extends wordspec.AnyWordSpec with should.Matchers {
   "The RecipeCompiler should" should {
 
     "not have validation errors for a valid recipe" in {
-      val recipe: Recipe = getRecipe("ValidRecipe")
+      val recipe: Recipe = Webshop.webShopRecipe
       val compiledRecipe: CompiledRecipe = RecipeCompiler.compileRecipe(recipe)
       compiledRecipe.validationErrors shouldBe List.empty
 

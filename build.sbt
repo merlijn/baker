@@ -111,8 +111,6 @@ lazy val runtime = project.in(file("runtime"))
         
         "com.thesamet.scalapb" %% "compilerplugin" % scalaPbVersion,
         "com.thesamet.scalapb" %% "scalapb-runtime" % scalaPbVersion % "protobuf",
-        guava,
-        objenisis,
         protobufJava,
         kryo,
         kryoSerializers,

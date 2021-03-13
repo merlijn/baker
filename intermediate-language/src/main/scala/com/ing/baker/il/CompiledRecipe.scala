@@ -70,27 +70,7 @@ case class CompiledRecipe(name: String,
     * @return
     */
   def getRecipeVisualization: String = ??? //RecipeVisualizer.visualizeRecipe(this)
-
-  /**
-    * Visualise the compiled recipe in DOT format
-    *
-    * @param filterFunc
-    * @return
-    */
-  def getFilteredRecipeVisualization(filterFunc: String => Boolean): String = ??? // RecipeVisualizer.visualizeRecipe(this, filter = filterFunc)
-
-
-  def getFilteredRecipeVisualization(filter: String): String = ??? // getFilteredRecipeVisualization(x => !x.contains(filter))
-
-  /**
-    * Returns a DOT (http://www.graphviz.org/) representation of the recipe.
-    * All events/interaction/ingredients that contain one of the given filter strings are filtered out
-    *
-    * @param filters
-    * @return
-    */
-  def getFilteredRecipeVisualization(filters: Array[String]): String = ??? // getFilteredRecipeVisualization((current) => filters.forall(filter => !current.contains(filter)))
-
+ 
   /**
     * Visualises the underlying petri net in DOT format
     *

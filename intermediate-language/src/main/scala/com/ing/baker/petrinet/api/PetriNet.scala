@@ -4,7 +4,9 @@ import PetriNet.Edge
 
 object PetriNet {
   
-  type Weighted[T] = T => Int
+  case class Weight(n: Int) extends AnyVal
+  
+  type Weighted[T] = T => Weight
 
   case class Edge[P, T](source: Either[P, T], target: Either[P, T], weight: Int, label: Option[Any])
   
@@ -28,6 +30,9 @@ object PetriNet {
  * Petri net class.
  */
 case class PetriNet[P, T](places: Set[P], transitions: Set[T], edges: Set[Edge[P, T]]) extends DiGraph[Either[P, T], PetriNet.Edge[P, T]] {
+  
+  
+  type InnerEdge = Edge[P, T]
   
   def removePlace(p: P): PetriNet[P, T] = {
     
