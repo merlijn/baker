@@ -3,8 +3,8 @@ import sbt.Keys._
 
 def testScope(project: ProjectReference) = project % "test->test;test->compile"
 
-val dottyVersion = "3.0.0-M3"
-val scalaPbVersion = "0.11.0-M4+31-fbaaafae+20201222-1006-SNAPSHOT"
+val dottyVersion = "3.0.0-RC1"
+val scalaPbVersion = "0.11.0-M7"
 
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
   organization := "com.ing.baker",
@@ -79,7 +79,6 @@ lazy val intermediateLanguage = project.in(file("intermediate-language"))
     moduleName := "baker-intermediate-language",
     libraryDependencies ++= Seq(
       slf4jApi,
-      objenisis,
       typeSafeConfig,
       scalaTest % "test",
       scalaTestCheck % "test",

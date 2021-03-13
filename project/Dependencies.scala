@@ -6,7 +6,7 @@ object Dependencies {
   val akkaVersion = "2.6.10"
   val jvmV = "1.8"
 
-  val typeSafeConfig =            "com.typesafe"               %  "config"                             % "1.3.1"
+  val typeSafeConfig =            "com.typesafe"               %  "config"                             % "1.4.1"
 
   val akkaInmemoryJournal =      ("com.github.dnvriend"        %% "akka-persistence-inmemory"          % "2.5.15.2")
       .exclude("com.typesafe.akka", "akka-actor")
@@ -61,9 +61,9 @@ object Dependencies {
   val objenisis =                 "org.objenesis"              %  "objenesis"                          % "3.1"
 
   val slf4jApi =                  "org.slf4j"                  %  "slf4j-api"                          % "1.7.30"
-  val scalaTest =                 "org.scalatest"              %% "scalatest"                          % "3.2.3"
-  val scalaCheck =                "org.scalacheck"             %% "scalacheck"                         % "1.15.2"
-  val scalaTestCheck =            "org.scalatestplus"          %% "scalacheck-1-15"                    % "3.2.3.0"
+  val scalaTest =                 "org.scalatest"              %% "scalatest"                          % "3.2.6"
+  val scalaCheck =                "org.scalacheck"             %% "scalacheck"                         % "1.15.3"
+  val scalaTestCheck =            "org.scalatestplus"          %% "scalacheck-1-15"                    % "3.2.6.0"
 
   def scopeDeps(scope: String, modules: Seq[ModuleID]) =  modules.map(m => m % scope)
   def compileDeps(modules: ModuleID*) = modules.toSeq
