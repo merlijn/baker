@@ -5,7 +5,7 @@ import java.util.concurrent.ConcurrentHashMap
 import com.ing.baker.il.petrinet.InteractionTransition
 import com.ing.baker.runtime.core.InteractionImplementation
 
-import scala.compat.java8.FunctionConverters._
+import scala.compat.java8.FunctionConverters.*
 
 /**
   * The InteractionManager is responsible for all implementation of interactions.

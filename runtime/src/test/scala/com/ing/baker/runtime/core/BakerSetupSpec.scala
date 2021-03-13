@@ -1,9 +1,9 @@
 package com.ing.baker.runtime.core
 
 import akka.actor.ActorSystem
-import com.ing.baker._
+import com.ing.baker.*
 import com.ing.baker.compiler.RecipeCompiler
-import com.ing.baker.recipe.dsl.examples.TestRecipe._
+import com.ing.baker.recipe.dsl.examples.TestRecipe.*
 import com.ing.baker.recipe.dsl.Recipe
 import com.ing.baker.runtime.core.implementations.{InteractionOneFieldName, InteractionOneInterfaceImplementation, InteractionOneWrongApply}
 

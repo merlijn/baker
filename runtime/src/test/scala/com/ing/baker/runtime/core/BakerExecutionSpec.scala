@@ -6,20 +6,20 @@ import java.util.{Optional, UUID}
 import akka.actor.ActorSystem
 import akka.persistence.inmemory.extension.{InMemoryJournalStorage, StorageExtension}
 import akka.testkit.{TestDuration, TestKit, TestProbe}
-import com.ing.baker._
+import com.ing.baker.*
 import com.ing.baker.compiler.RecipeCompiler
-import com.ing.baker.recipe.dsl.examples.TestRecipe._
+import com.ing.baker.recipe.dsl.examples.TestRecipe.*
 import com.ing.baker.recipe.dsl.InteractionFailureStrategy.FireEventAfterFailure
 import com.ing.baker.recipe.dsl.{InteractionFailureStrategy, Recipe}
 import com.ing.baker.runtime.core.events.BakerEvent
 import com.ing.baker.types.reflect.Reflect
-import org.mockito.Matchers._
-import org.mockito.Mockito._
+import org.mockito.Matchers.*
+import org.mockito.Mockito.*
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.slf4j.LoggerFactory
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.language.postfixOps
 
 case class SomeNotDefinedEvent(name: String)

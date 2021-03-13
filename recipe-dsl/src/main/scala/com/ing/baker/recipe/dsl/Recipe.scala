@@ -1,7 +1,7 @@
 package com.ing.baker.recipe.dsl
 
 import scala.annotation.varargs
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.*
 import scala.concurrent.duration
 import scala.concurrent.duration.{Duration, FiniteDuration}
 

@@ -5,13 +5,13 @@ import java.lang.reflect.InvocationTargetException
 import akka.event.EventStream
 import cats.effect.IO
 import com.ing.baker.il.{CompiledRecipe, IngredientDescriptor, InteractionFailureStrategyOutcome, processIdName}
-import com.ing.baker.il.petrinet._
-import com.ing.baker.petrinet.api._
+import com.ing.baker.il.petrinet.*
+import com.ing.baker.petrinet.api.*
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceRuntime
 import com.ing.baker.runtime.actor.process_instance.internal.ExceptionStrategy.{BlockTransition, Continue, RetryWithDelay}
-import com.ing.baker.runtime.actor.process_instance.internal._
+import com.ing.baker.runtime.actor.process_instance.internal.*
 import com.ing.baker.runtime.core.events.{InteractionCompleted, InteractionFailed, InteractionStarted}
-import com.ing.baker.runtime.core.internal.RecipeRuntime._
+import com.ing.baker.runtime.core.internal.RecipeRuntime.*
 import com.ing.baker.runtime.core.{ProcessEvent, ProcessState}
 import com.ing.baker.types.{PrimitiveValue, Value}
 import org.slf4j.MDC

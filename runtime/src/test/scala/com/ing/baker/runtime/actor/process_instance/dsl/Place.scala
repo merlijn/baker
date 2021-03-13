@@ -1,6 +1,6 @@
 package com.ing.baker.runtime.actor.process_instance.dsl
 
-import com.ing.baker.petrinet.api._
+import com.ing.baker.petrinet.api.*
 
 object Place {
   def apply(id: Long): Place = Place(id, s"p$id")

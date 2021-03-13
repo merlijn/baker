@@ -1,6 +1,6 @@
 package com.ing.baker.il
 
-import com.ing.baker.petrinet.api._
+import com.ing.baker.petrinet.api.*
 
 package object petrinet {
 

@@ -2,13 +2,13 @@ package com.ing.baker.runtime.actor.process_instance
 
 import java.security.MessageDigest
 
-import com.ing.baker.petrinet.api._
-import com.ing.baker.runtime.actor.process_instance.ProcessInstanceEventSourcing._
-import com.ing.baker.runtime.actor.process_instance.ProcessInstanceSerialization._
+import com.ing.baker.petrinet.api.*
+import com.ing.baker.runtime.actor.process_instance.ProcessInstanceEventSourcing.*
+import com.ing.baker.runtime.actor.process_instance.ProcessInstanceSerialization.*
 import com.ing.baker.runtime.actor.process_instance.internal.ExceptionStrategy.{BlockTransition, RetryWithDelay}
 import com.ing.baker.runtime.actor.process_instance.internal.Instance
 import com.ing.baker.runtime.actor.process_instance.protobuf.FailureStrategy.StrategyType
-import com.ing.baker.runtime.actor.process_instance.protobuf._
+import com.ing.baker.runtime.actor.process_instance.protobuf.*
 import com.ing.baker.runtime.actor.protobuf.{ProducedToken, SerializedData}
 import com.ing.baker.runtime.actor.serialization.ProtoEventAdapter
 

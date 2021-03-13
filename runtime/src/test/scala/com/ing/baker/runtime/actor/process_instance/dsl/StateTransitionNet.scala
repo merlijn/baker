@@ -1,10 +1,10 @@
 package com.ing.baker.runtime.actor.process_instance.dsl
 
 import cats.effect.IO
-import com.ing.baker.petrinet.api._
+import com.ing.baker.petrinet.api.*
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceRuntime
 import com.ing.baker.runtime.actor.process_instance.internal.ExceptionStrategy.BlockTransition
-import com.ing.baker.runtime.actor.process_instance.internal._
+import com.ing.baker.runtime.actor.process_instance.internal.*
 
 import scala.util.Random
 

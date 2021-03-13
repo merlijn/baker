@@ -1,7 +1,7 @@
 package com.ing.baker.il
 
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.*
+import org.scalatest.matchers.*
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import org.scalacheck.{Gen, Prop, Test}
 

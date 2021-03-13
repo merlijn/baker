@@ -1,9 +1,9 @@
 package com.ing.baker.recipe.dsl
 
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.*
+import org.scalatest.matchers.*
 
-import InteractionDescriptorSpec._
+import InteractionDescriptorSpec.*
 
 object InteractionDescriptorSpec {
   val customerName = Ingredient[String]("customerName")

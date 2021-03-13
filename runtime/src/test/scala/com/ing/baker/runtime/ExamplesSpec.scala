@@ -7,7 +7,7 @@ class ExamplesSpec extends  WordSpecLike with Matchers  {
 
   "The WebShop recipe" should {
 
-    import com.ing.baker.recipe.dsl.examples.Webshop._
+    import com.ing.baker.recipe.dsl.examples.Webshop.*
 
     "compile without validation errors" in {
 
@@ -23,7 +23,7 @@ class ExamplesSpec extends  WordSpecLike with Matchers  {
 
   "The open account recipe" should {
 
-    import com.ing.baker.recipe.dsl.examples.OpenAccount._
+    import com.ing.baker.recipe.dsl.examples.OpenAccount.*
 
     "compile without validation errors" in {
 

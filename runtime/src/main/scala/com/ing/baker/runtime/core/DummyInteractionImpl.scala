@@ -1,7 +1,7 @@
 package com.ing.baker.runtime.core
 import com.ing.baker.il.IngredientDescriptor
 import com.ing.baker.il.petrinet.InteractionTransition
-import com.ing.baker.types._
+import com.ing.baker.types.*
 
 import scala.util.Random
 

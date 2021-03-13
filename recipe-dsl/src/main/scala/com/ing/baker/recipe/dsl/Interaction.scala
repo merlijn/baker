@@ -6,7 +6,7 @@ import com.ing.baker.recipe.dsl
 import org.reflections.Reflections
 
 import scala.annotation.varargs
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.*
 
 case class Interaction(
       name: String,

@@ -1,6 +1,6 @@
 package com.ing.baker.recipe.dsl.examples
 
-import com.ing.baker.recipe.dsl._
+import com.ing.baker.recipe.dsl.*
 
 object OpenAccount {
 

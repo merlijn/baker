@@ -4,7 +4,7 @@ import com.ing.baker.il.EventDescriptor
 import com.ing.baker.types.reflect.Reflect
 import com.ing.baker.types.{NullValue, RecordValue, Value}
 
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.*
 
 object ProcessEvent {
 

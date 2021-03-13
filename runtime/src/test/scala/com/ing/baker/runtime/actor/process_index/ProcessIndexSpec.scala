@@ -10,9 +10,9 @@ import com.ing.baker.il.petrinet.{EventTransition, Place, RecipePetriNet, Transi
 import com.ing.baker.il.{CompiledRecipe, EventDescriptor, IngredientDescriptor}
 import com.ing.baker.petrinet.api.{Marking, PetriNet}
 import com.ing.baker.runtime.actor.process_index.ProcessIndex.CheckForProcessesToBeDeleted
-import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol._
+import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol.*
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol
-import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol._
+import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol.*
 import com.ing.baker.runtime.actor.recipe_manager.RecipeManagerProtocol
 import com.ing.baker.runtime.actor.recipe_manager.RecipeManagerProtocol.{AllRecipes, GetAllRecipes, RecipeInformation}
 import com.ing.baker.runtime.actor.serialization.Encryption
@@ -27,7 +27,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, Matchers, WordSpecLike}
 import scalax.collection.immutable.Graph
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 object ProcessIndexSpec {
   val config: Config = ConfigFactory.parseString(

@@ -5,8 +5,8 @@ import akka.event.Logging.LogLevel
 
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicInteger
-import scala.collection.JavaConverters._
-import scala.concurrent._
+import scala.collection.JavaConverters.*
+import scala.concurrent.*
 import scala.concurrent.duration.{FiniteDuration, _}
 import scala.util.{Failure, Success}
 

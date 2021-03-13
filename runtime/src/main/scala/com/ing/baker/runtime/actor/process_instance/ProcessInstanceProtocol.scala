@@ -1,6 +1,6 @@
 package com.ing.baker.runtime.actor.process_instance
 
-import com.ing.baker.petrinet.api._
+import com.ing.baker.petrinet.api.*
 import com.ing.baker.runtime.actor.serialization.BakerProtoMessage
 
 /**

@@ -3,10 +3,10 @@ package com.ing.baker.il
 import com.ing.baker.il.InteractionFailureStrategy.RetryWithIncrementalBackoff
 import com.ing.baker.il.InteractionFailureStrategyOutcome.{BlockTransition, RetryWithDelay}
 
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.*
+import org.scalatest.matchers.*
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 class InteractionFailureStrategySpec extends wordspec.AnyWordSpec with should.Matchers {
 

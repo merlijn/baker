@@ -1,6 +1,6 @@
 package com.ing.baker
 
-import com.ing.baker.il.petrinet._
+import com.ing.baker.il.petrinet.*
 import com.ing.baker.il.{EventDescriptor, InteractionFailureStrategy, _}
 import com.ing.baker.recipe.dsl
 import com.ing.baker.recipe.dsl.Interaction

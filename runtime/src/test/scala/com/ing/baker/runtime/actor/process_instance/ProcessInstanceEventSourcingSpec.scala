@@ -4,23 +4,23 @@ import java.util.UUID
 
 import akka.persistence.inmemory.extension.{InMemoryJournalStorage, StorageExtension}
 import akka.persistence.query.PersistenceQuery
-import akka.persistence.query.scaladsl._
+import akka.persistence.query.scaladsl.*
 import akka.stream.ActorMaterializer
 import akka.stream.testkit.scaladsl.TestSink
 import akka.testkit.TestProbe
 import akka.util.Timeout
-import com.ing.baker.petrinet.api._
-import com.ing.baker.runtime.actor.process_instance.ProcessInstanceEventSourcing._
-import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol._
-import com.ing.baker.runtime.actor.process_instance.ProcessInstanceSpec._
-import com.ing.baker.runtime.actor.process_instance.dsl._
+import com.ing.baker.petrinet.api.*
+import com.ing.baker.runtime.actor.process_instance.ProcessInstanceEventSourcing.*
+import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol.*
+import com.ing.baker.runtime.actor.process_instance.ProcessInstanceSpec.*
+import com.ing.baker.runtime.actor.process_instance.dsl.*
 import com.ing.baker.runtime.actor.serialization.Encryption.NoEncryption
 import com.ing.baker.runtime.actor.AkkaTestBase
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.Matchers._
+import org.scalatest.Matchers.*
 
 import scala.concurrent.ExecutionContext
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 class ProcessInstanceEventSourcingSpec extends AkkaTestBase("ProcessQuerySpec") with BeforeAndAfterEach {
 

@@ -2,10 +2,10 @@ package com.ing.baker.runtime.actor.process_instance
 
 import akka.persistence.{PersistentActor, RecoveryCompleted}
 import akka.serialization.SerializationExtension
-import com.ing.baker.petrinet.api._
+import com.ing.baker.petrinet.api.*
 import com.ing.baker.runtime.actor.process_instance.internal.{ExceptionState, ExceptionStrategy, Instance, Job}
 import com.ing.baker.runtime.actor.serialization.{Encryption, ProtoEventAdapterImpl}
-import ProcessInstanceEventSourcing._
+import ProcessInstanceEventSourcing.*
 import akka.NotUsed
 import akka.actor.{ActorSystem, NoSerializationVerificationNeeded}
 import akka.persistence.query.scaladsl.CurrentEventsByPersistenceIdQuery

@@ -2,7 +2,7 @@ package com.ing.baker.runtime.actor.serialization.modules
 
 import com.google.protobuf.ByteString
 import com.ing.baker.runtime.actor.protobuf
-import com.ing.baker.runtime.actor.protobuf._
+import com.ing.baker.runtime.actor.protobuf.*
 import com.ing.baker.runtime.actor.serialization.{ProtoEventAdapter, ProtoEventAdapterModule}
 import com.ing.baker.types
 import org.joda.time.format.ISODateTimeFormat
@@ -53,7 +53,7 @@ class TypesModule extends ProtoEventAdapterModule {
 
     case v: types.Value =>
 
-      import protobuf.Value.OneofValue._
+      import protobuf.Value.OneofValue.*
 
       val oneof: protobuf.Value.OneofValue = v match {
         case types.NullValue => (NullValue(true))
@@ -83,8 +83,8 @@ class TypesModule extends ProtoEventAdapterModule {
 
     case msg: protobuf.Type =>
 
-      import Type.OneofType._
-      import PrimitiveType._
+      import Type.OneofType.*
+      import PrimitiveType.*
 
       msg.`oneofType` match {
 
@@ -139,7 +139,7 @@ class TypesModule extends ProtoEventAdapterModule {
 
     case msg: protobuf.Value =>
 
-      import protobuf.Value.OneofValue._
+      import protobuf.Value.OneofValue.*
 
       msg.oneofValue match {
         case NullValue(_) => types.NullValue

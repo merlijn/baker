@@ -10,24 +10,24 @@ import akka.stream.{Materializer, SourceRef, StreamRefAttributes}
 import akka.util.Timeout
 import com.ing.baker.il.CompiledRecipe
 import com.ing.baker.il.petrinet.{InteractionTransition, Place, Transition}
-import com.ing.baker.petrinet.api._
-import com.ing.baker.runtime.actor.Util.logging._
-import com.ing.baker.runtime.actor.process_index.ProcessIndex._
-import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol._
-import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol._
+import com.ing.baker.petrinet.api.*
+import com.ing.baker.runtime.actor.Util.logging.*
+import com.ing.baker.runtime.actor.process_index.ProcessIndex.*
+import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol.*
+import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol.*
 import com.ing.baker.runtime.actor.process_instance.{ProcessInstance, ProcessInstanceRuntime}
-import com.ing.baker.runtime.actor.recipe_manager.RecipeManagerProtocol._
+import com.ing.baker.runtime.actor.recipe_manager.RecipeManagerProtocol.*
 import com.ing.baker.runtime.actor.serialization.{BakerProtoMessage, Encryption}
 import com.ing.baker.runtime.core.events.{ProcessCreated, RejectReason}
 import com.ing.baker.runtime.core.internal.{InteractionManager, RecipeRuntime}
 import com.ing.baker.runtime.core.{ProcessEvent, ProcessState, events, namedCachedThreadPool, _}
 
 import scala.collection.mutable
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 import cats.data.OptionT
-import cats.instances.future._
+import cats.instances.future.*
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol.ExceptionStrategy.{BlockTransition, Continue, RetryWithDelay}
 import com.ing.baker.runtime.actor.recipe_manager.RecipeManagerProtocol
 

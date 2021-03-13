@@ -1,7 +1,7 @@
 package com.ing.baker.il
 
 import com.ing.baker.il.petrinet.InteractionTransition
-import com.ing.baker.petrinet.api._
+import com.ing.baker.petrinet.api.*
 
 import scala.collection.mutable
 

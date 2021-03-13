@@ -5,10 +5,10 @@ import java.util.concurrent.TimeUnit
 import akka.actor.ActorSystem
 import com.ing.baker.compiler.RecipeCompiler
 import com.ing.baker.il.CompiledRecipe
-import com.ing.baker.petrinet.api._
+import com.ing.baker.petrinet.api.*
 import com.ing.baker.recipe.dsl.examples.AllTypeRecipe
-import com.ing.baker.runtime.actor.serialization.Encryption._
-import com.ing.baker.runtime.actor.serialization.ProtoEventAdapterSpec._
+import com.ing.baker.runtime.actor.serialization.Encryption.*
+import com.ing.baker.runtime.actor.serialization.ProtoEventAdapterSpec.*
 import com.ing.baker.types
 import javax.crypto.BadPaddingException
 import org.scalacheck.Gen
@@ -17,7 +17,7 @@ import org.scalacheck.Test.Parameters.defaultVerbose
 import org.scalatest.prop.Checkers
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 object ProtoEventAdapterSpec {
 
@@ -54,7 +54,7 @@ object ProtoEventAdapterSpec {
 
   object Runtime {
 
-    import com.ing.baker.runtime.core._
+    import com.ing.baker.runtime.core.*
 
     val eventNameGen: Gen[String] = Gen.alphaStr
     val ingredientNameGen: Gen[String] = Gen.alphaStr
@@ -76,8 +76,8 @@ object ProtoEventAdapterSpec {
 
   object RecipeManager {
 
-    import IntermediateLanguage._
-    import com.ing.baker.runtime.actor.recipe_manager.RecipeManagerProtocol._
+    import IntermediateLanguage.*
+    import com.ing.baker.runtime.actor.recipe_manager.RecipeManagerProtocol.*
 
     val addRecipeGen: Gen[AddRecipe] = recipeGen.map(AddRecipe(_))
     val getRecipeGen: Gen[GetRecipe] = recipeIdGen.map(GetRecipe(_))
@@ -108,8 +108,8 @@ object ProtoEventAdapterSpec {
 
   object ProcessIndex {
 
-    import com.ing.baker.runtime.actor.process_index.ProcessIndex._
-    import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol._
+    import com.ing.baker.runtime.actor.process_index.ProcessIndex.*
+    import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol.*
 
     val processStatusGen: Gen[ProcessStatus] = Gen.oneOf(Active, Deleted)
     val createdTimeGen: Gen[Long] = Gen.chooseNum[Long](0, Long.MaxValue)
@@ -172,7 +172,7 @@ object ProtoEventAdapterSpec {
 
   object ProcessInstance {
 
-    import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol._
+    import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol.*
 
     val transitionIdGen = Gen.posNum[Long]
     val placeIdGen = Gen.posNum[Long]
@@ -280,8 +280,8 @@ object ProtoEventAdapterSpec {
 
   object Types {
 
-    import com.ing.baker.types._
-    import com.ing.baker.types.reflect.modules.PrimitiveModuleSpec._
+    import com.ing.baker.types.*
+    import com.ing.baker.types.reflect.modules.PrimitiveModuleSpec.*
 
     val fieldNameGen = Gen.alphaStr
 

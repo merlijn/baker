@@ -6,7 +6,7 @@ import com.ing.baker.runtime.actor.process_index.ProcessIndex.ActorMetadata
 import com.ing.baker.runtime.actor.serialization.Encryption
 import com.ing.baker.runtime.actor.serialization.Encryption.NoEncryption
 import com.ing.baker.runtime.core.internal.InteractionManager
-import net.ceedubs.ficus.Ficus._
+import net.ceedubs.ficus.Ficus.*
 
 import scala.concurrent.duration.FiniteDuration
 

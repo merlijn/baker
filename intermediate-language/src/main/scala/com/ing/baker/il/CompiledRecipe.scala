@@ -3,7 +3,7 @@ package com.ing.baker.il
 import com.ing.baker.il.petrinet.{EventTransition, InteractionTransition, Place, RecipePetriNet}
 import com.ing.baker.petrinet.api.Marking
 
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.*
 import scala.concurrent.duration.FiniteDuration
 
 object CompiledRecipe {

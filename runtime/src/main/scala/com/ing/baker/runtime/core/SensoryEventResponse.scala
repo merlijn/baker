@@ -57,7 +57,7 @@ object SensoryEventResponse {
     val graph = RunnableGraph.fromGraph(GraphDSL.create(sinkHead, sinkLast)((_, _)) {
       implicit b =>
         (head, last) => {
-          import GraphDSL.Implicits._
+          import GraphDSL.Implicits.*
 
           val bcast = b.add(Broadcast[Any](2))
           source ~> bcast.in

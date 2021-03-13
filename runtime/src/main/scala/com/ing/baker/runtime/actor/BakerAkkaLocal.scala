@@ -9,10 +9,10 @@ import com.ing.baker.runtime.actor.recipe_manager.RecipeManager
 import com.ing.baker.runtime.actor.serialization.Encryption
 import com.ing.baker.runtime.core.internal.InteractionManager
 import com.typesafe.config.Config
-import net.ceedubs.ficus.Ficus._
+import net.ceedubs.ficus.Ficus.*
 
 import scala.concurrent.Await
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 class BakerAkkaLocal(config: Config, override val configuredEncryption: Encryption)(implicit actorSystem: ActorSystem, materializer: Materializer) extends BakerAkka {
 

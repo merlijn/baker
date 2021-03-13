@@ -1,6 +1,6 @@
 package com.ing.baker.runtime.actor.process_instance.internal
 
-import com.ing.baker.petrinet.api._
+import com.ing.baker.petrinet.api.*
 
 import scala.util.Random
 

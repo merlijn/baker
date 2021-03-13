@@ -1,10 +1,10 @@
 package com.ing.baker.recipe.dsl
 
 import com.ing.baker.recipe.dsl.InteractionFailureStrategy.RetryWithIncrementalBackoff
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.*
+import org.scalatest.matchers.*
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.language.postfixOps
 
 class InteractionFailureStrategySpec extends wordspec.AnyWordSpec with should.Matchers {

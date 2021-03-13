@@ -3,10 +3,10 @@ package com.ing.baker.runtime.actor.serialization.modules
 import java.util.concurrent.TimeUnit
 
 import com.ing.baker.il.petrinet.{Node, RecipePetriNet}
-import com.ing.baker.petrinet.api._
+import com.ing.baker.petrinet.api.*
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceSerialization.tokenIdentifier
 import com.ing.baker.runtime.actor.protobuf
-import com.ing.baker.runtime.actor.protobuf._
+import com.ing.baker.runtime.actor.protobuf.*
 import com.ing.baker.runtime.actor.serialization.{ProtoEventAdapter, ProtoEventAdapterModule}
 import com.ing.baker.types.Value
 import com.ing.baker.{il, types}

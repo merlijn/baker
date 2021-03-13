@@ -23,7 +23,7 @@ object BakerProtobufSerializer {
 }
 
 class BakerProtobufSerializer(system: ExtendedActorSystem) extends SerializerWithStringManifest {
-  import BakerProtobufSerializer._
+  import BakerProtobufSerializer.*
 
   def getSerializationExtension(): Serialization = SerializationExtension.get(system)
 

@@ -1,22 +1,22 @@
 package com.ing.baker.runtime.actor.process_instance
 
-import akka.actor._
+import akka.actor.*
 import akka.event.{DiagnosticLoggingAdapter, Logging}
 import akka.persistence.{DeleteMessagesFailure, DeleteMessagesSuccess}
 import cats.effect.IO
-import cats.syntax.apply._
-import com.ing.baker.petrinet.api._
-import com.ing.baker.runtime.actor.process_instance.ProcessInstance._
-import com.ing.baker.runtime.actor.process_instance.ProcessInstanceEventSourcing._
-import com.ing.baker.runtime.actor.process_instance.ProcessInstanceLogger._
-import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol._
+import cats.syntax.apply.*
+import com.ing.baker.petrinet.api.*
+import com.ing.baker.runtime.actor.process_instance.ProcessInstance.*
+import com.ing.baker.runtime.actor.process_instance.ProcessInstanceEventSourcing.*
+import com.ing.baker.runtime.actor.process_instance.ProcessInstanceLogger.*
+import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol.*
 import com.ing.baker.runtime.actor.process_instance.internal.ExceptionStrategy.{Continue, RetryWithDelay}
-import com.ing.baker.runtime.actor.process_instance.internal._
+import com.ing.baker.runtime.actor.process_instance.internal.*
 import com.ing.baker.runtime.actor.process_instance.{ProcessInstanceProtocol => protocol}
 import com.ing.baker.runtime.actor.serialization.Encryption
 
 import scala.concurrent.ExecutionContext
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.language.existentials
 import scala.util.Try
 

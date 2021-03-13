@@ -2,8 +2,8 @@ package com.ing.baker.runtime.actor
 
 import scala.collection.immutable.List
 import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.duration._
-import org.scalatest.Matchers._
+import scala.concurrent.duration.*
+import org.scalatest.Matchers.*
 
 class UtilSpec extends AkkaTestBase("UtilSpec") {
 

@@ -2,24 +2,24 @@ package com.ing.baker.runtime.actor
 
 import akka.actor.{ActorRef, ActorSystem, Address, AddressFromURIString, PoisonPill}
 import akka.cluster.Cluster
-import akka.cluster.sharding.ShardRegion._
+import akka.cluster.sharding.ShardRegion.*
 import akka.cluster.sharding.{ClusterSharding, ClusterShardingSettings, ShardRegion}
 import akka.cluster.singleton.{ClusterSingletonManager, ClusterSingletonManagerSettings, ClusterSingletonProxy, ClusterSingletonProxySettings}
 import akka.stream.Materializer
 import akka.util.Timeout
 import com.ing.baker.il.sha256HashCode
-import com.ing.baker.runtime.actor.BakerAkkaCluster._
+import com.ing.baker.runtime.actor.BakerAkkaCluster.*
 import com.ing.baker.runtime.actor.process_index.ProcessIndex.ActorMetadata
-import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol._
-import com.ing.baker.runtime.actor.process_index._
+import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol.*
+import com.ing.baker.runtime.actor.process_index.*
 import com.ing.baker.runtime.actor.recipe_manager.RecipeManager
 import com.ing.baker.runtime.actor.serialization.{BakerProtoMessage, Encryption}
 import com.ing.baker.runtime.core.internal.InteractionManager
 import com.typesafe.config.Config
-import net.ceedubs.ficus.Ficus._
+import net.ceedubs.ficus.Ficus.*
 import org.slf4j.LoggerFactory
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{Await, TimeoutException}
 
 object BakerAkkaCluster {

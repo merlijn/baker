@@ -4,9 +4,9 @@ import java.io.{PrintWriter, StringWriter}
 
 import cats.data.State
 import cats.effect.IO
-import com.ing.baker.petrinet.api._
-import com.ing.baker.runtime.core._
-import com.ing.baker.runtime.actor.process_instance.ProcessInstanceEventSourcing._
+import com.ing.baker.petrinet.api.*
+import com.ing.baker.runtime.core.*
+import com.ing.baker.runtime.actor.process_instance.ProcessInstanceEventSourcing.*
 import com.ing.baker.runtime.actor.process_instance.internal.ExceptionStrategy.BlockTransition
 import com.ing.baker.runtime.actor.process_instance.internal.{ExceptionStrategy, Instance, Job}
 import org.slf4j.LoggerFactory

@@ -46,7 +46,6 @@ object Dependencies {
   val paranamer =                 "com.thoughtworks.paranamer" %  "paranamer"                          % "2.8"
   val liftJson =                  "net.liftweb"                %% "lift-json"                          % "3.3.0"
   
-  val guava =                     "com.google.guava"           %  "guava"                              % "23.0"
   val findbugs =                  "com.google.code.findbugs"   %  "jsr305"                             % "3.0.2"
 
   val chill =                    ("com.twitter"                %% "chill-akka"                         % "0.9.5")
@@ -58,7 +57,6 @@ object Dependencies {
   val protobufJava =              "com.google.protobuf"        % "protobuf-java"                       % "3.14.0"
 
   val betterFiles =               "com.github.pathikrit"       %% "better-files"                       % "3.9.1"
-  val objenisis =                 "org.objenesis"              %  "objenesis"                          % "3.1"
 
   val slf4jApi =                  "org.slf4j"                  %  "slf4j-api"                          % "1.7.30"
   val scalaTest =                 "org.scalatest"              %% "scalatest"                          % "3.2.6"

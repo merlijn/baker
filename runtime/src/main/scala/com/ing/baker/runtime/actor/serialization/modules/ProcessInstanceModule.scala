@@ -1,6 +1,6 @@
 package com.ing.baker.runtime.actor.serialization.modules
 
-import com.ing.baker.petrinet.api._
+import com.ing.baker.petrinet.api.*
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol.ExceptionStrategy
 import com.ing.baker.runtime.actor.process_instance.protobuf.FailureStrategyMessage.StrategyTypeMessage
 import com.ing.baker.runtime.actor.process_instance.{protobuf, ProcessInstanceProtocol => protocol}

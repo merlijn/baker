@@ -1,7 +1,7 @@
 package com.ing.baker.recipe.dsl
 
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.*
+import org.scalatest.matchers.*
 
 class IngredientSpec extends wordspec.AnyWordSpec with should.Matchers {
   "an Ingredient" when {

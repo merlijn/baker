@@ -3,7 +3,7 @@ package com.ing.baker.runtime.core
 import akka.actor.ActorSystem
 import akka.persistence.inmemory.extension.{InMemoryJournalStorage, StorageExtension}
 import akka.testkit.TestProbe
-import com.ing.baker._
+import com.ing.baker.*
 import com.ing.baker.compiler.RecipeCompiler
 import com.ing.baker.il.CompiledRecipe
 import com.ing.baker.recipe.dsl.examples.TestRecipe.getRecipe

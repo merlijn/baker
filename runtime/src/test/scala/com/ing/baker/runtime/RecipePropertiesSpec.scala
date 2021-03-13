@@ -8,7 +8,7 @@ import com.ing.baker.recipe.dsl
 import com.ing.baker.recipe.dsl.{Event, Ingredient, Interaction, Recipe}
 import org.scalacheck.Prop.forAll
 import org.scalacheck.Test.Parameters.defaultVerbose
-import org.scalacheck._
+import org.scalacheck.*
 import org.scalatest.FunSuite
 import org.scalatest.prop.Checkers
 
@@ -17,7 +17,7 @@ import scala.util.Random
 
 class RecipePropertiesSpec extends FunSuite with Checkers {
 
-  import RecipePropertiesSpec._
+  import RecipePropertiesSpec.*
 
   test("Baker can compile any valid recipe") {
     val prop = forAll(recipeGen) { recipe =>

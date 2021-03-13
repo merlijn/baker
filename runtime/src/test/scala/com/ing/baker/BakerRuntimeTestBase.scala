@@ -14,12 +14,12 @@ import com.ing.baker.runtime.core.{Baker, ProcessEvent}
 import com.ing.baker.types.Value
 import com.ing.baker.types.reflect.Reflect
 import com.typesafe.config.{Config, ConfigFactory}
-import org.mockito.Matchers._
-import org.mockito.Mockito._
-import org.scalatest._
+import org.mockito.Matchers.*
+import org.mockito.Mockito.*
+import org.scalatest.*
 import org.scalatest.mockito.MockitoSugar
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.language.postfixOps
 
 trait BakerRuntimeTestBase

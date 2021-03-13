@@ -7,7 +7,7 @@ val dottyVersion = "3.0.0-RC1"
 val scalaPbVersion = "0.11.0-M7"
 
 val commonSettings = Defaults.coreDefaultSettings ++ Seq(
-  organization := "com.ing.baker",
+  organization := "com.github.merlijn",
   scalaVersion := dottyVersion,
   crossScalaVersions := Seq("2.13.4", dottyVersion),
   fork := true,

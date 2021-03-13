@@ -2,8 +2,8 @@ package com.ing.baker.runtime.actor.process_instance
 
 import akka.event.{DiagnosticLoggingAdapter, Logging}
 
-import scala.concurrent.duration._
-import com.ing.baker.runtime.actor.Util.logging._
+import scala.concurrent.duration.*
+import com.ing.baker.runtime.actor.Util.logging.*
 
 object ProcessInstanceLogger {
 

@@ -7,19 +7,19 @@ import java.util.concurrent.atomic.AtomicInteger
 import akka.actor.{ActorRef, ActorSystem, PoisonPill, Props, Terminated}
 import akka.testkit.TestDuration
 import akka.util.Timeout
-import com.ing.baker.petrinet.api._
+import com.ing.baker.petrinet.api.*
 import com.ing.baker.runtime.actor.AkkaTestBase
 import com.ing.baker.runtime.actor.process_instance.ProcessInstance.Settings
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol.ExceptionStrategy.BlockTransition
-import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol._
-import com.ing.baker.runtime.actor.process_instance.ProcessInstanceSpec._
-import com.ing.baker.runtime.actor.process_instance.dsl._
+import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol.*
+import com.ing.baker.runtime.actor.process_instance.ProcessInstanceSpec.*
+import com.ing.baker.runtime.actor.process_instance.dsl.*
 import com.ing.baker.runtime.actor.process_instance.internal.ExceptionStrategy.RetryWithDelay
 import com.ing.baker.runtime.actor.process_instance.{ProcessInstanceProtocol => protocol}
 import com.ing.baker.runtime.actor.serialization.Encryption.NoEncryption
 import com.ing.baker.runtime.core.namedCachedThreadPool
-import org.mockito.Matchers._
-import org.mockito.Mockito._
+import org.mockito.Matchers.*
+import org.mockito.Mockito.*
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest.Matchers
@@ -28,7 +28,7 @@ import org.scalatest.mockito.MockitoSugar
 import org.scalatest.time.{Milliseconds, Span}
 
 import scala.concurrent.Promise
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.util.Success
 
 
@@ -629,7 +629,7 @@ class ProcessInstanceSpec extends AkkaTestBase("ProcessInstanceSpec") with Scala
 
       expectMsgPF() { case TransitionFired(_, 1, _, _, _, _, _) => }
 
-      import org.scalatest.concurrent.Timeouts._
+      import org.scalatest.concurrent.Timeouts.*
 
       failAfter(Span(dilatedMillis(1000), Milliseconds)) {
 

@@ -11,7 +11,7 @@ import com.ing.baker.il.CompiledRecipe
 import com.ing.baker.il.petrinet.Transition
 import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol.FireEvent
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol.ExceptionStrategy.RetryWithDelay
-import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol._
+import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol.*
 import com.ing.baker.runtime.core.events
 import com.ing.baker.runtime.core.events.RejectReason
 

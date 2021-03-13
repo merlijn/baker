@@ -1,15 +1,15 @@
 package com.ing.baker.runtime.actor.serialization
 
 import akka.actor.ActorSystem
-import akka.serialization._
+import akka.serialization.*
 import com.google.protobuf.ByteString
 import com.ing.baker.runtime.actor.protobuf.SerializedData
-import com.ing.baker.runtime.actor.serialization.modules._
+import com.ing.baker.runtime.actor.serialization.modules.*
 import scalapb.GeneratedMessage
 
 import scala.util.Try
 
-import ProtoEventAdapterImpl._
+import ProtoEventAdapterImpl.*
 
 object ProtoEventAdapterImpl {
 

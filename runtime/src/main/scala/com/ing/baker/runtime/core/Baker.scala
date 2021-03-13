@@ -6,23 +6,23 @@ import akka.NotUsed
 import akka.actor.{Actor, ActorSystem, Props}
 import akka.pattern.ask
 import akka.persistence.query.PersistenceQuery
-import akka.persistence.query.scaladsl._
+import akka.persistence.query.scaladsl.*
 import akka.stream.scaladsl.{Sink, Source}
 import akka.util.Timeout
-import com.ing.baker.il._
-import com.ing.baker.il.petrinet._
-import com.ing.baker.runtime.actor._
+import com.ing.baker.il.*
+import com.ing.baker.il.petrinet.*
+import com.ing.baker.runtime.actor.*
 import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol
-import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol._
+import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol.*
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceEventSourcing
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceEventSourcing.TransitionFiredEvent
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol.{Initialized, InstanceState, Uninitialized}
-import com.ing.baker.runtime.actor.recipe_manager.RecipeManagerProtocol._
+import com.ing.baker.runtime.actor.recipe_manager.RecipeManagerProtocol.*
 import com.ing.baker.runtime.core
 import com.ing.baker.runtime.core.events.BakerEvent
 import com.ing.baker.runtime.core.internal.{InteractionImplementationMethod, RecipeRuntime}
 import com.ing.baker.types.Value
-import net.ceedubs.ficus.Ficus._
+import net.ceedubs.ficus.Ficus.*
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext.Implicits.global

@@ -2,7 +2,7 @@ package com.ing.baker.il.petrinet
 
 import com.ing.baker.il
 import com.ing.baker.il.{EventOutputTransformer, InteractionFailureStrategy, _}
-import org.slf4j._
+import org.slf4j.*
 
 
 /**

@@ -10,14 +10,14 @@ import akka.testkit.{TestDuration, TestKit, TestProbe}
 import com.ing.baker.compiler.RecipeCompiler
 import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol.FireEvent
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol
-import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol._
+import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol.*
 import com.ing.baker.runtime.core.ProcessEvent
 import com.typesafe.config.{Config, ConfigFactory}
-import org.scalatest.Matchers._
+import org.scalatest.Matchers.*
 import org.scalatest.WordSpecLike
 
 import scala.concurrent.ExecutionContext
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 
 object FireEventActorSpec {
   val config: Config = ConfigFactory.parseString(

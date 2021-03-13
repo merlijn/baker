@@ -5,16 +5,16 @@ import java.util.UUID
 import akka.actor.ActorRef
 import akka.persistence.inmemory.extension.{InMemoryJournalStorage, StorageExtension}
 import akka.testkit.TestProbe
-import com.ing.baker._
-import com.ing.baker.recipe.dsl.examples.TestRecipe._
+import com.ing.baker.*
+import com.ing.baker.recipe.dsl.examples.TestRecipe.*
 import com.ing.baker.recipe.dsl.{InteractionFailureStrategy, Recipe}
-import com.ing.baker.runtime.core.events.RejectReason._
-import com.ing.baker.runtime.core.events._
+import com.ing.baker.runtime.core.events.RejectReason.*
+import com.ing.baker.runtime.core.events.*
 import com.ing.baker.types.{PrimitiveValue, Value}
 import org.slf4j.LoggerFactory
 
 import scala.collection.immutable.Map
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.language.postfixOps
 
 
@@ -71,7 +71,7 @@ object BakerEventsSpec {
 
 class BakerEventsSpec extends BakerRuntimeTestBase {
 
-  import BakerEventsSpec._
+  import BakerEventsSpec.*
 
   override def actorSystemName = "BakerEventsSpec"
 

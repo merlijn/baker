@@ -1,7 +1,7 @@
 package com.ing.baker.petrinet.api
 
-import org.scalatest._
-import org.scalatest.matchers._
+import org.scalatest.*
+import org.scalatest.matchers.*
 
 class MarkingSpec extends wordspec.AnyWordSpec with should.Matchers {
 

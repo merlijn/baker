@@ -4,7 +4,7 @@ import com.ing.baker.il.RecipeVisualizer.Dot.DotAttr
 import com.ing.baker.il.RecipeVisualizer.log
 import com.typesafe.config.Config
 
-import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.*
 
 class RecipeVisualStyle(config: Config) {
 

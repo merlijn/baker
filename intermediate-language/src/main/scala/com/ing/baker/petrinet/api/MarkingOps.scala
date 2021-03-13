@@ -7,7 +7,7 @@ trait MarkingOps {
    */
   extension[P](marking: Marking[P]) {
 
-    // Note: extra .map(identity) is a needed to workaround the scala Map serialization bug: https://issues.scala-lang.org/browse/SI-7005
+    // TODO Note: extra .map(identity) is a needed to workaround the scala Map serialization bug: https://issues.scala-lang.org/browse/SI-7005
     def multiplicities: MultiSet[P] = marking.view.mapValues(_.multisetSize).toMap
 
     def add(p: P, value: Any, count: Int = 1): Marking[P] = {

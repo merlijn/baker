@@ -1,9 +1,9 @@
 package com.ing.baker.il
 
-import com.ing.baker.il.RecipeVisualizer.Dot._
-import com.ing.baker.il.petrinet.Place._
-import com.ing.baker.il.petrinet._
-import com.ing.baker.petrinet.api._
+import com.ing.baker.il.RecipeVisualizer.Dot.*
+import com.ing.baker.il.petrinet.Place.*
+import com.ing.baker.il.petrinet.*
+import com.ing.baker.petrinet.api.*
 import com.typesafe.config.{Config, ConfigFactory}
 import org.slf4j.LoggerFactory
 
