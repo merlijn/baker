@@ -12,12 +12,12 @@ object Instance {
  * Keeps the state of a petri net instance.
  */
 case class Instance[P, T, S](
-    petriNet: PetriNet[P, T],
-    sequenceNr: Long,
-    marking: Marking[P],
-    state: S,
-    jobs: Map[Long, Job[P, T, S]],
-    receivedCorrelationIds: Set[String]) {
+                              petriNet: PetriNet[P, T],
+                              sequenceNr: Long,
+                              marking: Marking[P],
+                              state: S,
+                              jobs: Map[Long, Job[P, T, S]],
+                              receivedCorrelationIds: Set[String]) {
 
   /**
    * The marking that is already used by running jobs

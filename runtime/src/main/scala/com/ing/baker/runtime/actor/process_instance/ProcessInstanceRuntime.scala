@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory
  * @tparam S The state type
  * @tparam E The event type
  */
-trait ProcessInstanceRuntime[P, T, S, E] {
+trait ProcessInstanceRuntime[P : Identifiable, T : Identifiable, S, E] {
 
   val logger = LoggerFactory.getLogger(classOf[ProcessInstanceRuntime[_,_,_,_]])
 
@@ -70,7 +70,7 @@ trait ProcessInstanceRuntime[P, T, S, E] {
     * However, since that is not used this can be refactored to a simple function: Job -> TransitionEvent
     *
     */
-  def jobExecutor(topology: PetriNet[P, T])(using transitionIdentifier: Identifiable[T], placeIdentifier: Identifiable[P]): Job[P, T, S] => IO[TransitionEvent] = {
+  def jobExecutor(topology: PetriNet[P, T]): Job[P, T, S] => IO[TransitionEvent] = {
 
     def exceptionStackTrace(e: Throwable): String = {
       val sw = new StringWriter()

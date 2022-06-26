@@ -86,8 +86,8 @@ object ProcessInstanceProtocol {
    * This message is only send in response to an Initialize message.
    */
   case class Initialized(
-    marking: Marking[Id],
-    state: Any) extends Response
+                          marking: Marking[Id],
+                          state: Any) extends Response
 
   /**
    * Any message that is a response to a FireTransition command.
@@ -101,25 +101,25 @@ object ProcessInstanceProtocol {
    * TODO This class should contain a timestamp
    */
   case class TransitionFired(
-    jobId: Long,
-    override val transitionId: Id,
-    correlationId: Option[String],
-    consumed: Marking[Id],
-    produced: Marking[Id],
-    newJobsIds: Set[Long],
-    output: Any) extends TransitionResponse
+                              jobId: Long,
+                              override val transitionId: Id,
+                              correlationId: Option[String],
+                              consumed: Marking[Id],
+                              produced: Marking[Id],
+                              newJobsIds: Set[Long],
+                              output: Any) extends TransitionResponse
 
   /**
    * Response indicating that a transition has failed.
    */
   case class TransitionFailed(
-    jobId: Long,
-    override val transitionId: Id,
-    correlationId: Option[String],
-    consume: Marking[Id],
-    input: Any,
-    reason: String,
-    strategy: ExceptionStrategy) extends TransitionResponse
+                               jobId: Long,
+                               override val transitionId: Id,
+                               correlationId: Option[String],
+                               consume: Marking[Id],
+                               input: Any,
+                               reason: String,
+                               strategy: ExceptionStrategy) extends TransitionResponse
 
   /**
    * Response indicating that the transition could not be fired because it is not enabled.
@@ -160,18 +160,18 @@ object ProcessInstanceProtocol {
    * Response containing the state of the `Job`.
    */
   case class JobState(
-      id: Long,
-      transitionId: Id,
-      consumedMarking: Marking[Id],
-      input: Any,
-      exceptionState: Option[ExceptionState])
+                       id: Long,
+                       transitionId: Id,
+                       consumedMarking: Marking[Id],
+                       input: Any,
+                       exceptionState: Option[ExceptionState])
 
   /**
    * Response containing the state of the process.
    */
   case class InstanceState(
-    sequenceNr: Long,
-    marking: Marking[Id],
-    state: Any,
-    jobs: Map[Long, JobState]) extends Response
+                            sequenceNr: Long,
+                            marking: Marking[Id],
+                            state: Any,
+                            jobs: Map[Long, JobState]) extends Response
 }

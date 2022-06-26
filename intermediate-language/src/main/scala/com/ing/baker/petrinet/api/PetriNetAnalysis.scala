@@ -5,7 +5,7 @@ object PetriNetAnalysis {
   // indicates an unbounded token count in a place
   val W: Int = -1
 
-  implicit class WMarkingOps[P](marking: MultiSet[P]) {
+  extension[P](marking: MultiSet[P]) {
     // this checks if marking m 'covers' another
     def >=(other: MultiSet[P]): Boolean = other.forall {
       case (p, `W`) => marking.get(p).contains(W)

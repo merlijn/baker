@@ -1,7 +1,7 @@
 package com.ing.baker.petrinet
 
 
-package object api extends MultiSetOps with MarkingOps {
+package object api {
 
   /**
     * Identifier type for elements.
@@ -12,16 +12,6 @@ package object api extends MultiSetOps with MarkingOps {
     * Type alias for something that is identifiable.
     */
   type Identifiable[T] = T => Id
-
-  /**
-    * Type alias for a multi set.
-    */
-  type MultiSet[T] = Map[T, Int]
-
-  /**
-    * Type alias for a marking.
-    */
-  type Marking[P] = Map[P, MultiSet[Any]]
 
   extension [T : Identifiable](e: T) {
 

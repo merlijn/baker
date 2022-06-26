@@ -15,8 +15,6 @@ object DSL {
 
   type SimpleMarking = MultiSet[Int]
   
-  type MarkingLike[T] = Conversion[T, SimpleMarking]
-
   case class TransitionAdjacency(in: SimpleMarking, out: SimpleMarking)
   
   def marking(n1: Int): SimpleMarking = Map(n1 -> 1) 

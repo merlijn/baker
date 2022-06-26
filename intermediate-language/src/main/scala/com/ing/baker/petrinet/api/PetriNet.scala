@@ -22,7 +22,7 @@ object PetriNet {
       case Edge(_, Right(t), _, _) => t
     }
     
-    PetriNet[P, T](places.toSet, transitions.toSet, edges)
+    PetriNet[P, T](places, transitions, edges)
   }
 }
 
