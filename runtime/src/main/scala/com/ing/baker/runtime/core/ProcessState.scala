@@ -1,9 +1,6 @@
 package com.ing.baker.runtime.core
 
 import com.ing.baker.il.InteractionFailureStrategyOutcome
-import com.ing.baker.types.Value
-
-import scala.collection.JavaConverters.*
 
 /**
   * Holds the 'state' of a process instance.
@@ -13,5 +10,5 @@ import scala.collection.JavaConverters.*
   * @param eventNames The names of the events occurred so far
   */
 case class ProcessState(processId: String,
-                        ingredients: Map[String, Value],
+                        ingredients: Map[String, Any],
                         eventNames: List[String]) extends Serializable

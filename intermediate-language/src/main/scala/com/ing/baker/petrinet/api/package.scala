@@ -6,7 +6,7 @@ package object api extends MultiSetOps with MarkingOps {
   /**
     * Identifier type for elements.
     */
-  type Id = Long
+  type Id = String
 
   /**
     * Type alias for something that is identifiable.
@@ -34,12 +34,5 @@ package object api extends MultiSetOps with MarkingOps {
 
     def getById(id: Id, name: String = "element"): T = findById(id).getOrElse { throw new IllegalStateException(s"No $name found with id: $id") }
   }
-
-  extension [P : Identifiable](marking: Marking[P]) {
-
-    def marshall: Marking[Id] = translateMapKeys(marking, (p: P) => summon[Identifiable[P]].apply(p))
-  }
-
-  def translateMapKeys[K1, K2, V](map: Map[K1, V], fn: K1 => K2): Map[K2, V] = map.map { case (key, value) => fn(key) -> value }
 }
 

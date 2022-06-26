@@ -59,7 +59,8 @@ class ProcessInstanceSerialization[P : Identifiable, T : Identifiable, S, E](ser
       case e: TransitionFailedEvent => serializeTransitionFailed(e)
     }
 
-  private def missingFieldException(field: String) = throw new IllegalStateException(s"Missing field in serialized data: $field")
+  private def missingFieldException(field: String) =
+    throw new IllegalStateException(s"Missing field in serialized data: $field")
 
   def serializeObject(obj: Any): Option[SerializedData] = {
 
@@ -72,8 +73,8 @@ class ProcessInstanceSerialization[P : Identifiable, T : Identifiable, S, E](ser
   private def deserializeObject(obj: SerializedData): AnyRef = serializer.toDomain[AnyRef](obj)
 
   private def deserializeProducedMarking(instance: Instance[P, T, S], produced: Seq[ProducedToken]): Marking[Id] = {
-    produced.foldLeft(Marking.empty[Long]) {
-      case (accumulated, ProducedToken(Some(placeId), Some(_), Some(count), data)) =>
+    produced.foldLeft(Marking.empty[Id]) {
+      case (accumulated, ProducedToken(Some(placeId), Some(_), Some(count), data, _)) =>
         val value = data.map(deserializeObject).orNull // In the colored petrinet, tokens have values and they could be null.
         accumulated.add(placeId, value, count)
       case _ => throw new IllegalStateException("Missing data in persisted ProducedToken")
@@ -105,8 +106,8 @@ class ProcessInstanceSerialization[P : Identifiable, T : Identifiable, S, E](ser
     }
 
   private def deserializeConsumedMarking(instance: Instance[P, T, S], persisted: Seq[protobuf.ConsumedToken]): Marking[Id] = {
-    persisted.foldLeft(Marking.empty[Long]) {
-      case (accumulated, protobuf.ConsumedToken(Some(placeId), Some(tokenId), Some(count))) =>
+    persisted.foldLeft(Marking.empty[Id]) {
+      case (accumulated, protobuf.ConsumedToken(Some(placeId), Some(tokenId), Some(count), _)) =>
         val place = instance.petriNet.places.getById(placeId, "place in the petrinet")
         val value = instance.marking(place).keySet.find(e => tokenIdentifier(e) == tokenId).get
         accumulated.add(placeId, value, count)
@@ -138,8 +139,8 @@ class ProcessInstanceSerialization[P : Identifiable, T : Identifiable, S, E](ser
       val failureReason = e.failureReason.getOrElse("")
       val consumed = deserializeConsumedMarking(instance, e.consumed)
       val failureStrategy = e.failureStrategy.getOrElse(missingFieldException("time_failed")) match {
-        case FailureStrategy(Some(StrategyType.BLOCK_TRANSITION), _) => BlockTransition
-        case FailureStrategy(Some(StrategyType.RETRY), Some(delay)) => RetryWithDelay(delay)
+        case FailureStrategy(Some(StrategyType.BLOCK_TRANSITION), _, _) => BlockTransition
+        case FailureStrategy(Some(StrategyType.RETRY), Some(delay), _) => RetryWithDelay(delay)
         case other@_ => throw new IllegalStateException(s"Invalid failure strategy: $other")
       }
 

@@ -20,8 +20,7 @@ import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol.{Ini
 import com.ing.baker.runtime.actor.recipe_manager.RecipeManagerProtocol.*
 import com.ing.baker.runtime.core
 import com.ing.baker.runtime.core.events.BakerEvent
-import com.ing.baker.runtime.core.internal.{InteractionImplementationMethod, RecipeRuntime}
-import com.ing.baker.types.Value
+import com.ing.baker.runtime.core.internal.RecipeRuntime
 import net.ceedubs.ficus.Ficus.*
 import org.slf4j.LoggerFactory
 
@@ -99,7 +98,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     * @return
     */
   @throws[TimeoutException]("When the request does not receive a reply within the given deadline")
-  def getRecipeInformation(recipeId: String, timeout: FiniteDuration = defaultInquireTimeout): RecipeInformation = {
+  def getRecipeInformation(recipeId: String, timeout: FiniteDuration = defaultInquireTimeout): core.RecipeInformation = {
     // here we ask the RecipeManager actor to return us the recipe for the given id
     val futureResult = bakerActorApi.recipeManagerActor.ask(GetRecipe(recipeId))(timeout)
     Await.result(futureResult, timeout) match {
@@ -114,37 +113,16 @@ class Baker()(implicit val actorSystem: ActorSystem) {
   }
 
   /**
-    * Returns all recipes added to this baker instance.
-    *
-    * @return All recipes in the form of map of recipeId -> CompiledRecipe
-    */
-  @throws[TimeoutException]("When the request does not receive a reply within the given deadline")
-  def getAllRecipes(timeout: FiniteDuration = defaultInquireTimeout): Map[String, RecipeInformation] =
-    Await.result(getAllRecipesAsync(timeout), timeout)
-
-  /**
     * Returns a future of all recipes added to this baker instance.
     *
     * @return All recipes in the form of map of recipeId -> CompiledRecipe
     */
-  def getAllRecipesAsync(timeout: FiniteDuration = defaultInquireTimeout): Future[Map[String, RecipeInformation]] =
-    bakerActorApi.recipeManagerActor.ask(GetAllRecipes)(timeout)
-      .mapTo[AllRecipes]
-      .map(_.recipes.map { ri =>
-        ri.compiledRecipe.recipeId -> core.RecipeInformation(ri.compiledRecipe, ri.timestamp, getMissingImplementations(ri.compiledRecipe))
-      }.toMap)
-
-  /**
-    * Creates a process instance for the given recipeId with the given processId as identifier
-    *
-    * @param recipeId  The recipeId for the recipe to bake
-    * @param processId The identifier for the newly baked process
-    * @param timeout
-    * @return
-    */
-  @throws[TimeoutException]("When the request does not receive a reply within the given deadline")
-  def createProcess(recipeId: String, processId: String, timeout: FiniteDuration = defaultCreateProcessTimeout): ProcessState =
-    Await.result(createProcessAsync(recipeId, processId), timeout)
+//  def getAllRecipes(timeout: FiniteDuration = defaultInquireTimeout): Future[Map[String, RecipeInformation]] =
+//    bakerActorApi.recipeManagerActor.ask(GetAllRecipes)(timeout)
+//      .mapTo[AllRecipes]
+//      .map(_.recipes.map { ri =>
+//        ri.compiledRecipe.recipeId -> core.RecipeInformation(ri.compiledRecipe, ri.timestamp, getMissingImplementations(ri.compiledRecipe))
+//      }.toMap)
 
   /**
     * Asynchronously creates a process instance for the given recipeId with the given processId as identifier
@@ -169,24 +147,11 @@ class Baker()(implicit val actorSystem: ActorSystem) {
   }
 
   /**
-    * Notifies Baker that an event has happened and waits until all the actions which depend on this event are executed.
-    *
-    * @param processId The process identifier
-    * @param event     The event object
-    */
-  @throws[NoSuchProcessException]("When no process exists for the given id")
-  @throws[ProcessDeletedException]("If the process is already deleted")
-  @throws[TimeoutException]("When the request does not receive a reply within the given deadline")
-  def fireEvent(processId: String, event: Any, correlationId: Option[String] = None, timeout: FiniteDuration = defaultProcessEventTimeout): SensoryEventStatus = {
-    fireEventAsync(processId, event, correlationId, timeout).confirmCompleted(timeout)
-  }
-
-  /**
     * Notifies Baker that an event has happened.
     *
     * If nothing is done with the BakerResponse there is NO guarantee that the event is received by the process instance.
     */
-  def fireEventAsync(processId: String, event: Any, correlationId: Option[String] = None, timeout: FiniteDuration = defaultProcessEventTimeout): SensoryEventResponse = {
+  def fireEvent(processId: String, event: Any, correlationId: Option[String] = None, timeout: FiniteDuration = defaultProcessEventTimeout): SensoryEventResponse = {
 
     val source = fireEventStream(processId, event, correlationId, timeout)
 
@@ -250,18 +215,12 @@ class Baker()(implicit val actorSystem: ActorSystem) {
   }
 
   /**
-    * Synchronously returns all event names that occurred for a process.
-    */
-  def eventNames(processId: String, timeout: FiniteDuration = defaultInquireTimeout): List[String] =
-    getProcessState(processId, timeout).eventNames
-
-  /**
     * Returns a stream of all events with their timestamps for a process.
     *
     * @param processId The process identifier.
     * @return The source of events.
     */
-  def getEventsWithTimestampAsync(processId: String): Source[(ProcessEvent, Long), NotUsed] = {
+  def getEventsWithTimestamp(processId: String): Source[(ProcessEvent, Long), NotUsed] = {
 
     val futureResult = bakerActorApi.processIndexActor.ask(GetCompiledRecipe(processId))(defaultInquireTimeout)
 
@@ -286,7 +245,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     * @return A sequence of events with their timestamps.
     */
   def getEventsAsync(processId: String): Source[ProcessEvent, NotUsed] =
-    getEventsWithTimestampAsync(processId).map { case (event, _) => event }
+    getEventsWithTimestamp(processId).map { case (event, _) => event }
 
   /**
     * Synchronously returns a sequence of all events for a process.
@@ -294,20 +253,8 @@ class Baker()(implicit val actorSystem: ActorSystem) {
     * @param processId The process identifier.
     * @param timeout How long to wait to retrieve the events.
     */
-  def getEvents(processId: String, timeout: FiniteDuration = defaultInquireTimeout): Seq[ProcessEvent] =
-    eventsWithTimestamp(processId, timeout).map { case (event, _) => event }
-
-  /**
-    * Synchronously returns a sequence of all events with their timestamps for a process.
-    *
-    * @param processId The process identifier.
-    * @param timeout How long to wait to retrieve the events.
-    * @return A sequence of events with their timestamps.
-    */
-  def eventsWithTimestamp(processId: String, timeout: FiniteDuration = defaultInquireTimeout): Seq[(ProcessEvent, Long)] = {
-    val futureEventSeq = getEventsWithTimestampAsync(processId).runWith(Sink.seq)
-    Await.result(futureEventSeq, timeout)
-  }
+//  def getEvents(processId: String, timeout: FiniteDuration = defaultInquireTimeout): Seq[ProcessEvent] =
+//    eventsWithTimestamp(processId, timeout).map { case (event, _) => event }
 
   /**
     * Returns an index of all processes.
@@ -326,17 +273,6 @@ class Baker()(implicit val actorSystem: ActorSystem) {
   }
 
   /**
-    * Returns the process state.
-    *
-    * @param processId The process identifier
-    * @return The process state.
-    */
-  @throws[NoSuchProcessException]("When no process exists for the given id")
-  @throws[TimeoutException]("When the request does not receive a reply within the given deadline")
-  def getProcessState(processId: String, timeout: FiniteDuration = defaultInquireTimeout): ProcessState =
-    Await.result(getProcessStateAsync(processId), timeout)
-
-  /**
     * returns a future with the process state.
     *
     * @param processId The process identifier
@@ -345,7 +281,7 @@ class Baker()(implicit val actorSystem: ActorSystem) {
   @throws[NoSuchProcessException]("When no process exists for the given id")
   @throws[ProcessDeletedException]("If the process is already deleted")
   @throws[TimeoutException]("When the request does not receive a reply within the given deadline")
-  def getProcessStateAsync(processId: String, timeout: FiniteDuration = defaultInquireTimeout): Future[ProcessState] = {
+  def getProcessState(processId: String, timeout: FiniteDuration = defaultInquireTimeout): Future[ProcessState] = {
     bakerActorApi.processIndexActor
       .ask(GetProcessState(processId))(Timeout.durationToTimeout(timeout))
       .flatMap {
@@ -355,50 +291,15 @@ class Baker()(implicit val actorSystem: ActorSystem) {
         case msg                     => Future.failed(new IllegalStateException(s"Received unexpected message of type: ${msg.getClass}"))
       }
   }
-
-  /**
-    * Returns all provided ingredients for a given process id.
-    *
-    * @param processId The process id.
-    * @return The provided ingredients.
-    */
-  @throws[NoSuchProcessException]("When no process exists for the given id")
-  @throws[ProcessDeletedException]("If the process is already deleted")
-  @throws[TimeoutException]("When the request does not receive a reply within the given deadline")
-  def getIngredients(processId: String, timeout: FiniteDuration = defaultInquireTimeout): Map[String, Value] =
-    getProcessState(processId).ingredients
-
+  
   /**
     * Returns a future of all the provided ingredients for a given process id.
     *
     * @param processId The process id.
     * @return A future of the provided ingredients.
     */
-  def getIngredientsAsync(processId: String, timeout: FiniteDuration = defaultInquireTimeout): Future[Map[String, Value]] = {
-    getProcessStateAsync(processId).map(_.ingredients)
-  }
-
-  /**
-    * Returns the visual state (.dot) for a given process.
-    *
-    * @param processId The process identifier.
-    * @param timeout   How long to wait to retrieve the process state.
-    * @return A visual (.dot) representation of the process state.
-    */
-  @throws[ProcessDeletedException]("If the process is already deleted")
-  @throws[NoSuchProcessException]("If the process is not found")
-  def getVisualState(processId: String, timeout: FiniteDuration = defaultInquireTimeout): String = {
-    val futureResult = bakerActorApi.processIndexActor.ask(GetCompiledRecipe(processId))(timeout)
-    Await.result(futureResult, timeout) match {
-      case RecipeFound(compiledRecipe, _) =>
-        RecipeVisualizer.visualizeRecipe(
-          compiledRecipe,
-          config,
-          eventNames = getEvents(processId).map(_.name).toSet,
-          ingredientNames = getIngredients(processId).keySet)
-      case ProcessDeleted(_) => throw new ProcessDeletedException(s"Process $processId is deleted")
-      case Uninitialized(_)  => throw new NoSuchProcessException(s"Process $processId is not found")
-    }
+  def getIngredients(processId: String, timeout: FiniteDuration = defaultInquireTimeout): Future[Map[String, Any]] = {
+    getProcessState(processId).map(_.ingredients)
   }
 
   /**
@@ -419,30 +320,4 @@ class Baker()(implicit val actorSystem: ActorSystem) {
 
     actorSystem.eventStream.subscribe(listenerActor, classOf[BakerEvent])
   }
-
-  /**
-    * Adds a method implementation for an interaction to baker.
-    *
-    * This is assumed to be a an object with a method named 'apply' defined on it.
-    *
-    * @param implementation The method implementation.
-    */
-  def addImplementationMethod(implementation: AnyRef): Unit =
-    bakerActorApi.interactionManager.addImplementation(InteractionImplementationMethod(implementation))
-
-  /**
-    * Adds a sequence of method implementations for a interactions to baker.
-    *
-    * @param implementations The sequence of method implementations.
-    */
-  def addImplementationMethods(implementations: Seq[AnyRef]): Unit =
-    implementations.foreach(addImplementationMethod)
-
-  /**
-    * Adds a sequence of interaction implementations to baker.
-    *
-    * @param implementations A sequence of InteractionImplementation instances
-    */
-  def addImplementations(implementations: Seq[InteractionImplementation]): Unit =
-    implementations.foreach(bakerActorApi.interactionManager.addImplementation)
 }

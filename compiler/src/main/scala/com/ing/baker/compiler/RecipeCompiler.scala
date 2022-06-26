@@ -208,11 +208,7 @@ object RecipeCompiler {
 
     // all ingredients provided by interactions
     val interactionIngredients: Seq[String] = recipe.interactions.flatMap(i => i.output.flatMap { e =>
-        // check if the event was renamed (check if there is a transformer for this event)
-        i.eventRenames.get(e.name) match {
-          case Some(transformer) => e.providedIngredients.map(_.name).map(name => transformer.ingredientRenames.getOrElse(name, name))
-          case None              => e.providedIngredients.map(_.name)
-        }
+        e.providedIngredients.map(_.name)
       }
     )
 
@@ -227,7 +223,7 @@ object RecipeCompiler {
 
     // events provided from outside
     val sensoryEventTransitions: Seq[EventTransition] = recipe.sensoryEvents.map {
-      event => EventTransition(parseDSLEvent(event), isSensoryEvent = true, event.maxFiringLimit)
+      event => EventTransition(parseDSLEvent(event), isSensoryEvent = true, event.firingLimit)
     }
 
     // events provided by other transitions / actions
@@ -298,7 +294,7 @@ object RecipeCompiler {
     // Add one new transition for each duplicate input (the newly added one in the image above)
     val multipleConsumerFacilitatorTransitions: Seq[Transition] =
       ingredientsWithMultipleConsumers.keys
-        .map(name => MultiFacilitatorTransition(label = name))
+        .map(name => SplitTransition(label = name))
         .toSeq
 
     val multipleOutputFacilitatorArcs: Seq[Arc] =
@@ -334,7 +330,6 @@ object RecipeCompiler {
       petriNet = petriNet,
       initialMarking = initialMarking,
       validationErrors = errors,
-      eventReceivePeriod = recipe.eventReceivePeriod,
       retentionPeriod = recipe.retentionPeriod
     )
 

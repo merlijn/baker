@@ -95,7 +95,7 @@ object RecipeVisualizer {
         case Right(t: InteractionTransition) if eventNames.intersect(t.events.map(_.name).toSet).nonEmpty => style.firedInteractionAttributes
         case Right(_: InteractionTransition) => style.interactionAttributes
         case Right(transition: Transition) if eventNames.contains(transition.label) => style.eventFiredAttributes
-        case Right(_: MultiFacilitatorTransition) => style.choiceAttributes
+        case Right(_: SplitTransition) => style.choiceAttributes
         case Right(_: MissingEventTransition) => style.eventMissingAttributes
         case Right(EventTransition(_, true, _)) => style.sensoryEventAttributes
         case Right(_) => style.eventAttributes
@@ -128,7 +128,7 @@ object RecipeVisualizer {
 
     // specifies which transitions to compact (remove)
     val transitionsToCompact = (node: RecipeNode) => node match {
-      case Right(transition: Transition) => transition.isInstanceOf[IntermediateTransition] || transition.isInstanceOf[MultiFacilitatorTransition]
+      case Right(transition: Transition) => transition.isInstanceOf[IntermediateTransition] || transition.isInstanceOf[SplitTransition]
       case _ => false
     }
 

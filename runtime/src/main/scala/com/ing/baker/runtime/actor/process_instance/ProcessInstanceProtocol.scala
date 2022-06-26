@@ -49,7 +49,7 @@ object ProcessInstanceProtocol {
     * @param jobId The id of the job.
     * @param failureStrategy The new failure strategy
     */
-  case class OverrideExceptionStrategy(jobId: Id, failureStrategy: ExceptionStrategy) extends Command
+  case class OverrideExceptionStrategy(jobId: Long, failureStrategy: ExceptionStrategy) extends Command
 
   /**
    * A common trait for all responses coming from a petri net instance.
@@ -93,7 +93,7 @@ object ProcessInstanceProtocol {
    * Any message that is a response to a FireTransition command.
    */
   sealed trait TransitionResponse extends Response {
-    val transitionId: Long
+    val transitionId: String
   }
 
   /**

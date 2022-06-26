@@ -6,7 +6,7 @@ import scalax.collection.edge.WLDiEdge
 import scalax.collection.immutable.Graph
 
 package object dsl {
-
+  
   /**
     * An exception handler function associated with a transition.
     */

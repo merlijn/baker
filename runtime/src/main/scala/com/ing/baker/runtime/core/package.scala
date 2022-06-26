@@ -12,7 +12,7 @@ import scala.util.control.NonFatal
 
 package object core {
 
-  implicit class IOHandleErrors[T](io: IO[T]) {
+  extension [T](io: IO[T]) {
 
     def handleException[Y >: T](pf: PartialFunction[Throwable, Y]): IO[Y] =
       io.attempt.flatMap {
@@ -27,7 +27,7 @@ package object core {
       }
   }
 
-  implicit class JavaDurationConversions(duration: java.time.Duration) {
+  extension (duration: java.time.Duration) {
     def toScala: FiniteDuration = FiniteDuration(duration.toMillis, TimeUnit.MILLISECONDS)
   }
 

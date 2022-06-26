@@ -6,22 +6,7 @@ import scala.concurrent.duration.*
 import com.ing.baker.runtime.actor.Util.logging.*
 
 object ProcessInstanceLogger {
-
-  import org.joda.time.format.PeriodFormatterBuilder
-
-  val durationFormatter = new PeriodFormatterBuilder()
-    .appendDays.appendSuffix("d")
-    .appendSeparator(" ")
-    .appendHours.appendSuffix("h")
-    .appendSeparator(" ")
-    .appendMinutes.appendSuffix("m")
-    .appendSeparator(" ")
-    .appendSeconds.appendSuffix("s")
-    .appendSeparator(" ")
-    .appendMillis.appendSuffix("ms")
-    .appendSeparator(" ")
-    .toFormatter
-
+  
   implicit class LoggingAdapterFns(log: DiagnosticLoggingAdapter) {
 
     def processHistoryDeletionSuccessful(processId: String, toSequenceNr: Long) = {
@@ -62,7 +47,7 @@ object ProcessInstanceLogger {
       log.logWithMDC(Logging.DebugLevel, msg, mdc)
     }
 
-    def transitionFailed(processId: String, transitionId: String, jobId: Long, timeStarted: Long, timeFailed: Long, failureReason: String) {
+    def transitionFailed(processId: String, transitionId: String, jobId: Long, timeStarted: Long, timeFailed: Long, failureReason: String) = {
       val mdc = Map(
         "processEvent" -> "TransitionFailed",
         "processId" -> processId,
@@ -91,14 +76,14 @@ object ProcessInstanceLogger {
       log.logWithMDC(Logging.DebugLevel, msg, mdc)
     }
 
-    def idleStop(processId: String, idleTTL: FiniteDuration)  {
+    def idleStop(processId: String, idleTTL: FiniteDuration) = {
       val mdc = Map("processId" -> processId)
       val msg = s"Instance was idle for $idleTTL, stopping the actor"
 
       log.logWithMDC(Logging.DebugLevel, msg, mdc)
     }
 
-    def fireTransitionRejected(processId: String, transitionId: String, rejectReason: String) {
+    def fireTransitionRejected(processId: String, transitionId: String, rejectReason: String) = {
       val mdc = Map(
         "processEvent" -> "FireTransitionRejected",
         "processId" -> processId,
@@ -110,13 +95,13 @@ object ProcessInstanceLogger {
       log.logWithMDC(Logging.WarningLevel, msg, mdc)
     }
 
-    def scheduleRetry(processId: String, transitionId: String, delay: Long) {
+    def scheduleRetry(processId: String, transitionId: String, delay: Long) = {
       val mdc = Map(
         "processEvent" -> "TransitionRetry",
         "processId" -> processId,
         "transitionId" -> transitionId)
 
-      val msg = s"Scheduling a retry of transition '$transitionId' in ${durationFormatter.print(new org.joda.time.Period(delay))}"
+      val msg = s"Scheduling a retry of transition '$transitionId' in ${delay}"
 
       log.logWithMDC(Logging.InfoLevel, msg, mdc)
     }

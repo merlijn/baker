@@ -11,6 +11,6 @@ case class EventTransition(event: EventDescriptor,
                            maxFiringLimit: Option[Int] = None) extends Transition {
 
   override val label: String = event.name
-  override val id: Long = il.sha256HashCode(s"EventTransition:$label")
+  override val id: String = s"Event:$label"
   override val toString: String = label
 }

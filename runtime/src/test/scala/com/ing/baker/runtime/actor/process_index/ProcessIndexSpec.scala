@@ -65,7 +65,7 @@ class ProcessIndexSpec extends TestKit(ActorSystem("ProcessIndexSpec", ProcessIn
   val recipeManager = system.actorOf(Props(new Actor() {
     override def receive: Receive = {
       case GetAllRecipes => {
-        sender ! AllRecipes(Seq[RecipeInformation](
+        sender() ! AllRecipes(Seq[RecipeInformation](
           RecipeInformation(CompiledRecipe("name", recipeId, new PetriNet(Graph.empty), Marking.empty, Seq.empty, Option.empty, Option.empty), 0L)))
       }
     }

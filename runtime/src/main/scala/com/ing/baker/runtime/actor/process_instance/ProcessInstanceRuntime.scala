@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory
  */
 trait ProcessInstanceRuntime[P, T, S, E] {
 
-  val log = LoggerFactory.getLogger("com.ing.baker.runtime.actor.process_instance.ProcessInstanceRuntime")
+  val logger = LoggerFactory.getLogger(classOf[ProcessInstanceRuntime[_,_,_,_]])
 
   /**
     * The event source function for the state associated with a process instance.
@@ -47,7 +47,8 @@ trait ProcessInstanceRuntime[P, T, S, E] {
     *
     * By default, cold transitions (without in adjacent places) are not auto fireable.
     */
-  def isAutoFireable(instance: Instance[P, T, S], t: T): Boolean = !instance.petriNet.incomingPlaces(t).isEmpty
+  def isAutoFireable(instance: Instance[P, T, S], t: T): Boolean = 
+    !instance.petriNet.incomingPlaces(t).isEmpty
 
   /**
     * Defines which tokens from a marking for a particular place are consumable by a transition.
@@ -57,7 +58,7 @@ trait ProcessInstanceRuntime[P, T, S, E] {
     * You can override this for example in case you use a colored (data) petri net model with filter rules on the edges.
     */
   def consumableTokens(petriNet: PetriNet[P, T])(marking: Marking[P], p: P, t: T): MultiSet[Any] = marking.getOrElse(p, MultiSet.empty)
-
+  
   /**
     * Takes a Job specification, executes it and returns a TransitionEvent (asychronously using cats.effect.IO)
     *
@@ -69,7 +70,7 @@ trait ProcessInstanceRuntime[P, T, S, E] {
     * However, since that is not used this can be refactored to a simple function: Job -> TransitionEvent
     *
     */
-  def jobExecutor(topology: PetriNet[P, T])(implicit transitionIdentifier: Identifiable[T], placeIdentifier: Identifiable[P]): Job[P, T, S] => IO[TransitionEvent] = {
+  def jobExecutor(topology: PetriNet[P, T])(using transitionIdentifier: Identifiable[T], placeIdentifier: Identifiable[P]): Job[P, T, S] => IO[TransitionEvent] = {
 
     def exceptionStackTrace(e: Throwable): String = {
       val sw = new StringWriter()
@@ -98,7 +99,7 @@ trait ProcessInstanceRuntime[P, T, S, E] {
       }.handleException {
         // If an exception was thrown while computing the failure strategy we block the interaction from firing
         case e: Throwable =>
-          log.error(s"Exception while handling transition failure", e)
+          logger.error(s"Exception while handling transition failure", e)
           TransitionFailedEvent(job.id, transition.getId, job.correlationId, startTime, System.currentTimeMillis(), consumed, job.input, exceptionStackTrace(e), ExceptionStrategy.BlockTransition)
       }
     }
@@ -129,7 +130,8 @@ trait ProcessInstanceRuntime[P, T, S, E] {
   /**
     * Checks whether a transition is 'enabled' in a marking.
     */
-  def isEnabled(petriNet: PetriNet[P, T])(marking: Marking[P], t: T): Boolean = consumableMarkings(petriNet)(marking, t).nonEmpty
+  def isEnabled(petriNet: PetriNet[P, T])(marking: Marking[P], t: T): Boolean = 
+    consumableMarkings(petriNet)(marking, t).nonEmpty
 
   /**
     * Returns all enabled transitions for a marking.

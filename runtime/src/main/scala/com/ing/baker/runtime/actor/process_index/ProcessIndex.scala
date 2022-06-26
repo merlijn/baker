@@ -30,6 +30,7 @@ import cats.data.OptionT
 import cats.instances.future.*
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol.ExceptionStrategy.{BlockTransition, Continue, RetryWithDelay}
 import com.ing.baker.runtime.actor.recipe_manager.RecipeManagerProtocol
+import com.ing.baker.runtime.actor.process_instance.marshall
 
 object ProcessIndex {
 
@@ -37,7 +38,7 @@ object ProcessIndex {
             retentionCheckInterval: Option[FiniteDuration],
             configuredEncryption: Encryption,
             interactionManager: InteractionManager,
-            recipeManager: ActorRef)(implicit materializer: Materializer) =
+            recipeManager: ActorRef)(using materializer: Materializer) =
     Props(new ProcessIndex(processIdleTimeout, retentionCheckInterval, configuredEncryption, interactionManager, recipeManager))
 
   sealed trait ProcessStatus
@@ -77,9 +78,9 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
                    retentionCheckInterval: Option[FiniteDuration],
                    configuredEncryption: Encryption,
                    interactionManager: InteractionManager,
-                   recipeManager: ActorRef)(implicit materializer: Materializer) extends PersistentActor {
+                   recipeManager: ActorRef)(using materializer: Materializer) extends PersistentActor {
 
-  val log: DiagnosticLoggingAdapter = Logging.getLogger(this)
+  val logger: DiagnosticLoggingAdapter = Logging.getLogger(this)
 
   import context.dispatcher
 
@@ -157,9 +158,7 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
     }
   }
 
-  def getInteractionJob(processId: String, interactionName: String, processActor: ActorRef): OptionT[Future, (InteractionTransition, Id)] = {
-    // we find which job correlates with the interaction
-    // TODO make a more convenient command to stop a transition without having to know the jobId
+  def getInteractionJob(processId: String, interactionName: String, processActor: ActorRef): OptionT[Future, (InteractionTransition, Long)] = {
     for {
       recipe     <- OptionT.fromOption(getRecipeNow(index(processId).recipeId))
       transition <- OptionT.fromOption(recipe.interactionTransitions.find(_.name == interactionName))
@@ -176,14 +175,14 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
     case CheckForProcessesToBeDeleted =>
       val toBeDeleted = index.values.filter(shouldDelete)
       if (toBeDeleted.nonEmpty)
-        log.debug(s"Deleting processes: {}", toBeDeleted.mkString(","))
+        logger.debug(s"Deleting processes: {}", toBeDeleted.mkString(","))
 
       toBeDeleted.foreach(meta => getOrCreateProcessActor(meta.processId) ! Stop(delete = true))
 
     case Terminated(actorRef) =>
       val processId = actorRef.path.name
 
-      log.logWithMDC(Logging.DebugLevel, s"Actor terminated: $actorRef", Map("processId" -> processId))
+      logger.logWithMDC(Logging.DebugLevel, s"Actor terminated: $actorRef", Map("processId" -> processId))
 
       index.get(processId) match {
         case Some(meta) if shouldDelete(meta) =>
@@ -191,11 +190,11 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
             index.update(processId, meta.copy(processStatus = Deleted))
           }
         case Some(meta) if meta.isDeleted =>
-          log.logWithMDC(Logging.WarningLevel, s"Received Terminated message for already deleted process: ${meta.processId}", Map("processId" -> processId))
+          logger.logWithMDC(Logging.WarningLevel, s"Received Terminated message for already deleted process: ${meta.processId}", Map("processId" -> processId))
         case Some(_) =>
           persist(ActorPassivated(processId)) { _ => }
         case None =>
-          log.logWithMDC(Logging.WarningLevel, s"Received Terminated message for non indexed actor: $actorRef", Map("processId" -> processId))
+          logger.logWithMDC(Logging.WarningLevel, s"Received Terminated message for non indexed actor: $actorRef", Map("processId" -> processId))
       }
 
     case CreateProcess(recipeId, processId) =>
@@ -324,11 +323,10 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
               case None        =>
                 val petriNet = getRecipeNow(index(processId).recipeId).get.petriNet
                 val producedMarking = RecipeRuntime.createProducedMarking(petriNet.outMarking(interaction), Some(event))
-                val transformedEvent = RecipeRuntime.transformInteractionEvent(interaction, event)
 
-                processActor.tell(OverrideExceptionStrategy(jobId, Continue(producedMarking.marshall, transformedEvent)), originalSender)
+                processActor.tell(OverrideExceptionStrategy(jobId, Continue(producedMarking.marshall, event)), originalSender)
               case Some(error) =>
-                log.warning("Invalid event given: " + error)
+                logger.warning("Invalid event given: " + error)
                 originalSender ! InvalidEvent(processId, error)
             }
           case Success(_)         => originalSender ! akka.actor.Status.Failure(new IllegalArgumentException("Interaction is not blocked"))
@@ -351,7 +349,7 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
         case None => sender() ! NoSuchProcess(processId)
       }
     case cmd =>
-      log.error(s"Unrecognized command $cmd")
+      logger.error(s"Unrecognized command $cmd")
   }
 
   // This Set holds all the actor ids to be created again after the recovery completed
@@ -371,7 +369,7 @@ class ProcessIndex(processIdleTimeout: Option[FiniteDuration],
         case Some(processMeta) =>
           index.update(processId, processMeta.copy(processStatus = Deleted))
         case None =>
-          log.error(s"ActorDeleted persisted for non existing processId: $processId")
+          logger.error(s"ActorDeleted persisted for non existing processId: $processId")
       }
 
     case RecoveryCompleted =>

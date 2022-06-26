@@ -42,10 +42,6 @@ object Onboarding {
             automaticApprovedEvent,
             manualApprovedEvent)),
         openAccount
-          .withEventOutputTransformer(
-            accountOpenedEvent,
-            "newAccountOpenedEvent",
-            Map.empty)
       )
       .withSensoryEvents(Set(
         agreementsAcceptedEvent,

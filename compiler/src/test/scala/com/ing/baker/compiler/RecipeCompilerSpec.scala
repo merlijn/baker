@@ -174,8 +174,8 @@ class RecipeCompilerSpec extends wordspec.AnyWordSpec with should.Matchers {
 
     "validate if there are unreachable interactions exist or not" in {
       
-      val interactionA = Interaction(name = "A", input = Seq.empty, output = Seq.emtpy)
-      val interactionB = Interaction(name = "B", input = seq("a"), output = Seq.empty)
+      val interactionA = Interaction(name = "A", input = Seq.empty, output = Seq.empty)
+      val interactionB = Interaction(name = "B", input = Seq("a"), output = Seq.empty)
       
       val recipe = Recipe("RecipeWithUnreachableInteraction")
         .withInteractions(interactionSeven.withMaximumInteractionCount(1), interactionEight)

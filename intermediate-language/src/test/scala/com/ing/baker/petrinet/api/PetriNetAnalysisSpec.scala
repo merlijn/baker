@@ -60,7 +60,7 @@ object DSL {
         a.out.map { case (p, weight) => PetriNet.Edge[Place, Transition](Right(t + 1), Left(p), weight, None) }.toSeq
     }
 
-    new PetriNet(edges.toSet)
+    PetriNet(edges.toSet)
   }
 }
 

@@ -2,7 +2,6 @@ package com.ing.baker.runtime.core
 
 import java.time.Duration
 import java.util.concurrent.{CompletableFuture, TimeoutException}
-
 import akka.NotUsed
 import akka.stream.javadsl.RunnableGraph
 import akka.stream.scaladsl.{Broadcast, GraphDSL, Sink, Source}
@@ -24,7 +23,7 @@ object SensoryEventResponse {
 
   private def translateFirstMessage(msg: Any): SensoryEventStatus = msg match {
     case _: ProcessInstanceProtocol.TransitionFired => SensoryEventStatus.OK
-    case _: ProcessInstanceProtocol.TransitionNotEnabled => SensoryEventStatus.FiringLimitMet
+    case _: ProcessInstanceProtocol.TransitionNotEnabled => SensoryEventStatus.FiringLimitReached
     case _: ProcessInstanceProtocol.AlreadyReceived => SensoryEventStatus.AlreadyReceived
     case ProcessIndexProtocol.NoSuchProcess(processId) => throw new NoSuchProcessException(s"No such process: $processId")
     case ProcessIndexProtocol.ReceivePeriodExpired(_) => SensoryEventStatus.ReceivePeriodExpired
@@ -54,12 +53,12 @@ object SensoryEventResponse {
     val sinkHead: Sink[Any, Future[Any]] = Sink.head[Any]
     val sinkLast: Sink[Any, Future[immutable.Seq[Any]]] = Sink.seq[Any]
 
-    val graph = RunnableGraph.fromGraph(GraphDSL.create(sinkHead, sinkLast)((_, _)) {
-      implicit b =>
-        (head, last) => {
-          import GraphDSL.Implicits.*
+    val graph = RunnableGraph.fromGraph(GraphDSL.createGraph(sinkHead, sinkLast)((_, _)) {
+      implicit builder => (head, last) => {
+          
+        import GraphDSL.Implicits.*
 
-          val bcast = b.add(Broadcast[Any](2))
+          val bcast = builder.add(Broadcast[Any](2))
           source ~> bcast.in
           bcast.out(0) ~> head.in
           bcast.out(1) ~> last.in

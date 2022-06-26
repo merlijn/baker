@@ -181,7 +181,7 @@ trait BakerRuntimeTestBase
        |}
     """.stripMargin).withFallback(localLevelDBConfig(actorSystemName, journalInitializeTimeout, journalPath, snapshotsPath))
 
-  implicit val defaultActorSystem = ActorSystem(actorSystemName)
+  implicit val defaultActorSystem: ActorSystem = ActorSystem(actorSystemName)
 
   override def afterAll(): Unit = {
     TestKit.shutdownActorSystem(defaultActorSystem)

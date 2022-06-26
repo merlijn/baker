@@ -11,7 +11,7 @@ option (scalapb.options) = {
 // Events
 
 message ConsumedToken {
-    optional int64 place_id = 1;
+    optional string place_id = 1;
     optional int64 token_id = 2;
     optional int32 count = 3;
 }
@@ -29,7 +29,7 @@ message TransitionFired {
 
     optional int64 job_id = 1;
     optional string correlation_id = 9;
-    optional int64 transition_id = 3;
+    optional string transition_id = 3;
     optional int64 time_started = 4;
     optional int64 time_completed = 5;
     repeated ConsumedToken consumed = 6;
@@ -54,7 +54,7 @@ message TransitionFailed {
 
     optional int64 job_id = 1;
     optional string correlation_id = 10;
-    optional int64 transition_id = 3;
+    optional string transition_id = 3;
     optional int64 time_started = 4;
     optional int64 time_failed = 5;
     optional SerializedData input_data = 6;
@@ -74,7 +74,7 @@ message Stop {
 }
 
 message MarkingData {
-    optional int64 place_id  = 1;
+    optional string place_id  = 1;
     optional SerializedData data = 2;
     optional int32 count = 3;
 }
@@ -105,7 +105,7 @@ message ExceptionState {
 
 message JobState {
     optional int64 jobId = 1;
-    optional int64 transitionId = 2;
+    optional string transitionId = 2;
     repeated MarkingData consumedMarking = 3;
     optional SerializedData input = 4;
     optional ExceptionState exceptionState = 5;
@@ -119,7 +119,7 @@ message InstanceState {
 }
 
 message FireTransition {
-    optional int64 transitionId = 1;
+    optional string transitionId = 1;
     optional SerializedData input = 2;
     optional string correlationId = 3;
 }

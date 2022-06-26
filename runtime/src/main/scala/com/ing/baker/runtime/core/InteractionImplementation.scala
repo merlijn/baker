@@ -1,7 +1,5 @@
 package com.ing.baker.runtime.core
 
-import com.ing.baker.types.{Type, Value}
-
 /**
   * Provides an implementation for an interaction.
   */
@@ -13,11 +11,6 @@ trait InteractionImplementation {
   val name: String
 
   /**
-    * The required input.
-    */
-  val inputTypes: Seq[Type]
-
-  /**
     * Executes the interaction.
     *
     * TODO return type should be async
@@ -26,5 +19,5 @@ trait InteractionImplementation {
     * @param input
     * @return
     */
-  def execute(input: Seq[(String, Value)]): Option[ProcessEvent]
+  def execute(input: Seq[(String, Any)]): Option[ProcessEvent]
 }

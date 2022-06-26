@@ -22,5 +22,5 @@ object Place {
 
 case class Place(label: String, placeType: PlaceType) {
 
-  val id: Long = il.sha256HashCode(s"$placeType:$label")
+  val id: String = s"$placeType:$label"
 }

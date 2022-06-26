@@ -10,7 +10,6 @@ case class Recipe(
     interactions: Seq[Interaction] = Seq.empty,
     sensoryEvents: Seq[Event]= Seq.empty,
     defaultFailureStrategy: InteractionFailureStrategy = InteractionFailureStrategy.BlockInteraction,
-    eventReceivePeriod: Option[FiniteDuration] = None,
     retentionPeriod: Option[FiniteDuration] = None) {
 
   /**
@@ -21,7 +20,7 @@ case class Recipe(
     * @param name
     * @return
     */
-  def this(name: String) = this(name, Seq.empty, Seq.empty, InteractionFailureStrategy.BlockInteraction, None, None)
+  def this(name: String) = this(name, Seq.empty, Seq.empty, InteractionFailureStrategy.BlockInteraction, None)
 
   /**
     * Adds the interactions to the recipe.
@@ -40,7 +39,7 @@ case class Recipe(
     * @return
     */
   def withSensoryEvent(event: Event, maxFiringLimit: Int): Recipe =
-    copy(sensoryEvents = sensoryEvents :+ event.copy(maxFiringLimit = Some(maxFiringLimit)))
+    copy(sensoryEvents = sensoryEvents :+ event.copy(firingLimit = Some(maxFiringLimit)))
 
   /**
     * Adds the sensory events to the recipe with the firing limit set to 1
@@ -49,7 +48,7 @@ case class Recipe(
     * @return
     */
   def withSensoryEvents(eventClasses: Event*): Recipe =
-    copy(sensoryEvents = sensoryEvents ++ eventClasses.map(_.copy(maxFiringLimit = Some(1))))
+    copy(sensoryEvents = sensoryEvents ++ eventClasses.map(_.copy(firingLimit = Some(1))))
 
   /**
     * Adds the sensory event to the recipe with firing limit set to unlimited
@@ -68,7 +67,7 @@ case class Recipe(
     */
   @SafeVarargs
   def withSensoryEventsNoFiringLimit(eventClasses: Event*): Recipe =
-    copy(sensoryEvents = sensoryEvents ++ eventClasses.map(_.copy(maxFiringLimit = None)))
+    copy(sensoryEvents = sensoryEvents ++ eventClasses.map(_.copy(firingLimit = None)))
 
   /**
     * This set the failure strategy as default for this recipe.
@@ -81,15 +80,6 @@ case class Recipe(
     copy(defaultFailureStrategy = interactionFailureStrategy)
 
   /**
-    * Sets the event receive period. This is the period for which processes can receive sensory events.
-    *
-    * @param recivePeriod The period
-    * @return
-    */
-  def withEventReceivePeriod(recivePeriod: java.time.Duration): Recipe =
-    copy(eventReceivePeriod = Some(Duration(recivePeriod.toMillis, duration.MILLISECONDS)))
-
-  /**
     * Sets the process retention period. This is the period for which data & history for processes is kept.
     *
     * @param retentionPeriod The retention period.
@@ -97,9 +87,6 @@ case class Recipe(
     */
   def withRetentionPeriod(retentionPeriod: java.time.Duration): Recipe =
     copy(retentionPeriod = Some(Duration(retentionPeriod.toMillis, duration.MILLISECONDS)))
-
-
-  def withEventReceivePeriod(duration: FiniteDuration): Recipe = copy(eventReceivePeriod = Some(duration))
 
   def withRetentionPeriod(duration: FiniteDuration): Recipe = copy(retentionPeriod = Some(duration))
 

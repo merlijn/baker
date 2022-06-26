@@ -141,7 +141,7 @@ object RecipePropertiesSpec {
   def interactionsGen(events: Iterable[dsl.Event]): Gen[Set[Interaction]] = Gen.const(getInteractions(events))
 
   def getInteractions(sensoryEvents: Iterable[dsl.Event]): Set[Interaction] = {
-    @tailrec def interaction(ingredients: Set[dsl.Ingredient], events: Set[dsl.Event], acc: Set[Interaction]): Set[Interaction] = ingredients match {
+    @tailrec def interaction(ingredients: Set[dsl.Ingredient[_]], events: Set[dsl.Event], acc: Set[Interaction]): Set[Interaction] = ingredients match {
       case _ingredients if _ingredients.isEmpty => acc
       case ingredientsLeft =>
         val (andPreconditionEvents, orPreconditionEvents) = getPreconditionEvents(events)
@@ -184,7 +184,7 @@ object RecipePropertiesSpec {
     * @param ingredients input ingredients set
     * @return Tuple3(interactionDescriptor, outputIngredients, outputEvents)
     */
-  def getInteractionDescriptor(ingredients: Set[dsl.Ingredient], andPreconditionEvents: Set[dsl.Event], orPreconditionEvents: Set[dsl.Event]): (Interaction, Set[dsl.Event]) = {
+  def getInteractionDescriptor(ingredients: Set[dsl.Ingredient[_]], andPreconditionEvents: Set[dsl.Event], orPreconditionEvents: Set[dsl.Event]): (Interaction, Set[dsl.Event]) = {
     //each interaction fires a single event
     val events = sample(interactionOutputGen)
 
@@ -215,7 +215,7 @@ object RecipePropertiesSpec {
     (andPreconditionEvents, orPreconditionEvents)
   }
 
-  def getIngredientsFrom(events: Iterable[dsl.Event]): Set[dsl.Ingredient] = events.flatMap(_.providedIngredients).toSet
+  def getIngredientsFrom(events: Iterable[dsl.Event]): Set[dsl.Ingredient[_]] = events.flatMap(_.providedIngredients).toSet
 
   def ingredientValuesFrom[T](ingredients: Seq[T], nameExtractor: T => String): Map[String, Any] = ingredients map (t => nameExtractor(t) -> "") toMap
 

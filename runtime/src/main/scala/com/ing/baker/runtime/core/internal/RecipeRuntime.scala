@@ -13,7 +13,7 @@ import com.ing.baker.runtime.actor.process_instance.internal.*
 import com.ing.baker.runtime.core.events.{InteractionCompleted, InteractionFailed, InteractionStarted}
 import com.ing.baker.runtime.core.internal.RecipeRuntime.*
 import com.ing.baker.runtime.core.{ProcessEvent, ProcessState}
-import com.ing.baker.types.{PrimitiveValue, Value}
+import com.ing.baker.runtime.core.handleExceptionWith
 import org.slf4j.MDC
 
 object RecipeRuntime {
@@ -86,31 +86,18 @@ object RecipeRuntime {
   /**
     * Creates the input parameters for an interaction implementation
     */
-  def createInteractionInput(interaction: InteractionTransition, state: ProcessState): Seq[(String, Value)] = {
+  def createInteractionInput(interaction: InteractionTransition, state: ProcessState): Seq[(String, Any)] = {
 
     // the process id is a special ingredient that is always available
-    val processId: (String, Value) = processIdName -> PrimitiveValue(state.processId.toString)
+    val processId: (String, Any) = processIdName -> state.processId.toString
 
     // a map of all ingredients
-    val allIngredients: Map[String, Value] = interaction.predefinedIngredients ++ state.ingredients + processId
+    val allIngredients: Map[String, Any] = interaction.predefinedIngredients ++ state.ingredients + processId
 
     // arranges the ingredients in the expected order
     interaction.requiredIngredients.map {
-      case IngredientDescriptor(name, _) =>
-        name -> allIngredients.getOrElse(name, throw new FatalInteractionException(s"Missing parameter '$name'"))
-    }
-  }
-
-  // function that (optionally) transforms the output event using the event output transformers
-  def transformInteractionEvent(interaction: InteractionTransition, runtimeEvent: ProcessEvent): ProcessEvent = {
-    interaction.eventOutputTransformers.get(runtimeEvent.name) match {
-      case Some(transfomer) =>
-        ProcessEvent(
-          transfomer.newEventName,
-          runtimeEvent.providedIngredients.map {
-            case (name, value) => transfomer.ingredientRenames.getOrElse(name, name) -> value
-          })
-      case None => runtimeEvent
+      case IngredientDescriptor(name) =>
+        name -> allIngredients.getOrElse(name, throw FatalInteractionException(s"Missing parameter '$name'"))
     }
   }
 }
@@ -193,7 +180,7 @@ class RecipeRuntime(recipe: CompiledRecipe, interactionManager: InteractionManag
 
         // obtain the interaction implementation
         val implementation = interactionManager.getImplementation(interaction).getOrElse {
-          throw new FatalInteractionException("No implementation available for interaction")
+          throw FatalInteractionException("No implementation available for interaction")
         }
 
         // create the interaction input
@@ -209,12 +196,11 @@ class RecipeRuntime(recipe: CompiledRecipe, interactionManager: InteractionManag
 
         // validates the event, throws a FatalInteraction exception if invalid
         RecipeRuntime.validateInteractionOutput(interaction, interactionOutput).foreach { validationError =>
-          throw new FatalInteractionException(validationError)
+          throw FatalInteractionException(validationError)
         }
 
         // transform the event if there is one
         val outputEvent: Option[ProcessEvent] = interactionOutput
-          .map(e => transformInteractionEvent(interaction, e))
 
         val timeCompleted = System.currentTimeMillis()
 

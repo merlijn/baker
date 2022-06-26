@@ -9,7 +9,7 @@ import scala.concurrent.duration.FiniteDuration
 object CompiledRecipe {
 
   def apply(name: String, petriNet: RecipePetriNet, initialMarking: Marking[Place], validationErrors: Seq[String],
-            eventReceivePeriod: Option[FiniteDuration], retentionPeriod: Option[FiniteDuration]): CompiledRecipe = {
+            retentionPeriod: Option[FiniteDuration]): CompiledRecipe = {
     /**
       * This calculates a SHA-256 hash for a deterministic string representation of the recipe.
       *
@@ -37,7 +37,7 @@ object CompiledRecipe {
         }
       }.toString
 
-      val recipeString: String = name + petriNetId + initMarkingId + validationErrors.mkString + eventReceivePeriod.toString + retentionPeriod
+      val recipeString: String = name + petriNetId + initMarkingId + validationErrors.mkString + retentionPeriod
 
       // truncate to 64 bits = 16 hex chars
       zeroPaddedSHA256(recipeString).substring(0, 16)
@@ -45,7 +45,7 @@ object CompiledRecipe {
 
     // the recipe id is a hexadecimal format of the hashcode
     val recipeId = calculateRecipeId()
-    CompiledRecipe(name, recipeId, petriNet, initialMarking, validationErrors, eventReceivePeriod, retentionPeriod)
+    CompiledRecipe(name, recipeId, petriNet, initialMarking, validationErrors, retentionPeriod)
   }
 }
 
@@ -57,7 +57,6 @@ case class CompiledRecipe(name: String,
                           petriNet: RecipePetriNet,
                           initialMarking: Marking[Place],
                           validationErrors: Seq[String] = Seq.empty,
-                          eventReceivePeriod: Option[FiniteDuration],
                           retentionPeriod: Option[FiniteDuration]) {
 
   def sensoryEvents: Set[EventDescriptor] = petriNet.transitions.collect {
@@ -89,4 +88,6 @@ case class CompiledRecipe(name: String,
   val allIngredients: Set[IngredientDescriptor] = allEvents.flatMap {
     events => events.ingredients
   }
+  
+  def eventReceivePeriod: Option[FiniteDuration] = ???
 }

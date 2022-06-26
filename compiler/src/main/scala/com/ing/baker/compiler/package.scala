@@ -24,9 +24,6 @@ package object compiler {
 
     val originalEvents: Seq[EventDescriptor] = interactionDescriptor.output.map(e => parseDSLEvent(e))
 
-    val eventOutputTransformers: Map[String, EventOutputTransformer] = interactionDescriptor.eventRenames.map {
-      case (event, transformer) => event -> EventOutputTransformer(transformer.newEventName, transformer.ingredientRenames) }
-
     // TODO provide None values at compile time in dsl
     val predefinedIngredients: Map[String, Any] = interactionDescriptor.predefinedIngredients
     // in case the ingredient is optional and not provided anywhere it is predefined as null (None, Optional.empty())
@@ -60,7 +57,6 @@ package object compiler {
       originalName = interactionDescriptor.originalName.getOrElse(interactionDescriptor.name),
       predefinedIngredients = predefinedIngredients,
       maximumExecutionCount = interactionDescriptor.maximumExecutionCount,
-      failureStrategy = failureStrategy,
-      eventOutputTransformers = eventOutputTransformers )
+      failureStrategy = failureStrategy)
   }
 }

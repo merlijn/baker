@@ -3,14 +3,14 @@ package com.ing.baker.runtime.actor.process_instance
 import akka.persistence.{PersistentActor, RecoveryCompleted}
 import akka.serialization.SerializationExtension
 import com.ing.baker.petrinet.api.*
-import com.ing.baker.runtime.actor.process_instance.internal.{ExceptionState, ExceptionStrategy, Instance, Job}
+import com.ing.baker.runtime.actor.process_instance.internal.*
 import com.ing.baker.runtime.actor.serialization.{Encryption, ProtoEventAdapterImpl}
+import com.ing.baker.runtime.actor.serialization.Encryption.NoEncryption
 import ProcessInstanceEventSourcing.*
 import akka.NotUsed
 import akka.actor.{ActorSystem, NoSerializationVerificationNeeded}
 import akka.persistence.query.scaladsl.CurrentEventsByPersistenceIdQuery
 import akka.stream.scaladsl.Source
-import com.ing.baker.runtime.actor.serialization.Encryption.NoEncryption
 
 object ProcessInstanceEventSourcing {
 
@@ -62,6 +62,7 @@ object ProcessInstanceEventSourcing {
 
       val transition = instance.petriNet.transitions.getById(e.transitionId)
       val newState = sourceFn(transition)(instance.state)(e.output.asInstanceOf[E])
+      
       val consumed: Marking[P] = e.consumed.unmarshall(instance.petriNet.places)
       val produced: Marking[P] = e.produced.unmarshall(instance.petriNet.places)
 
@@ -91,7 +92,7 @@ object ProcessInstanceEventSourcing {
       topology: PetriNet[P, T],
       encryption: Encryption = NoEncryption,
       readJournal: CurrentEventsByPersistenceIdQuery,
-      eventSourceFn: T => (S => E => S))(implicit actorSystem: ActorSystem): Source[(Instance[P, T, S], Event), NotUsed] = {
+      eventSourceFn: T => (S => E => S))(using actorSystem: ActorSystem): Source[(Instance[P, T, S], Event), NotUsed] = {
 
     val protoEventAdapter = new ProtoEventAdapterImpl(SerializationExtension.get(actorSystem), encryption)
     val serializer = new ProcessInstanceSerialization[P, T, S, E](protoEventAdapter)
@@ -115,14 +116,14 @@ abstract class ProcessInstanceEventSourcing[P : Identifiable, T : Identifiable, 
     encryption: Encryption,
     eventSourceFn: T => (S => E => S)) extends PersistentActor {
 
-  implicit val system = context.system
+  implicit val system: ActorSystem = context.system
 
   val eventSource = ProcessInstanceEventSourcing.apply[P, T, S, E](eventSourceFn)
 
   private val protoEventAdapter = new ProtoEventAdapterImpl(SerializationExtension.get(system), encryption)
   private val serializer = new ProcessInstanceSerialization[P, T, S, E](protoEventAdapter)
 
-  def onRecoveryCompleted(state: Instance[P, T, S])
+  def onRecoveryCompleted(state: Instance[P, T, S]): Unit
 
   def persistEvent[O](instance: Instance[P, T, S], e: Event)(fn: Event => O): Unit = {
     val serializedEvent = serializer.serializeEvent(e)(instance)

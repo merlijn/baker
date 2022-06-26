@@ -9,6 +9,18 @@ object Transition {
 
 trait Transition {
 
-  def id: Long
+  def id: String
   def label: String
+}
+
+case class MissingEventTransition(override val label: String) extends Transition {
+  override def id: String = s"MissingEventTransition:$label"
+}
+
+case class IntermediateTransition(override val label: String) extends Transition {
+  override val id: String = s"IntermediateTransition:$label"
+}
+
+case class SplitTransition(override val label: String) extends Transition {
+  override def id: String = s"MultiFacilitatorTransition:$label"
 }

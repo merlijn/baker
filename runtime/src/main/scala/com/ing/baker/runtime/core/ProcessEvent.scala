@@ -1,10 +1,6 @@
 package com.ing.baker.runtime.core
 
 import com.ing.baker.il.EventDescriptor
-import com.ing.baker.types.reflect.Reflect
-import com.ing.baker.types.{NullValue, RecordValue, Value}
-
-import scala.collection.JavaConverters.*
 
 object ProcessEvent {
 
@@ -17,20 +13,16 @@ object ProcessEvent {
   def of(event: Any): ProcessEvent = {
     event match {
       case runtimeEvent: ProcessEvent => runtimeEvent
-      case obj                        =>
-        Reflect.toValue(obj) match {
-          case RecordValue(entries) => ProcessEvent(obj.getClass.getSimpleName, entries)
-          case other                => throw new IllegalArgumentException(s"Unexpected value: $other")
-        }
+      case obj                        => null // TODO implement
     }
   }
 
-  def apply(name: String, providedIngredients: Seq[(String, Value)]): ProcessEvent =
+  def apply(name: String, providedIngredients: Seq[(String, Any)]): ProcessEvent =
     ProcessEvent(name, providedIngredients.toMap)
 }
 
 case class ProcessEvent(name: String,
-                        providedIngredients: Map[String, Value]) {
+                        providedIngredients: Map[String, Any]) {
 
   /**
     * This checks if the runtime event is an instance of a event type.
@@ -59,12 +51,13 @@ case class ProcessEvent(name: String,
           case None        =>
             Seq(s"no value was provided for ingredient '${ingredient.name}'")
           // we can only check the class since the type parameters are available on objects
-          case Some(NullValue) if !ingredient.`type`.isOption =>
-            Seq(s"null is not allowed for non optional ingredient '${ingredient.name}'")
+          case Some(null) =>
+            Seq(s"null is not allowed ingredients")
           case Some(value) =>
-            value.validate(ingredient.`type`).map(
-              reason => s"ingredient '${ingredient.name}' has an incorrect type:\n$reason"
-            ).toSeq
+            Seq.empty
+//            value.validate(ingredient.`type`).map(
+//              reason => s"ingredient '${ingredient.name}' has an incorrect type:\n$reason"
+//            ).toSeq
           case _ =>
             Seq.empty
         }

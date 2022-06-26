@@ -31,7 +31,6 @@ object PetriNet {
  */
 case class PetriNet[P, T](places: Set[P], transitions: Set[T], edges: Set[Edge[P, T]]) extends DiGraph[Either[P, T], PetriNet.Edge[P, T]] {
   
-  
   type InnerEdge = Edge[P, T]
   
   def removePlace(p: P): PetriNet[P, T] = {
@@ -102,8 +101,8 @@ case class PetriNet[P, T](places: Set[P], transitions: Set[T], edges: Set[Edge[P
     * @return
     */
   def outgoingTransitions(p: P): Set[T] = edges.collect {
-    case Edge(Left(`p`), Right(t), _, _) => t 
-  }.toSet
+    case Edge(Left(`p`), Right(t), _, _) => t
+  }
 
   /**
     * The in-adjacent places of a transition.
@@ -121,7 +120,7 @@ case class PetriNet[P, T](places: Set[P], transitions: Set[T], edges: Set[Edge[P
     */
   def incomingTransitions(p: P): Set[T] = edges.collect {
     case Edge(Right(t), Left(`p`), _, _) => t
-  }.toSet
+  }
 
   /**
     * The set of nodes (places + transitions) in the petri net.

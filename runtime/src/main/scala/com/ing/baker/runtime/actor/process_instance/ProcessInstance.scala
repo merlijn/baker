@@ -18,6 +18,7 @@ import com.ing.baker.runtime.actor.serialization.Encryption
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.*
 import scala.language.existentials
+import scala.language.implicitConversions
 import scala.util.Try
 
 object ProcessInstance {
@@ -70,10 +71,10 @@ class ProcessInstance[P : Identifiable, T : Identifiable, S, E](
 
   override def receiveCommand: Receive = uninitialized
 
-  private implicit def marshallMarking(marking: Marking[Any]): Marking[Id] = marking.asInstanceOf[Marking[P]].marshall
+  private implicit def marshallMarking(marking: Marking[P]): Marking[Id] = marking.marshall
 
   private implicit def fromExecutionInstance(instance: internal.Instance[P, T, S]): protocol.InstanceState =
-    protocol.InstanceState(instance.sequenceNr, instance.marking.marshall, instance.state, instance.jobs.mapValues(fromExecutionJob(_)).map(identity))
+    protocol.InstanceState(instance.sequenceNr, instance.marking.marshall, instance.state, instance.jobs.mapValues(fromExecutionJob(_)).map(identity).toMap)
 
   private implicit def fromExecutionJob(job: internal.Job[P, T, S]): protocol.JobState =
     protocol.JobState(job.id, job.transition.getId, job.consume.marshall, job.input, job.failure.map(fromExecutionExceptionState))
@@ -198,18 +199,6 @@ class ProcessInstance[P : Identifiable, T : Identifiable, S, E](
                 context become running(updatedInstance, scheduledRetries + (jobId -> retry))
               }
           )
-
-        case Continue(produced, out) =>
-          val transitionFiredEvent = TransitionFiredEvent(
-            jobId, transitionId, correlationId, timeStarted, timeFailed, consume, produced, out)
-
-          persistEvent(instance, transitionFiredEvent)(
-            eventSource.apply(instance)
-              .andThen(step)
-              .andThen { case (updatedInstance, newJobs) =>
-                sender() ! TransitionFired(jobId, transitionId, correlationId, consume, produced, newJobs.map(_.id), out)
-                context become running(updatedInstance, scheduledRetries - jobId)
-              })
 
         case _ =>
           persistEvent(instance, event)(
@@ -359,8 +348,9 @@ class ProcessInstance[P : Identifiable, T : Identifiable, S, E](
     // context.self can be potentially throw NullPointerException in non graceful shutdown situations
     Try(context.self).foreach { self =>
 
+      import cats.effect.unsafe.implicits.global
       // executes the IO task on the ExecutionContext
-      val io = IO.shift(settings.executionContext) *> executor(job)
+      val io = executor(job).evalOn(settings.executionContext)
 
       // pipes the result back this actor
       io.unsafeRunAsync {

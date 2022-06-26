@@ -14,109 +14,6 @@ message SerializedData {
     optional bytes data = 3;
 }
 
-// Baker type system messages
-enum PrimitiveType {
-
-    BOOL = 1;
-    BYTE = 3;
-    INT16 = 5;
-    CHAR = 7;
-    INT32 = 9;
-    INT64 = 11;
-    INT_BIG = 20;
-    FLOAT32 = 13;
-    FLOAT64 = 15;
-    FLOAT_BIG = 18;
-    CHAR_ARRAY = 17;
-    BYTE_ARRAY = 22;
-
-    // depcrecated but do not remove!
-    DATE = 23;
-    BIG_INT_JAVA = 21;
-    BIG_DECIMAL_JAVA = 19;
-    DOUBLE_PRIMITIVE = 16;
-    FLOAT_PRIMITIVE = 14;
-    LONG_PRIMITIVE = 12;
-    INT = 10;
-    CHARACTER_PRIMITIVE = 8;
-    SHORT_PRIMITIVE = 6;
-    BYTE_PRIMITIVE = 4;
-    BOOLEAN_PRIMITIVE = 2;
-    JODA_LOCAL_DATE = 24;
-    JODA_LOCAL_DATETIME = 25;
-}
-
-message OptionalType {
-    optional Type entryType = 1;
-}
-
-message ListType {
-    optional Type entryType = 1;
-}
-
-message RecordField {
-    optional string name = 1;
-    optional Type type = 2;
-}
-
-message RecordType {
-    repeated RecordField fields = 1;
-}
-
-message MapType {
-    optional Type valueType = 1;
-}
-
-message EnumType {
-    repeated string options = 1;
-}
-
-message Type {
-    oneof oneof_type {
-        PrimitiveType primitive = 1;
-        OptionalType optional = 2;
-        ListType list = 3;
-        RecordType record = 4;
-        MapType map = 5;
-        EnumType enum = 6;
-    }
-}
-
-message Value {
-    oneof oneof_value {
-        bool NullValue = 1;
-        bool BooleanValue = 2;
-        int32 ByteValue = 3;
-        int32 ShortValue = 4;
-        int32 CharValue = 5;
-        int32 IntValue = 6;
-        int64 LongValue = 7;
-        float FloatValue = 8;
-        double DoubleValue = 9;
-        string StringValue = 10;
-        string BigDecimalScalaValue = 12;
-        string BigDecimalJavaValue = 13;
-        string BigIntScalaValue = 14;
-        string BigIntJavaValue = 15;
-        bytes ByteArrayValue = 16;
-        string JodaDatetimeValue = 17;
-        string JodaLocaldateValue = 18;
-        string JodaLocaldatetimeValue = 19;
-
-        Record RecordValue = 50;
-        List ListValue = 51;
-    }
-}
-
-message Record {
-    map<string, Value> fields = 1;
-}
-
-message List {
-    repeated Value entries = 1;
-}
-
-
 // END -- Baker type system messages
 
 
@@ -125,8 +22,6 @@ message Ingredient {
     optional string name = 1;
     // before baker type system the data could be anything
     optional SerializedData data = 2;
-    // now it is always of the 'Value' type
-    optional Value value = 3;
 }
 
 message RuntimeEvent {
@@ -144,7 +39,6 @@ message ProcessState {
 // DESCRIPTORS (Intermediate Language messages)
 message IngredientDescriptor {
     optional string name = 1;
-    optional Type type = 2;
 }
 
 message EventDescriptor {
@@ -189,7 +83,7 @@ message PetriNet {
 }
 
 message ProducedToken {
-    optional int64 place_id = 1;
+    optional string place_id = 1;
     optional int64 token_id = 2;
     optional int32 count = 3;
     optional SerializedData token_data = 4;
@@ -263,7 +157,7 @@ message InteractionTransition {
     optional string interactionName = 5;
     optional string originalInteractionName = 6;
     // optional bool isSieve = 7; // removed field, do not re-use this identifier!
-    map<string, Value> predefinedParameters = 8;
+    map<string, SerializedData> predefinedParameters = 8;
     optional int32 maximumInteractionCount = 9;
     optional InteractionFailureStrategy failureStrategy = 10;
     map<string, EventOutputTransformer> eventOutputTransformers = 11;

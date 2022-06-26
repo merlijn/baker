@@ -36,9 +36,6 @@ class BakerProtobufSerializer(system: ExtendedActorSystem) extends SerializerWit
 
     Entry("il.CompiledRecipe", classOf[il.CompiledRecipe], protobuf.CompiledRecipe),
 
-    Entry("baker.types.Type", classOf[com.ing.baker.types.Type], actor.protobuf.Type),
-    Entry("baker.types.Value", classOf[com.ing.baker.types.Value], actor.protobuf.Value),
-
     Entry("ProcessIndex.GetShardIndex", classOf[com.ing.baker.runtime.actor.BakerAkkaCluster.GetShardIndex], actor.process_index.protobuf.GetShardIndex),
 
     Entry("ProcessIndex.ActorCreated", classOf[ProcessIndex.ActorCreated], actor.process_index.protobuf.ActorCreated),

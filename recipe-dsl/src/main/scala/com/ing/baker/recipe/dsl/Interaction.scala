@@ -3,10 +3,8 @@ package com.ing.baker.recipe.dsl
 import java.lang.reflect.Method
 
 import com.ing.baker.recipe.dsl
-import org.reflections.Reflections
 
-import scala.annotation.varargs
-import scala.collection.JavaConverters.*
+import collection.JavaConverters.mapAsScalaMapConverter
 
 case class Interaction(
       name: String,
@@ -18,8 +16,7 @@ case class Interaction(
       predefinedIngredients: Map[String, Any] = Map.empty,
       renamedInputIngredients: Map[String, String] = Map.empty,
       maximumExecutionCount: Option[Int] = None,
-      failureStrategy: Option[InteractionFailureStrategy] = None,
-      eventRenames: Map[String, EventRenamer] = Map.empty) {
+      failureStrategy: Option[InteractionFailureStrategy] = None) {
 
   /**
     * The retry exhausted event name
@@ -131,10 +128,4 @@ case class Interaction(
   def withOverriddenIngredientName(oldIngredient: String,
                                    newIngredient: String): Interaction =
     copy(renamedInputIngredients = renamedInputIngredients + (oldIngredient -> newIngredient))
-
-  def withEventOutputTransformer(event: Event, ingredientRenames: Map[String, String]): Interaction =
-    copy(eventRenames = eventRenames + (event.name -> EventRenamer(event.name, ingredientRenames)))
-
-  def withEventOutputTransformer(event: Event, newEventName: String, ingredientRenames: Map[String, String]): Interaction =
-    copy(eventRenames = eventRenames + (event.name -> EventRenamer(newEventName, ingredientRenames)))
 }

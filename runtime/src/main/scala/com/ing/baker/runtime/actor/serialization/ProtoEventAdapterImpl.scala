@@ -4,7 +4,6 @@ import akka.actor.ActorSystem
 import akka.serialization.*
 import com.google.protobuf.ByteString
 import com.ing.baker.runtime.actor.protobuf.SerializedData
-import com.ing.baker.runtime.actor.serialization.modules.*
 import scalapb.GeneratedMessage
 
 import scala.util.Try
@@ -13,14 +12,7 @@ import ProtoEventAdapterImpl.*
 
 object ProtoEventAdapterImpl {
 
-  val defaultModules: Set[ProtoEventAdapterModule] = Set(
-    new IntermediateLanguageModule,
-    new ProcessIndexModule,
-    new ProcessInstanceModule,
-    new RecipeManagerModule,
-    new RuntimeModule,
-    new TypesModule
-  )
+  val defaultModules: Set[ProtoEventAdapterModule] = Set.empty
 }
 
 class ProtoEventAdapterImpl(private val serialization: Serialization, encryption: Encryption, modules: Set[ProtoEventAdapterModule] = defaultModules) extends ProtoEventAdapter {
@@ -49,7 +41,7 @@ class ProtoEventAdapterImpl(private val serialization: Serialization, encryption
 
   def toDomainObject(serializedMessage: GeneratedMessage): AnyRef = serializedMessage match {
 
-    case SerializedData(Some(serializerId), Some(manifest), Some(bytes)) =>
+    case SerializedData(Some(serializerId), Some(manifest), Some(bytes), _) =>
 
       val serializer = serialization.serializerByIdentity.getOrElse(serializerId,
         throw new IllegalStateException(s"No serializer found with id $serializerId")

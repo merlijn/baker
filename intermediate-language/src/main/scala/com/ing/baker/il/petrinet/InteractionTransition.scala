@@ -1,7 +1,7 @@
 package com.ing.baker.il.petrinet
 
 import com.ing.baker.il
-import com.ing.baker.il.{EventOutputTransformer, InteractionFailureStrategy, _}
+import com.ing.baker.il.{InteractionFailureStrategy, _}
 import org.slf4j.*
 
 
@@ -14,8 +14,7 @@ case class InteractionTransition(originalEvents: Seq[EventDescriptor],
                                  originalName: String,
                                  predefinedIngredients: Map[String, Any],
                                  maximumExecutionCount: Option[Int],
-                                 failureStrategy: InteractionFailureStrategy,
-                                 eventOutputTransformers: Map[String, EventOutputTransformer] = Map.empty)
+                                 failureStrategy: InteractionFailureStrategy)
 
   extends Transition {
 
@@ -26,11 +25,11 @@ case class InteractionTransition(originalEvents: Seq[EventDescriptor],
     *
     * In case an event transformer is found it is applied on the event, otherwise the original is kept.
     */
-  val events: Seq[EventDescriptor] = originalEvents.map(e => eventOutputTransformers.get(e.name).map(_.apply(e)).getOrElse(e))
+  val events: Seq[EventDescriptor] = originalEvents
 
   override val label: String = name
 
-  override val id: Long = il.sha256HashCode(s"InteractionTransition:$label")
+  override val id: String = s"InteractionTransition:$label"
 
   override def toString: String = label
 
