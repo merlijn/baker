@@ -1,7 +1,7 @@
 package com.ing.baker.runtime.core.internal
 
-import com.ing.baker.il.IngredientDescriptor
-import com.ing.baker.il.petrinet.InteractionTransition
+import com.ing.baker.il.recipe.IngredientDescriptor
+import com.ing.baker.il.recipe.petrinet.InteractionTransition
 import com.ing.baker.runtime.core.InteractionImplementation
 import com.ing.baker.types
 import org.mockito.Mockito.when

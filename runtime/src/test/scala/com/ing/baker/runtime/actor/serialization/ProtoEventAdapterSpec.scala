@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor.ActorSystem
 import com.ing.baker.compiler.RecipeCompiler
-import com.ing.baker.il.CompiledRecipe
+import com.ing.baker.il.recipe.CompiledRecipe
 import com.ing.baker.petrinet.api.*
 import com.ing.baker.recipe.dsl.examples.AllTypeRecipe
 import com.ing.baker.runtime.actor.serialization.Encryption.*

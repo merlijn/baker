@@ -1,6 +1,6 @@
 package com.ing.baker.runtime.core
 
-import com.ing.baker.il.EventDescriptor
+import com.ing.baker.il.recipe.EventDescriptor
 
 object ProcessEvent {
 

@@ -1,4 +1,6 @@
-package com.ing.baker.il
+package com.ing.baker.il.recipe
+
+import com.ing.baker.il.recipe.IngredientDescriptor
 
 /**
   * Describes an event.

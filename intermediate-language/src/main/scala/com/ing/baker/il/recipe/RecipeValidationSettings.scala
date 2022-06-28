@@ -1,4 +1,4 @@
-package com.ing.baker.il
+package com.ing.baker.il.recipe
 
 object RecipeValidationSettings {
   val defaultValidationSettings = RecipeValidationSettings()

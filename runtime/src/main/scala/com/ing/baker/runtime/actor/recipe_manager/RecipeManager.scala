@@ -2,7 +2,7 @@ package com.ing.baker.runtime.actor.recipe_manager
 
 import akka.actor.{ActorLogging, Props}
 import akka.persistence.PersistentActor
-import com.ing.baker.il.CompiledRecipe
+import com.ing.baker.il.recipe.CompiledRecipe
 import com.ing.baker.runtime.actor.recipe_manager.RecipeManager.*
 import com.ing.baker.runtime.actor.recipe_manager.RecipeManagerProtocol.*
 import com.ing.baker.runtime.actor.serialization.BakerProtoMessage

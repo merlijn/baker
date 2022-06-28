@@ -1,9 +1,10 @@
-package com.ing.baker.il
+package com.ing.baker.il.recipe
+
+import com.ing.baker.il.recipe.InteractionFailureStrategyOutcome.{BlockTransition, Continue, RetryWithDelay}
+import com.ing.baker.il.recipe.EventDescriptor
+import com.ing.baker.il.recipe.{InteractionFailureStrategy, InteractionFailureStrategyOutcome}
 
 import java.util.concurrent.TimeUnit
-
-import com.ing.baker.il.InteractionFailureStrategyOutcome.{BlockTransition, Continue, RetryWithDelay}
-
 import scala.concurrent.duration.Duration
 
 object InteractionFailureStrategy {

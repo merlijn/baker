@@ -1,7 +1,9 @@
-package com.ing.baker.il
+package com.ing.baker.il.recipe
 
-import com.ing.baker.il.petrinet.InteractionTransition
-import com.ing.baker.petrinet.api.*
+import com.ing.baker.il.recipe.RecipeValidationSettings
+import com.ing.baker.il.recipe.petrinet.InteractionTransition
+import com.ing.baker.petrinet.api.PetriNetAnalysis
+import com.ing.baker.petrinet.api.multiplicities
 
 import scala.collection.mutable
 
@@ -15,7 +17,7 @@ object RecipeValidations {
       validationErrors += s"Interaction $interactionTransition does not have any requirements (ingredients or preconditions)! This will result in an infinite execution loop."
 
     // check if the process id argument type is correct
-    
+
     // TODO move type checking to dsl and scala compiler
 //    interactionTransition.requiredIngredients.filter(id => id.name.equals(processIdName)).map {
 //      case IngredientDescriptor(_ , types.CharArray)  =>
@@ -106,4 +108,3 @@ object RecipeValidations {
       validationErrors = compiledRecipe.validationErrors ++ postCompileValidationErrors)
   }
 }
-

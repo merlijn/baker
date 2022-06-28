@@ -3,6 +3,7 @@ package com.ing.baker.runtime.actor.serialization
 import akka.actor.ExtendedActorSystem
 import akka.serialization.{Serialization, SerializationExtension, SerializerWithStringManifest}
 import com.ing.baker.il
+import com.ing.baker.il.recipe.CompiledRecipe
 import com.ing.baker.runtime.actor.process_index.{ProcessIndex, ProcessIndexProtocol}
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol
 import com.ing.baker.runtime.actor.{process_instance, protobuf}
@@ -34,7 +35,7 @@ class BakerProtobufSerializer(system: ExtendedActorSystem) extends SerializerWit
     Entry("core.RuntimeEvent", classOf[core.ProcessEvent], protobuf.RuntimeEvent),
     Entry("core.ProcessState", classOf[core.ProcessState], protobuf.ProcessState),
 
-    Entry("il.CompiledRecipe", classOf[il.CompiledRecipe], protobuf.CompiledRecipe),
+    Entry("il.CompiledRecipe", classOf[CompiledRecipe], protobuf.CompiledRecipe),
 
     Entry("ProcessIndex.GetShardIndex", classOf[com.ing.baker.runtime.actor.BakerAkkaCluster.GetShardIndex], actor.process_index.protobuf.GetShardIndex),
 

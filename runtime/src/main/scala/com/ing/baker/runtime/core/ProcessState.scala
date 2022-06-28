@@ -1,6 +1,6 @@
 package com.ing.baker.runtime.core
 
-import com.ing.baker.il.InteractionFailureStrategyOutcome
+import com.ing.baker.il.recipe.InteractionFailureStrategyOutcome
 
 /**
   * Holds the 'state' of a process instance.

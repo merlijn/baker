@@ -3,7 +3,7 @@ package com.ing.baker.runtime
 import java.io.{File, PrintWriter}
 
 import com.ing.baker.compiler.RecipeCompiler
-import com.ing.baker.il.{CompiledRecipe, RecipeValidationSettings}
+import com.ing.baker.il.recipe.{CompiledRecipe, RecipeValidationSettings}
 import com.ing.baker.recipe.dsl
 import com.ing.baker.recipe.dsl.{Event, Ingredient, Interaction, Recipe}
 import org.scalacheck.Prop.forAll

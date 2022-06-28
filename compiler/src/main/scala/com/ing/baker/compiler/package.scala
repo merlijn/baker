@@ -1,7 +1,9 @@
 package com.ing.baker
 
-import com.ing.baker.il.petrinet.*
-import com.ing.baker.il.{EventDescriptor, InteractionFailureStrategy, _}
+import com.ing.baker.il.recipe.petrinet.*
+import com.ing.baker.il.recipe.{EventDescriptor, IngredientDescriptor, InteractionFailureStrategy}
+import com.ing.baker.il.{recipe, *}
+import com.ing.baker.il.recipe.petrinet.InteractionTransition
 import com.ing.baker.recipe.dsl
 import com.ing.baker.recipe.dsl.Interaction
 
@@ -38,19 +40,19 @@ package object compiler {
             case None                  => None
           }
 
-          (il.InteractionFailureStrategy.RetryWithIncrementalBackoff(initialTimeout, backoffFactor, maximumRetries, maxTimeBetweenRetries, exhaustedRetryEvent), exhaustedRetryEvent)
+          (il.recipe.InteractionFailureStrategy.RetryWithIncrementalBackoff(initialTimeout, backoffFactor, maximumRetries, maxTimeBetweenRetries, exhaustedRetryEvent), exhaustedRetryEvent)
         case dsl.InteractionFailureStrategy.BlockInteraction => (
 
-          il.InteractionFailureStrategy.BlockInteraction, None)
+          il.recipe.InteractionFailureStrategy.BlockInteraction, None)
         case dsl.InteractionFailureStrategy.FireEventAfterFailure(eventNameOption) =>
           val eventName = eventNameOption.getOrElse(interactionDescriptor.name + exhaustedEventAppend)
           val exhaustedRetryEvent: EventDescriptor = EventDescriptor(eventName, Seq.empty)
 
-          (il.InteractionFailureStrategy.FireEventAfterFailure(exhaustedRetryEvent), Some(exhaustedRetryEvent))
+          (il.recipe.InteractionFailureStrategy.FireEventAfterFailure(exhaustedRetryEvent), Some(exhaustedRetryEvent))
       }
     }
 
-    InteractionTransition(
+    recipe.petrinet.InteractionTransition(
       originalEvents = originalEvents ++ exhaustedRetryEvent,
       requiredIngredients = inputFields.map(IngredientDescriptor(_)),
       name = interactionDescriptor.name,

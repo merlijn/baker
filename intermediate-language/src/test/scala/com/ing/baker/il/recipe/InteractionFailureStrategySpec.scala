@@ -1,8 +1,7 @@
-package com.ing.baker.il
+package com.ing.baker.il.recipe
 
 import com.ing.baker.il.InteractionFailureStrategy.RetryWithIncrementalBackoff
 import com.ing.baker.il.InteractionFailureStrategyOutcome.{BlockTransition, RetryWithDelay}
-
 import org.scalatest.*
 import org.scalatest.matchers.*
 

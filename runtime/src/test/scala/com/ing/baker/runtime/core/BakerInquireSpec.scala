@@ -5,7 +5,7 @@ import akka.persistence.inmemory.extension.{InMemoryJournalStorage, StorageExten
 import akka.testkit.TestProbe
 import com.ing.baker.*
 import com.ing.baker.compiler.RecipeCompiler
-import com.ing.baker.il.CompiledRecipe
+import com.ing.baker.il.recipe.CompiledRecipe
 import com.ing.baker.recipe.dsl.examples.TestRecipe.getRecipe
 import org.slf4j.LoggerFactory
 

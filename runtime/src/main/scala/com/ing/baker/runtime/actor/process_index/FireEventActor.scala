@@ -7,8 +7,8 @@ import akka.actor.{Actor, ActorRef, ActorSystem, Props, ReceiveTimeout}
 import akka.stream.scaladsl.{Source, SourceQueueWithComplete}
 import akka.stream.{Materializer, OverflowStrategy}
 import akka.util.Timeout
-import com.ing.baker.il.CompiledRecipe
-import com.ing.baker.il.petrinet.Transition
+import com.ing.baker.il.recipe.CompiledRecipe
+import com.ing.baker.il.recipe.petrinet.Transition
 import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol.FireEvent
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol.ExceptionStrategy.RetryWithDelay
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceProtocol.*

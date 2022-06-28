@@ -1,11 +1,11 @@
 package com.ing.baker
 package compiler
 
-import com.ing.baker.il.RecipeValidations.postCompileValidations
-import com.ing.baker.il.petrinet.Place.*
-import com.ing.baker.il.petrinet.*
-import com.ing.baker.il.{CompiledRecipe, EventDescriptor, RecipeValidationSettings}
 import com.ing.baker.petrinet.api.*
+import com.ing.baker.il.recipe.*
+import com.ing.baker.il.recipe.petrinet.*
+import com.ing.baker.il.recipe.petrinet.Place.*
+import com.ing.baker.il.recipe.RecipeValidations.postCompileValidations
 import com.ing.baker.recipe.dsl.{Interaction, Recipe}
 
 import scala.language.postfixOps
@@ -173,7 +173,7 @@ object RecipeCompiler {
         arc(multiTransitionPlace, t, 1))
     }
     // the data input arcs / places
-    val dataInputArcs = fieldNamesWithoutPrefix.map(fieldName => arc(Place(fieldName, IngredientPlace), t, 1))
+    val dataInputArcs = fieldNamesWithoutPrefix.map(fieldName => arc(petrinet.Place(fieldName, IngredientPlace), t, 1))
 
     val limitInteractionCountArc =
       t.maximumExecutionCount.map(n => arc(Place(s"limit:${t.label}", FiringLimiterPlace(n)), t, 1))
@@ -223,7 +223,7 @@ object RecipeCompiler {
 
     // events provided from outside
     val sensoryEventTransitions: Seq[EventTransition] = recipe.sensoryEvents.map {
-      event => EventTransition(parseDSLEvent(event), isSensoryEvent = true, event.firingLimit)
+      event => petrinet.EventTransition(parseDSLEvent(event), isSensoryEvent = true, event.firingLimit)
     }
 
     // events provided by other transitions / actions

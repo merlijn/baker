@@ -1,8 +1,7 @@
 package com.ing.baker.runtime.core.internal
 
+import com.ing.baker.il.recipe.petrinet.InteractionTransition
 import java.util.concurrent.ConcurrentHashMap
-
-import com.ing.baker.il.petrinet.InteractionTransition
 import com.ing.baker.runtime.core.InteractionImplementation
 
 import scala.compat.java8.FunctionConverters.*

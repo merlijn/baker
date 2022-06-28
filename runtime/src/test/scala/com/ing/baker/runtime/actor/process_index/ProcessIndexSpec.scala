@@ -1,13 +1,13 @@
 package com.ing.baker.runtime.actor.process_index
 
 import java.util.UUID
-
 import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.stream.testkit.scaladsl.TestSink
 import akka.stream.{ActorMaterializer, Materializer}
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
-import com.ing.baker.il.petrinet.{EventTransition, Place, RecipePetriNet, Transition}
-import com.ing.baker.il.{CompiledRecipe, EventDescriptor, IngredientDescriptor}
+import com.ing.baker.il.petrinet.RecipePetriNet
+import com.ing.baker.il.recipe.petrinet.{EventTransition, Place, Transition}
+import com.ing.baker.il.recipe.{CompiledRecipe, EventDescriptor, IngredientDescriptor, petrinet}
 import com.ing.baker.petrinet.api.{Marking, PetriNet}
 import com.ing.baker.runtime.actor.process_index.ProcessIndex.CheckForProcessesToBeDeleted
 import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol.*
@@ -17,7 +17,7 @@ import com.ing.baker.runtime.actor.recipe_manager.RecipeManagerProtocol
 import com.ing.baker.runtime.actor.recipe_manager.RecipeManagerProtocol.{AllRecipes, GetAllRecipes, RecipeInformation}
 import com.ing.baker.runtime.actor.serialization.Encryption
 import com.ing.baker.runtime.core.internal.InteractionManager
-import com.ing.baker.runtime.core.{ProcessState, ProcessEvent}
+import com.ing.baker.runtime.core.{ProcessEvent, ProcessState}
 import com.ing.baker.types
 import com.typesafe.config.{Config, ConfigFactory}
 import org.mockito.Mockito
@@ -25,7 +25,6 @@ import org.mockito.Mockito.when
 import org.scalatest.concurrent.Eventually
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, Matchers, WordSpecLike}
-import scalax.collection.immutable.Graph
 
 import scala.concurrent.duration.*
 
@@ -162,7 +161,7 @@ class ProcessIndexSpec extends TestKit(ActorSystem("ProcessIndexSpec", ProcessIn
 
       val petrinetMock: RecipePetriNet = mock[RecipePetriNet]
       val eventType = EventDescriptor("Event", Seq.empty)
-      val transitions: Set[Transition] = Set(EventTransition(eventType, true, None))
+      val transitions: Set[Transition] = Set(petrinet.EventTransition(eventType, true, None))
       when(petrinetMock.transitions).thenReturn(transitions)
 
       actorIndex ! CreateProcess(recipeId, processId)
@@ -194,7 +193,7 @@ class ProcessIndexSpec extends TestKit(ActorSystem("ProcessIndexSpec", ProcessIn
 
       val petrinetMock: RecipePetriNet = mock[RecipePetriNet]
       val eventType = EventDescriptor("Event", Seq.empty)
-      val transitions: Set[Transition] = Set(EventTransition(eventType, true, None))
+      val transitions: Set[Transition] = Set(petrinet.EventTransition(eventType, true, None))
       when(petrinetMock.transitions).thenReturn(transitions)
 
       val event = new ProcessEvent("Event", Map.empty)
@@ -249,7 +248,7 @@ class ProcessIndexSpec extends TestKit(ActorSystem("ProcessIndexSpec", ProcessIn
 
       val petrinetMock: RecipePetriNet = mock[RecipePetriNet]
       val eventType = EventDescriptor("Event", Seq(IngredientDescriptor("ingredientName", types.CharArray)))
-      val transitions: Set[Transition] = Set(EventTransition(eventType, true, None))
+      val transitions: Set[Transition] = Set(petrinet.EventTransition(eventType, true, None))
       when(petrinetMock.transitions).thenReturn(transitions)
 
       actorIndex ! CreateProcess(recipeId, processId)
@@ -282,7 +281,7 @@ class ProcessIndexSpec extends TestKit(ActorSystem("ProcessIndexSpec", ProcessIn
 
       val petrinetMock: RecipePetriNet = mock[RecipePetriNet]
       val eventType = EventDescriptor("Event", Seq.empty)
-      val transitions: Set[Transition] = Set(EventTransition(eventType, true, None))
+      val transitions: Set[Transition] = Set(petrinet.EventTransition(eventType, true, None))
       when(petrinetMock.transitions).thenReturn(transitions)
 
       actorIndex ! CreateProcess(recipeId, processId)

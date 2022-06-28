@@ -1,4 +1,6 @@
 package com.ing.baker.petrinet.api
+import scala.language.implicitConversions
+import scala.util.NotGiven
 
 /**
   * Directed Graph
@@ -17,8 +19,9 @@ trait DiGraph[N, E] {
   def outgoingNodes(n: N): Set[N]
 
   def removeNode(n: N): DiGraph[N, E]
-  
-  def removeNodes(nodes: Iterable[N]): DiGraph[N, E] = nodes.foldLeft(this) { case (acc, n) => acc.removeNode(n) }
+
+  def removeNodes(nodes: Iterable[N]): DiGraph[N, E] =
+    nodes.foldLeft(this) { case (acc, n) => acc.removeNode(n) }
 
   def add(source: N, target: N, e: E): DiGraph[N, E]
 }

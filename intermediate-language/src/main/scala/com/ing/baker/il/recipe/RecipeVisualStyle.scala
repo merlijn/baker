@@ -1,7 +1,7 @@
-package com.ing.baker.il
+package com.ing.baker.il.recipe
 
-import com.ing.baker.il.RecipeVisualizer.Dot.DotAttr
-import com.ing.baker.il.RecipeVisualizer.log
+import com.ing.baker.il.recipe.RecipeVisualizer.Dot.DotAttr
+import com.ing.baker.il.recipe.RecipeVisualizer.log
 import com.typesafe.config.Config
 
 import scala.collection.JavaConverters.*

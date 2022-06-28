@@ -1,7 +1,7 @@
 package com.ing.baker.compiler
 
 import java.util.Optional
-import com.ing.baker.il.{CompiledRecipe, RecipeValidationSettings}
+import com.ing.baker.il.recipe.{CompiledRecipe, RecipeValidationSettings}
 import com.ing.baker.recipe.dsl.*
 import com.ing.baker.recipe.dsl.Constants.processId
 import com.ing.baker.recipe.dsl.examples.Webshop

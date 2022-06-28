@@ -1,4 +1,4 @@
-package com.ing.baker.il.petrinet
+package com.ing.baker.il.recipe.petrinet
 
 case class Edge(allowedEventName: Option[String]) {
 

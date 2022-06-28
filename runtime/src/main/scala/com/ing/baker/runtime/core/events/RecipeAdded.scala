@@ -1,6 +1,6 @@
 package com.ing.baker.runtime.core.events
 
-import com.ing.baker.il.CompiledRecipe
+import com.ing.baker.il.recipe.CompiledRecipe
 
 /**
   * An event describing the fact that a recipe was added to baker.

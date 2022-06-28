@@ -3,10 +3,6 @@ package com.ing.baker.petrinet.api
 import PetriNet.Edge
 
 object PetriNet {
-  
-  case class Weight(n: Int) extends AnyVal
-  
-  type Weighted[T] = T => Weight
 
   case class Edge[P, T](source: Either[P, T], target: Either[P, T], weight: Int, label: Option[Any])
   
@@ -32,6 +28,8 @@ object PetriNet {
 case class PetriNet[P, T](places: Set[P], transitions: Set[T], edges: Set[Edge[P, T]]) extends DiGraph[Either[P, T], PetriNet.Edge[P, T]] {
   
   type InnerEdge = Edge[P, T]
+
+  override def add(a: Either[P, T], b: Either[P, T], e: PetriNet.Edge[P, T]) = ???
   
   def removePlace(p: P): PetriNet[P, T] = {
     
@@ -80,10 +78,6 @@ case class PetriNet[P, T](places: Set[P], transitions: Set[T], edges: Set[Edge[P
     }
     
     PetriNet[P, T](places, transitions, newEdges)
-  }
-
-  override def add(source: Either[P, T], target: Either[P, T], e: Edge[P, T]): PetriNet[P, T] = {
-    this
   }
 
   /**

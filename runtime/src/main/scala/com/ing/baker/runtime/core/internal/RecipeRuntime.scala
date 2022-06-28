@@ -1,11 +1,12 @@
 package com.ing.baker.runtime.core.internal
 
 import java.lang.reflect.InvocationTargetException
-
 import akka.event.EventStream
 import cats.effect.IO
-import com.ing.baker.il.{CompiledRecipe, IngredientDescriptor, InteractionFailureStrategyOutcome, processIdName}
-import com.ing.baker.il.petrinet.*
+import com.ing.baker.il.processIdName
+import com.ing.baker.il.recipe.petrinet.*
+import com.ing.baker.il.recipe.petrinet.{Edge, EventTransition, InteractionTransition, Place, Transition}
+import com.ing.baker.il.recipe.{CompiledRecipe, IngredientDescriptor, InteractionFailureStrategyOutcome}
 import com.ing.baker.petrinet.api.*
 import com.ing.baker.runtime.actor.process_instance.ProcessInstanceRuntime
 import com.ing.baker.runtime.actor.process_instance.internal.ExceptionStrategy.{BlockTransition, Continue, RetryWithDelay}

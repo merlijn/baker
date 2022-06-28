@@ -1,7 +1,6 @@
 package com.ing.baker.runtime.core
 
 import java.util.concurrent.TimeoutException
-
 import akka.NotUsed
 import akka.actor.{Actor, ActorSystem, Props}
 import akka.pattern.ask
@@ -10,7 +9,9 @@ import akka.persistence.query.scaladsl.*
 import akka.stream.scaladsl.{Sink, Source}
 import akka.util.Timeout
 import com.ing.baker.il.*
-import com.ing.baker.il.petrinet.*
+import com.ing.baker.il.recipe.petrinet.*
+import com.ing.baker.il.recipe.CompiledRecipe
+import com.ing.baker.il.recipe.petrinet.{Place, Transition}
 import com.ing.baker.runtime.actor.*
 import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol
 import com.ing.baker.runtime.actor.process_index.ProcessIndexProtocol.*

@@ -1,27 +1,26 @@
-package com.ing.baker.il
+package com.ing.baker.il.recipe
 
-import com.ing.baker.il.RecipeVisualizer.Dot.*
-import com.ing.baker.il.petrinet.Place.*
-import com.ing.baker.il.petrinet.*
-import com.ing.baker.petrinet.api.*
+import com.ing.baker.il.recipe.RecipeVisualStyle
+import com.ing.baker.il.recipe.petrinet.Place.*
+import com.ing.baker.il.recipe.petrinet.*
+import com.ing.baker.petrinet.api.{DiGraph, PetriNet}
 import com.typesafe.config.{Config, ConfigFactory}
 import org.slf4j.LoggerFactory
-
-import scala.language.higherKinds
+import RecipeVisualizer.Dot.*
 
 object RecipeVisualizer {
-  
+
   object Dot {
-    
+
     object DotAttr {
       def apply(key: String, value: Double): DotAttr = DotAttr(key, value.toString)
     }
-    
+
     case class DotAttr(key: String, value: String)
     case class DotRoot(directed: Boolean, nodeAttributes: Seq[DotAttr], rootAttributes: Seq[DotAttr])
 
     case class DotNode(id: String, attributes: Seq[DotAttr])
-    
+
     case class DotEdge(source: String, target: String, attributes: Seq[DotAttr])
 
     def createDotRepr[N, E](graph: DiGraph[N, E], root: DotRoot, nodeFn: N => DotNode, edgeFn: E => DotEdge): String = {
@@ -34,26 +33,26 @@ object RecipeVisualizer {
   type RecipeEdge = PetriNet.Edge[Place, Transition]
 
   type RecipePetriNet = DiGraph[Either[Place, Transition], RecipeEdge]
-  
+
   type RecipeNode = Either[Place, Transition]
-  
+
   implicit class RecipePetriNetGraphFns(graph: RecipePetriNet) {
 
     def compactNode(node: Either[Place, Transition]): RecipePetriNet = {
 
       val incoming = graph.incomingNodes(node)
       val outgoing = graph.outgoingNodes(node)
-      
+
       // create direct edges from all incoming to outgoing nodes
       val newEdges = incoming.flatMap { in =>
         outgoing.map(out => PetriNet.Edge[Place, Transition](in, out, 0, None))
       }
-      
+
       val removed = graph.removeNodes(graph.incomingNodes(node) ++ graph.outgoingNodes(node) + node)
 
       // remove the node, removes all it's incoming and outgoing edges and add the new direct edges
       newEdges.foldLeft(removed) {
-        case (acc, e) => acc.add(e.source, e.target, e) 
+        case (acc, e) => acc.add(e.source, e.target, e)
       }
     }
 
@@ -110,12 +109,12 @@ object RecipeVisualizer {
       nodeAttributes = style.commonNodeAttributes,
       rootAttributes = style.rootAttributes)
 
-    def nodeStyleFn(node: RecipeNode): DotNode = 
+    def nodeStyleFn(node: RecipeNode): DotNode =
       DotNode(nodeIdFn(node), nodeDotAttrFn(graph, style)(node, eventNames, ingredientNames))
 
     def edgeStyleFn(edge: RecipeEdge): DotEdge =
       DotEdge(nodeIdFn(edge.source), nodeIdFn(edge.target), List.empty)
-    
+
 
     // specifies which places to compact (remove)
     val placesToCompact = (node: RecipeNode) => node match {
@@ -178,7 +177,7 @@ object RecipeVisualizer {
     def nodeStyleFn(node: Either[P, T]): DotNode = DotNode(nodeLabelFn(node), nodeDotAttrFn(node))
 
     def edgeStyleFn(edge: PetriNet.Edge[P, T]): DotEdge = DotEdge(nodeLabelFn(edge.source), nodeLabelFn(edge.target), List.empty)
-    
+
     // creates the .dot representation
     createDotRepr(
       graph = graph,

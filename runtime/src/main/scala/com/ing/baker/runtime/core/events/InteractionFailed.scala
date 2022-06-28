@@ -1,6 +1,6 @@
 package com.ing.baker.runtime.core.events
 
-import com.ing.baker.il.InteractionFailureStrategyOutcome
+import com.ing.baker.il.recipe.InteractionFailureStrategyOutcome
 
 /**
   * Event describing the fact that an interaction failed during execution

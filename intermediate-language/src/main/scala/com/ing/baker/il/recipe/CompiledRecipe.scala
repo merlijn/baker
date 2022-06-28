@@ -1,12 +1,24 @@
-package com.ing.baker.il
+package com.ing.baker.il.recipe
 
-import com.ing.baker.il.petrinet.{EventTransition, InteractionTransition, Place, RecipePetriNet}
-import com.ing.baker.petrinet.api.Marking
+import com.ing.baker.il.recipe.petrinet.{EventTransition, InteractionTransition, Place, Transition}
+import com.ing.baker.il.zeroPaddedSHA256
+import com.ing.baker.petrinet.api.{Marking, PetriNet}
 
 import scala.collection.JavaConverters.*
 import scala.concurrent.duration.FiniteDuration
+import CompiledRecipe.RecipePetriNet
 
 object CompiledRecipe {
+
+  /**
+    * Type alias for a petri net with recipe Place and Transition types
+    */
+  type RecipePetriNet = PetriNet[Place, Transition]
+
+  /**
+    * Type alias for the node type of the scalax.collection.Graph backing the petri net.
+    */
+  type Node = Either[Place, Transition]
 
   def apply(name: String, petriNet: RecipePetriNet, initialMarking: Marking[Place], validationErrors: Seq[String],
             retentionPeriod: Option[FiniteDuration]): CompiledRecipe = {

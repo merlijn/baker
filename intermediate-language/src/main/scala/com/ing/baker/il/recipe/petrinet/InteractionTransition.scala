@@ -1,9 +1,8 @@
-package com.ing.baker.il.petrinet
+package com.ing.baker.il.recipe.petrinet
 
-import com.ing.baker.il
-import com.ing.baker.il.{InteractionFailureStrategy, _}
-import org.slf4j.*
-
+import com.ing.baker.il.processIdName
+import com.ing.baker.il.recipe.petrinet.Transition
+import com.ing.baker.il.recipe.{EventDescriptor, IngredientDescriptor, InteractionFailureStrategy}
 
 /**
   * A transition that represents an Interaction
