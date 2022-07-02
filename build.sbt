@@ -69,6 +69,20 @@ lazy val recipeDsl = project
         )
   )
 
+lazy val graphLib = project
+  .in(file("graph-lib"))
+  .settings(defaultModuleSettings)
+  .settings(
+    moduleName := "graph-lib",
+    libraryDependencies ++= Seq(
+      scalaTest % "test",
+      scalaTestCheck % "test",
+      junitInterface % "test",
+      slf4jApi % "test",
+      logback % "test"
+    )
+  )
+
 lazy val intermediateLanguage = project.in(file("intermediate-language"))
   .settings(defaultModuleSettings)
   .settings(
@@ -80,7 +94,7 @@ lazy val intermediateLanguage = project.in(file("intermediate-language"))
       scalaTestCheck % "test",
       scalaCheck % "test",
       logback % "test")
-  )
+  ).dependsOn(graphLib)
 
 lazy val runtime = project.in(file("runtime"))
   .settings(defaultModuleSettings)
@@ -117,7 +131,7 @@ lazy val runtime = project.in(file("runtime"))
         mockito % "test",
         logback % "test")
   )
-  .dependsOn(intermediateLanguage, testScope(recipeDsl), testScope(recipeCompiler))
+  .dependsOn(graphLib)
 
 lazy val recipeCompiler = project.in(file("compiler"))
   .settings(defaultModuleSettings)
@@ -136,4 +150,4 @@ lazy val baker = project
   .in(file("."))
   .settings(defaultModuleSettings)
   .settings(noPublishSettings)
-  .aggregate(recipeDsl, intermediateLanguage, recipeCompiler)
+  .aggregate(recipeDsl, intermediateLanguage, recipeCompiler, runtime)
