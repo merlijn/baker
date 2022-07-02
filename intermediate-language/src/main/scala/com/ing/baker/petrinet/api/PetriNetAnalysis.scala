@@ -46,7 +46,7 @@ object PetriNetAnalysis {
     def maxNrTokens: Int = (marking.values ++ children.values.map(_.maxNrTokens)).max
   }
 
-  def optimize[P, T](petrinet: PetriNet[P, T], m0: MultiSet[P]): (PetriNet[P, T], MultiSet[P]) = {
+  def optimize[P, T, E](petrinet: PetriNet[P, T, E], m0: MultiSet[P]): (PetriNet[P, T, E], MultiSet[P]) = {
 
     val unboundedTransitions = unboundedEnabled(petrinet, m0)
 
@@ -66,7 +66,7 @@ object PetriNetAnalysis {
     }
   }
 
-  def unboundedEnabled[P, T](petrinet: PetriNet[P, T], m0: MultiSet[P]): Iterable[T] = {
+  def unboundedEnabled[P, T, E](petrinet: PetriNet[P, T, E], m0: MultiSet[P]): Iterable[T] = {
 
     val coldTransitions = petrinet.transitions.filter(t => petrinet.incomingPlaces(t).isEmpty)
     val unboundedMarking = m0.filter { case (_, n) => n == W }
@@ -79,7 +79,7 @@ object PetriNetAnalysis {
   /**
    * Implements page 47 of http://cpntools.org/_media/book/covgraph.pdf
    */
-  def calculateCoverabilityTree[P, T](petrinet: PetriNet[P, T], m0: MultiSet[P]): Node[P, T] = {
+  def calculateCoverabilityTree[P, T, E](petrinet: PetriNet[P, T, E], m0: MultiSet[P]): Node[P, T] = {
 
     val (pn, initialMarking) = optimize(petrinet, m0)
 

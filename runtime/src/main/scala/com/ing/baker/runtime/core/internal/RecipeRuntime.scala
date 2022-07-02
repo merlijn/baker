@@ -116,7 +116,7 @@ class RecipeRuntime(recipe: CompiledRecipe, interactionManager: InteractionManag
   /**
     * Tokens which are inhibited by the Edge filter may not be consumed.
     */
-  override def consumableTokens(petriNet: PetriNet[Place, Transition])(marking: Marking[Place], p: Place, t: Transition): MultiSet[Any] = {
+  override def consumableTokens(petriNet: PetriNet[Place, Transition, Edge])(marking: Marking[Place], p: Place, t: Transition): MultiSet[Any] = {
     val edge = petriNet.findPTEdge(p, t).map(_.asInstanceOf[Edge]).get
 
     marking.get(p) match {
@@ -159,7 +159,7 @@ class RecipeRuntime(recipe: CompiledRecipe, interactionManager: InteractionManag
       }
   }
 
-  override def transitionTask(petriNet: PetriNet[Place, Transition], t: Transition)(marking: Marking[Place], state: ProcessState, input: Any): IO[(Marking[Place], ProcessEvent)] =
+  override def transitionTask(petriNet: PetriNet[Place, Transition, Edge], t: Transition)(marking: Marking[Place], state: ProcessState, input: Any): IO[(Marking[Place], ProcessEvent)] =
     t match {
       case i: InteractionTransition => interactionTask(i, petriNet.outMarking(t), state)
       case e: EventTransition       => IO.pure(petriNet.outMarking(t).toMarking, input.asInstanceOf[ProcessEvent])

@@ -136,4 +136,4 @@ lazy val baker = project
   .in(file("."))
   .settings(defaultModuleSettings)
   .settings(noPublishSettings)
-  .aggregate(recipeDsl, intermediateLanguage, recipeCompiler, runtime)
+  .aggregate(recipeDsl, intermediateLanguage, recipeCompiler)

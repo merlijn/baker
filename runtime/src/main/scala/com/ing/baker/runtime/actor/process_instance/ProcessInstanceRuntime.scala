@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory
  * @tparam S The state type
  * @tparam E The event type
  */
-trait ProcessInstanceRuntime[P : Identifiable, T : Identifiable, S, E] {
+trait ProcessInstanceRuntime[P : Identifiable, T : Identifiable, PE, S, E] {
 
   val logger = LoggerFactory.getLogger(classOf[ProcessInstanceRuntime[_,_,_,_]])
 
@@ -40,7 +40,7 @@ trait ProcessInstanceRuntime[P : Identifiable, T : Identifiable, S, E] {
   /**
     * Returns the task that should be executed for a transition.
     */
-  def transitionTask(petriNet: PetriNet[P, T], t: T)(marking: Marking[P], state: S, input: Any): IO[(Marking[P], E)]
+  def transitionTask(petriNet: PetriNet[P, T, PE], t: T)(marking: Marking[P], state: S, input: Any): IO[(Marking[P], E)]
 
   /**
     * Checks if a transition is automatically 'fireable' by the runtime (not triggered by some outside input).
@@ -57,7 +57,7 @@ trait ProcessInstanceRuntime[P : Identifiable, T : Identifiable, S, E] {
     *
     * You can override this for example in case you use a colored (data) petri net model with filter rules on the edges.
     */
-  def consumableTokens(petriNet: PetriNet[P, T])(marking: Marking[P], p: P, t: T): MultiSet[Any] = marking.getOrElse(p, MultiSet.empty)
+  def consumableTokens(petriNet: PetriNet[P, T, PE])(marking: Marking[P], p: P, t: T): MultiSet[Any] = marking.getOrElse(p, MultiSet.empty)
   
   /**
     * Takes a Job specification, executes it and returns a TransitionEvent (asychronously using cats.effect.IO)
@@ -70,7 +70,7 @@ trait ProcessInstanceRuntime[P : Identifiable, T : Identifiable, S, E] {
     * However, since that is not used this can be refactored to a simple function: Job -> TransitionEvent
     *
     */
-  def jobExecutor(topology: PetriNet[P, T]): Job[P, T, S] => IO[TransitionEvent] = {
+  def jobExecutor(topology: PetriNet[P, T, PE]): Job[P, T, S] => IO[TransitionEvent] = {
 
     def exceptionStackTrace(e: Throwable): String = {
       val sw = new StringWriter()
@@ -105,10 +105,10 @@ trait ProcessInstanceRuntime[P : Identifiable, T : Identifiable, S, E] {
     }
   }
 
-  def enabledParameters(petriNet: PetriNet[P, T])(m: Marking[P]): Map[T, Iterable[Marking[P]]] =
+  def enabledParameters(petriNet: PetriNet[P, T, PE])(m: Marking[P]): Map[T, Iterable[Marking[P]]] =
     enabledTransitions(petriNet)(m).view.map(t => t -> consumableMarkings(petriNet)(m, t)).toMap
 
-  def consumableMarkings(petriNet: PetriNet[P, T])(marking: Marking[P], t: T): Iterable[Marking[P]] = {
+  def consumableMarkings(petriNet: PetriNet[P, T, PE])(marking: Marking[P], t: T): Iterable[Marking[P]] = {
     // TODO this is not the most efficient, should break early when consumable tokens < edge weight
     val consumable = petriNet.inMarking(t).map {
       case (place, count) => (place, count, consumableTokens(petriNet)(marking, place, t))
@@ -130,13 +130,13 @@ trait ProcessInstanceRuntime[P : Identifiable, T : Identifiable, S, E] {
   /**
     * Checks whether a transition is 'enabled' in a marking.
     */
-  def isEnabled(petriNet: PetriNet[P, T])(marking: Marking[P], t: T): Boolean = 
+  def isEnabled(petriNet: PetriNet[P, T, PE])(marking: Marking[P], t: T): Boolean =
     consumableMarkings(petriNet)(marking, t).nonEmpty
 
   /**
     * Returns all enabled transitions for a marking.
     */
-  def enabledTransitions(petriNet: PetriNet[P, T])(marking: Marking[P]): Iterable[T] =
+  def enabledTransitions(petriNet: PetriNet[P, T, PE])(marking: Marking[P]): Iterable[T] =
     petriNet.transitions.filter(t => consumableMarkings(petriNet)(marking, t).nonEmpty)
 
   /**

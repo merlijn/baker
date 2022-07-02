@@ -52,7 +52,7 @@ object ProcessInstanceEventSourcing {
   case class InitializedEvent(marking: Marking[Id],
                               state: Any) extends Event
 
-  def apply[P : Identifiable, T : Identifiable, S, E](sourceFn: T => (S => E => S)): Instance[P, T, S] => Event => Instance[P, T, S] = instance => {
+  def apply[P : Identifiable, T : Identifiable, PE, S, E](sourceFn: T => (S => E => S)): Instance[P, T, PE, S] => Event => Instance[P, T, S] = instance => {
     case InitializedEvent(initial, initialState) =>
 
       val initialMarking: Marking[P] = initial.unmarshall(instance.petriNet.places)
@@ -86,22 +86,22 @@ object ProcessInstanceEventSourcing {
       instance.copy[P, T, S](jobs = instance.jobs + (job.id -> updatedJob))
   }
 
-  def eventsForInstance[P : Identifiable, T : Identifiable, S, E](
+  def eventsForInstance[P : Identifiable, T : Identifiable, PE, S, E](
       processTypeName: String,
       processId: String,
-      topology: PetriNet[P, T],
+      topology: PetriNet[P, T, PE],
       encryption: Encryption = NoEncryption,
       readJournal: CurrentEventsByPersistenceIdQuery,
-      eventSourceFn: T => (S => E => S))(using actorSystem: ActorSystem): Source[(Instance[P, T, S], Event), NotUsed] = {
+      eventSourceFn: T => (S => E => S))(using actorSystem: ActorSystem): Source[(Instance[P, T, PE, S], Event), NotUsed] = {
 
     val protoEventAdapter = new ProtoEventAdapterImpl(SerializationExtension.get(actorSystem), encryption)
-    val serializer = new ProcessInstanceSerialization[P, T, S, E](protoEventAdapter)
+    val serializer = new ProcessInstanceSerialization[P, T, PE, S, E](protoEventAdapter)
 
     val persistentId = ProcessInstance.processId2PersistenceId(processTypeName, processId)
     val src = readJournal.currentEventsByPersistenceId(persistentId, 0, Long.MaxValue)
-    val eventSource = ProcessInstanceEventSourcing.apply[P, T, S, E](eventSourceFn)
+    val eventSource = ProcessInstanceEventSourcing.apply[P, T, PE, S, E](eventSourceFn)
 
-    src.scan[(Instance[P, T, S], Event)]((Instance.uninitialized[P, T, S](topology), null.asInstanceOf[Event])) {
+    src.scan[(Instance[P, T, S], Event)]((Instance.uninitialized[P, T, PE, S](topology), null.asInstanceOf[Event])) {
       case ((instance, _), e) =>
         val serializedEvent = e.event.asInstanceOf[AnyRef]
         val deserializedEvent = serializer.deserializeEvent(serializedEvent)(instance)
@@ -111,26 +111,26 @@ object ProcessInstanceEventSourcing {
   }
 }
 
-abstract class ProcessInstanceEventSourcing[P : Identifiable, T : Identifiable, S, E](
-    val petriNet: PetriNet[P, T],
+abstract class ProcessInstanceEventSourcing[P : Identifiable, T : Identifiable, PE, S, E](
+    val petriNet: PetriNet[P, T, PE],
     encryption: Encryption,
     eventSourceFn: T => (S => E => S)) extends PersistentActor {
 
   implicit val system: ActorSystem = context.system
 
-  val eventSource = ProcessInstanceEventSourcing.apply[P, T, S, E](eventSourceFn)
+  val eventSource = ProcessInstanceEventSourcing.apply[P, T, PE, S, E](eventSourceFn)
 
   private val protoEventAdapter = new ProtoEventAdapterImpl(SerializationExtension.get(system), encryption)
   private val serializer = new ProcessInstanceSerialization[P, T, S, E](protoEventAdapter)
 
-  def onRecoveryCompleted(state: Instance[P, T, S]): Unit
+  def onRecoveryCompleted(state: Instance[P, T, PE, S]): Unit
 
-  def persistEvent[O](instance: Instance[P, T, S], e: Event)(fn: Event => O): Unit = {
+  def persistEvent[O](instance: Instance[P, T, PE, S], e: Event)(fn: Event => O): Unit = {
     val serializedEvent = serializer.serializeEvent(e)(instance)
     persist(serializedEvent) { persisted => fn(e) }
   }
 
-  private var recoveringState: Instance[P, T, S] = Instance.uninitialized[P, T, S](petriNet)
+  private var recoveringState: Instance[P, T, PE, S] = Instance.uninitialized[P, T, PE, S](petriNet)
 
   private def applyToRecoveringState(e: AnyRef) = {
     val deserializedEvent = serializer.deserializeEvent(e)(recoveringState)

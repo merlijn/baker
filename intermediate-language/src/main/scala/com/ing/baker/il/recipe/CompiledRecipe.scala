@@ -7,13 +7,14 @@ import com.ing.baker.petrinet.api.{Marking, PetriNet}
 import scala.collection.JavaConverters.*
 import scala.concurrent.duration.FiniteDuration
 import CompiledRecipe.RecipePetriNet
+import petrinet.Edge
 
 object CompiledRecipe {
 
   /**
     * Type alias for a petri net with recipe Place and Transition types
     */
-  type RecipePetriNet = PetriNet[Place, Transition]
+  type RecipePetriNet = PetriNet[Place, Transition, Edge]
 
   /**
     * Type alias for the node type of the scalax.collection.Graph backing the petri net.

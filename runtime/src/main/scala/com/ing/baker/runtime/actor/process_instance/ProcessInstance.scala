@@ -53,11 +53,11 @@ object ProcessInstance {
 /**
   * This actor is responsible for maintaining the state of a single petri net instance.
   */
-class ProcessInstance[P : Identifiable, T : Identifiable, S, E](
+class ProcessInstance[P : Identifiable, T : Identifiable, PE, S, E](
      processType: String,
-     petriNet: PetriNet[P, T],
+     petriNet: PetriNet[P, T, PE],
      settings: Settings,
-     runtime: ProcessInstanceRuntime[P, T, S, E]) extends ProcessInstanceEventSourcing[P, T, S, E](petriNet, settings.encryption, runtime.eventSource) {
+     runtime: ProcessInstanceRuntime[P, T, PE, S, E]) extends ProcessInstanceEventSourcing[P, T, PE, S, E](petriNet, settings.encryption, runtime.eventSource) {
 
   import context.dispatcher
 

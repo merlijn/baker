@@ -5,44 +5,33 @@ import scala.reflect.Typeable
 
 object PetriNet {
 
-  sealed trait Edge[P, T] {
+  sealed trait InnerEdge[P, T, E] {
     val source: P | T
     val target: P | T
     val weight: Int
+    val value: E
   }
 
-  case class PTEdge[P, T](override val source: P, override val target: T, override val weight: Int, label: Option[Any]) extends Edge[P, T]
-  case class TPEdge[P, T](override val source: T, override val target: P, override val weight: Int, label: Option[Any]) extends Edge[P, T]
+  case class PTEdge[P, T, E](override val source: P, override val target: T, override val weight: Int, value: E) extends InnerEdge[P, T, E]
+  case class TPEdge[P, T, E](override val source: T, override val target: P, override val weight: Int, value: E) extends InnerEdge[P, T, E]
 
-  def apply[P : Typeable, T : Typeable](edges: Set[Edge[P, T]]): PetriNet[P, T] = {
-    
-    val places = edges.collect {
-      case TPEdge(_, p, _, _) => p
-      case PTEdge(p, _, _, _) => p
-    }
-    
-    val transitions = edges.collect {
-      case TPEdge(t, _, _, _) => t
-      case PTEdge(_, t, _, _) => t
-    }
+  def apply[P : Typeable, T : Typeable, E](edges: Set[InnerEdge[P, T, E]]): PetriNet[P, T, E] = {
 
     val innerNodes: Set[Either[P, T]] = edges.flatMap {
       case TPEdge(t, p, _, _) => Set(Left(p), Right(t))
       case PTEdge(p, t, _, _) => Set(Left(p), Right(t))
     }
     
-    PetriNet[P, T](innerNodes, edges)
+    PetriNet[P, T, E](innerNodes, edges)
   }
 }
 
 /**
  * Petri net class.
  */
-case class PetriNet[P : Typeable : Not[T], T : Typeable : Not[P]]
-  (private val innerNodes: Set[Either[P,T]], innerEdges: Set[Edge[P, T]]) extends DiGraph[P | T, Edge[P, T]] {
+case class PetriNet[P : Typeable : Not[T], T : Typeable : Not[P], E]
+  (private val innerNodes: Set[Either[P,T]], private val innerEdges: Set[InnerEdge[P, T, E]]) extends DiGraph[P | T, E] {
   
-  type InnerEdge = Edge[P, T]
-
   def places: Iterable[P] = innerNodes.view.collect { case Left(p) => p }
 
   def transitions: Iterable[T] = innerNodes.view.collect { case Right(t) => t }
@@ -52,27 +41,27 @@ case class PetriNet[P : Typeable : Not[T], T : Typeable : Not[P]]
     *
     * @return The set of nodes.
     */
-  override def nodes: Iterable[P | T] = innerNodes.map {
+  override def nodes: Iterable[P | T] = innerNodes.view.map {
     case Left(p) => p
     case Right(t) => t
   }
 
-  override def edges: Iterable[Edge[P, T]] = innerEdges
+  override def edges: Iterable[E] = innerEdges.map(_.value)
 
-  override def add(a: P | T, b: P | T, e: PetriNet.Edge[P, T]): DiGraph[P | T, Edge[P, T]] = ???
+  override def add(a: P | T, b: P | T, e: E): DiGraph[P | T, E] = ???
 
-  def removePlace(p: P): PetriNet[P, T] = {
+  def removePlace(p: P): PetriNet[P, T, E] = {
 
     val newEdges = innerEdges.filter(e => e.source == p || e.target == p)
 
-    PetriNet[P, T](innerNodes - Left(p), newEdges)
+    PetriNet[P, T, E](innerNodes - Left(p), newEdges)
   }
   
-  def removeTransition(t: T): PetriNet[P, T] = {
+  def removeTransition(t: T): PetriNet[P, T, E] = {
     
     val newEdges = innerEdges.filter(e => e.source == t || e.target == t)
     
-    PetriNet[P, T](innerNodes - Right(t), newEdges)
+    PetriNet[P, T, E](innerNodes - Right(t), newEdges)
   }
   
   def removeTransitions(transitions: Iterable[T]) = transitions.foldLeft(this) {
@@ -91,13 +80,13 @@ case class PetriNet[P : Typeable : Not[T], T : Typeable : Not[P]]
 
   override def outgoingNodes(n: P | T): Set[P | T] = ???
 
-  override def removeNode(n: P | T): PetriNet[P, T] = {
+  override def removeNode(n: P | T): PetriNet[P, T, E] = {
 
     val newEdges = innerEdges.filter(e => e.source == n || e.target == n)
 
     n match {
-      case p: P => PetriNet[P, T](innerNodes - Left(p), newEdges)
-      case t: T => PetriNet[P, T](innerNodes - Right(t), newEdges)
+      case p: P => PetriNet[P, T, E](innerNodes - Left(p), newEdges)
+      case t: T => PetriNet[P, T, E](innerNodes - Right(t), newEdges)
     }
   }
 
@@ -145,7 +134,7 @@ case class PetriNet[P : Typeable : Not[T], T : Typeable : Not[P]]
     * @param t transition
     * @return
     */
-  def inMarking(t: T): MultiSet[P] = edges.collect {
+  def inMarking(t: T): MultiSet[P] = innerEdges.collect {
     case PTEdge(p, `t`, weight, _) => p -> weight
   }.toMap
 
@@ -155,7 +144,7 @@ case class PetriNet[P : Typeable : Not[T], T : Typeable : Not[P]]
     * @param t transition
     * @return
     */
-  def outMarking(t: T): MultiSet[P] = edges.collect {
+  def outMarking(t: T): MultiSet[P] = innerEdges.collect {
     case TPEdge(`t`, p, weight, _) => p -> weight
   }.toMap
 
@@ -166,7 +155,7 @@ case class PetriNet[P : Typeable : Not[T], T : Typeable : Not[P]]
     * @param to The target transition.
     * @return
     */
-  def findPTEdge(from: P, to: T): Option[Any] = edges.collectFirst {
+  def findPTEdge(from: P, to: T): Option[Any] = innerEdges.collectFirst {
     case PTEdge(`from`, `to`, _, label) => label
   }
 
@@ -177,7 +166,7 @@ case class PetriNet[P : Typeable : Not[T], T : Typeable : Not[P]]
     * @param to The target place.
     * @return
     */
-  def findTPEdge(from: T, to: P): Option[Any] = edges.collectFirst {
+  def findTPEdge(from: T, to: P): Option[Any] = innerEdges.collectFirst {
     case TPEdge(`from`, `to`, _, label) => label
   }
 }
