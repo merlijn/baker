@@ -1,6 +1,6 @@
 package com.ing.baker.il.recipe
 
-import com.ing.baker.il.recipe.RecipeVisualizer.Dot.DotAttr
+import com.ing.baker.il.recipe.RecipeVisualizer.GraphViz.DotAttr
 import com.ing.baker.il.recipe.RecipeVisualizer.log
 import com.typesafe.config.Config
 

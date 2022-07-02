@@ -73,7 +73,7 @@ case class CompiledRecipe(name: String,
 
   def sensoryEvents: Set[EventDescriptor] = petriNet.transitions.collect {
     case EventTransition(eventDescriptor, true, _) => eventDescriptor
-  }
+  }.toSet
 
   /**
     * Visualise the compiled recipe in DOT format
@@ -91,7 +91,7 @@ case class CompiledRecipe(name: String,
 
   val interactionTransitions: Set[InteractionTransition] = petriNet.transitions.collect {
     case t: InteractionTransition => t
-  }
+  }.toSet
 
   val interactionEvents: Set[EventDescriptor] = interactionTransitions flatMap (it => it.events)
 

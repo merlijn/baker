@@ -58,8 +58,7 @@ case class ProcessEvent(name: String,
 //            value.validate(ingredient.`type`).map(
 //              reason => s"ingredient '${ingredient.name}' has an incorrect type:\n$reason"
 //            ).toSeq
-          case _ =>
-            Seq.empty
+          case null => Seq.empty
         }
     }
   }

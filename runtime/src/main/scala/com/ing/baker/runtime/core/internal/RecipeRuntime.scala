@@ -121,7 +121,7 @@ class RecipeRuntime(recipe: CompiledRecipe, interactionManager: InteractionManag
 
     marking.get(p) match {
       case None         => MultiSet.empty
-      case Some(tokens) => tokens.filter { case (e, _) => edge.isTokenAllowed(e) }
+      case Some(tokens) => tokens.filter { case (e, _) => edge.filterToken(e) }
     }
   }
 

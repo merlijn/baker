@@ -51,10 +51,10 @@ object RecipeCompiler {
   }
 
   def arc(t: Transition, p: Place, weight: Int): Arc = 
-    PetriNet.Edge(Right(t), Left(p), weight, Some(Edge(None)))
+    PetriNet.TPEdge(t, p, weight, Some(Edge(None)))
 
   def arc(p: Place, t: Transition, weight: Int, eventFilter: Option[String] = None): Arc =
-    PetriNet.Edge(Left(p), Right(t), weight, Some(Edge(eventFilter)))
+    PetriNet.PTEdge(p, t, weight, Some(Edge(eventFilter)))
 
   /**
     * Creates a transition for a missing event in the recipe.

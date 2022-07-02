@@ -2,6 +2,12 @@ package com.ing.baker.petrinet.api
 import scala.language.implicitConversions
 import scala.util.NotGiven
 
+opaque type Weighted[E] = E => Int
+
+object Weighted {
+  def apply[E](fn: E => Int): Weighted[E] = fn
+}
+
 /**
   * Directed Graph
   * 
@@ -10,9 +16,9 @@ import scala.util.NotGiven
   */
 trait DiGraph[N, E] {
 
-  def nodes: Set[N]
+  def nodes: Iterable[N]
 
-  def edges: Set[E]
+  def edges: Iterable[E]
 
   def incomingNodes(n: N): Set[N]
 

@@ -12,7 +12,7 @@ package object process_instance {
   
   extension(marking: Marking[Id]) {
     
-    def unmarshall[P : Identifiable](places: Set[P]) =
+    def unmarshall[P : Identifiable](places: Iterable[P]) =
       translateMapKeys(marking, (id: Id) => places.getById(id, "place in petrinet"))
   }
 
