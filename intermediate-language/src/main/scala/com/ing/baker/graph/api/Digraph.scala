@@ -1,4 +1,5 @@
-package com.ing.baker.petrinet.api
+package com.ing.baker.graph.api
+
 import scala.language.implicitConversions
 import scala.util.NotGiven
 

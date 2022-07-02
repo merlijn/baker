@@ -2,8 +2,8 @@ package com.ing.baker.il.recipe
 
 import com.ing.baker.il.recipe.RecipeValidationSettings
 import com.ing.baker.il.recipe.petrinet.InteractionTransition
-import com.ing.baker.petrinet.api.PetriNetAnalysis
-import com.ing.baker.petrinet.api.multiplicities
+import com.ing.baker.graph.api.PetriNetAnalysis
+import com.ing.baker.graph.api.multiplicities
 
 import scala.collection.mutable
 

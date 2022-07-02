@@ -1,4 +1,4 @@
-package com.ing.baker.petrinet.api
+package com.ing.baker.graph.api
 
 import org.scalatest.*
 import org.scalatest.matchers.*

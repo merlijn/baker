@@ -1,4 +1,4 @@
-package com.ing.baker.petrinet.api
+package com.ing.baker.graph.api
 
 /**
   * Type alias for a multi set.

@@ -1,6 +1,6 @@
 package com.ing.baker.compiler
 
-import com.ing.baker.petrinet.api.MultiSet
+import com.ing.baker.graph.api.MultiSet
 import com.ing.baker.recipe.dsl.{Event, Ingredient, Interaction, Recipe}
 
 import scala.collection.mutable

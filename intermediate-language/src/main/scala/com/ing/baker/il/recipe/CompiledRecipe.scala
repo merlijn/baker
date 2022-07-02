@@ -2,7 +2,7 @@ package com.ing.baker.il.recipe
 
 import com.ing.baker.il.recipe.petrinet.{EventTransition, InteractionTransition, Place, Transition}
 import com.ing.baker.il.zeroPaddedSHA256
-import com.ing.baker.petrinet.api.{Marking, PetriNet}
+import com.ing.baker.graph.api.{Marking, PetriNet}
 
 import scala.collection.JavaConverters.*
 import scala.concurrent.duration.FiniteDuration

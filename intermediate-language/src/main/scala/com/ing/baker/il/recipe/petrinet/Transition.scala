@@ -1,7 +1,7 @@
 package com.ing.baker.il.recipe.petrinet
 
 import com.ing.baker.il.recipe.petrinet.Transition
-import com.ing.baker.petrinet.api.Identifiable
+import com.ing.baker.il.Identifiable
 
 object Transition {
 

@@ -1,7 +1,8 @@
 package com.ing.baker
 package compiler
 
-import com.ing.baker.petrinet.api.*
+import com.ing.baker.graph.api.PetriNet
+import com.ing.baker.graph.api.*
 import com.ing.baker.il.recipe.*
 import com.ing.baker.il.recipe.petrinet.*
 import com.ing.baker.il.recipe.petrinet.Place.*
