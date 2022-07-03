@@ -10,11 +10,13 @@ object Dependencies {
   val mockito =                   "org.mockito"                %  "mockito-all"                        % "1.10.19"
   val junitInterface =            "com.novocode"               %  "junit-interface"                    % "0.11"
 
-  val akkaActor =                 "com.typesafe.akka"          %% "akka-actor"                         % akkaVersion
-  val akkaStream =                "com.typesafe.akka"          %% "akka-stream"                        % akkaVersion
-  val akkaPersistence =           "com.typesafe.akka"          %% "akka-persistence"                   % akkaVersion
-  val akkaPersistenceQuery =      "com.typesafe.akka"          %% "akka-persistence-query"             % akkaVersion
-  val akkaPersistenceCassandra =  "com.typesafe.akka"          %% "akka-persistence-cassandra"         % "1.0.5"
+  val akkaActorTyped           = "com.typesafe.akka"        %% "akka-actor-typed"           % akkaVersion
+  val akkaPersistence          = "com.typesafe.akka"        %% "akka-persistence-typed"     % akkaVersion
+  val akkaPersistenceJdbc      = "com.lightbend.akka"       %% "akka-persistence-jdbc"      % "5.0.4"         // no scala 3
+  val akkaStream               = "com.typesafe.akka"        %% "akka-stream"                % akkaVersion
+  val akkaPersistenceQuery     = "com.typesafe.akka"        %% "akka-persistence-query"     % akkaVersion
+  val akkaSerializationJackson = "com.typesafe.akka"        %% "akka-serialization-jackson" % akkaVersion
+
   val akkaCluster =               "com.typesafe.akka"          %% "akka-cluster"                       % akkaVersion
   val akkaClusterSharding =       "com.typesafe.akka"          %% "akka-cluster-sharding"              % akkaVersion
   val akkaSlf4j =                 "com.typesafe.akka"          %% "akka-slf4j"                         % akkaVersion
@@ -30,7 +32,7 @@ object Dependencies {
   
   val scalaGraphDot =             "org.scala-graph"            %% "graph-dot"                          % "1.13.0"
   val graphvizJava =              "guru.nidi"                  %  "graphviz-java"                      % "0.18.0"
-
+  
   val catsEffect =                "org.typelevel"              %% "cats-effect"                        % "3.3.12"
   val catsCore =                  "org.typelevel"              %% "cats-core"                          % "2.7.0"
 

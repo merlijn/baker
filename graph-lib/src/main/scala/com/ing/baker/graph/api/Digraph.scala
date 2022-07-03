@@ -3,12 +3,6 @@ package com.ing.baker.graph.api
 import scala.language.implicitConversions
 import scala.util.NotGiven
 
-opaque type Weighted[E] = E => Int
-
-object Weighted {
-  def apply[E](fn: E => Int): Weighted[E] = fn
-}
-
 /**
   * Directed Graph
   * 

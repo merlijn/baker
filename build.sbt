@@ -36,7 +36,7 @@ val dependencyOverrideSettings = Seq(
   // note that this does NOT add the dependencies, just forces the version
   dependencyOverrides ++= Seq(
     catsCore,
-    akkaActor,
+    akkaActorTyped,
     akkaStream,
     "com.github.jnr" % "jnr-constants" % "0.9.9"
   )
@@ -100,21 +100,23 @@ lazy val runtime = project.in(file("runtime"))
   .settings(defaultModuleSettings)
   .settings(scalaPBSettings)
   .settings(
-    moduleName := "baker-runtime",
+    moduleName := "kagera-runtime",
     // we have to exclude the sources because of a compiler bug: https://issues.scala-lang.org/browse/SI-10134
     sources in (Compile, doc) := Seq.empty,
     libraryDependencies ++=
       Seq(
-        akkaActor,
+        akkaActorTyped,
         akkaPersistence,
         akkaPersistenceQuery,
         akkaClusterSharding,
+        akkaSerializationJackson,
         akkaSlf4j,
         akkaStream,
-        ficusConfig.cross(CrossVersion.for3Use2_13),
         catsCore,
         catsEffect,
-        
+        levelDB,
+        levelDBJni,
+        logback,
         "com.thesamet.scalapb" %% "compilerplugin" % scalaPbVersion,
         "com.thesamet.scalapb" %% "scalapb-runtime" % scalaPbVersion % "protobuf",
         protobufJava,
@@ -124,8 +126,6 @@ lazy val runtime = project.in(file("runtime"))
         akkaStreamTestKit % "test",
         scalaTest % "test",
         scalaCheck % "test",
-        levelDB % "test",
-        levelDBJni % "test",
         graphvizJava % "test",
         junitInterface % "test",
         mockito % "test",
@@ -146,7 +146,7 @@ lazy val recipeCompiler = project.in(file("compiler"))
   )
   .dependsOn(recipeDsl, intermediateLanguage, testScope(recipeDsl))
 
-lazy val baker = project
+lazy val kagera = project
   .in(file("."))
   .settings(defaultModuleSettings)
   .settings(noPublishSettings)
