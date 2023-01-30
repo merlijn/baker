@@ -17,7 +17,7 @@ object Test {
     case Pong => Ping
   }
 
-  trait FooService extends Service[Request, Response] {
+  trait PingPongService extends Service[Request, Response] {
     override def ask(req: Request): Response[Request] = req match {
       case p: Ping => Pong(p.msg)
       case p: Pong => Ping(p.msg)

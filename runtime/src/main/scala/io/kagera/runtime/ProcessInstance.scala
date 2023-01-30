@@ -22,17 +22,17 @@ object ProcessInstance {
 
   val logger = LoggerFactory.getLogger("ProcessInstance")
 
-  def behavior[S, E, Cmd : ClassTag](
+  def behavior[S, E, Cmd[X], Resp](
     processId: String,
     initialState: S,
-    runtime: ProcessRuntime[S, E, Cmd]): Behavior[Cmd] = {
+    runtime: ProcessRuntime[S, E, Cmd]): Behavior[Cmd[Resp]] = {
 
-    Behaviors.setup[Either[JobCompleted[E], Cmd]] { context =>
+    Behaviors.setup[Either[JobCompleted[E], Cmd[Resp]]] { context =>
 
       given scheduler: Scheduler = context.system.scheduler
       val jobExecutor: ActorRef[ExecuteJob[E]] = context.spawn(jobHandler[E](), "job-executor")
 
-      EventSourcedBehavior.apply[Either[JobCompleted[E], Cmd], E, S](
+      EventSourcedBehavior.apply[Either[JobCompleted[E], Cmd[Resp]], E, S](
         persistenceId  = PersistenceId.ofUniqueId(processId),
         emptyState     = initialState,
         commandHandler = processHandler(runtime, jobExecutor, context),
@@ -41,16 +41,16 @@ object ProcessInstance {
         case (state, RecoveryCompleted) =>
           logger.info("recovered")
       }
-    }.transformMessages[Cmd](cmd => Right(cmd))
+    }.transformMessages[Cmd[Resp]](cmd => Right(cmd))
   }
 
   sealed trait ControlMsg
   case class Ack(id: String) extends ControlMsg
 
-  def processHandler[S, E, Cmd](
+  def processHandler[S, E, Cmd[X], Resp](
      runtime: ProcessRuntime[S, E, Cmd],
      jobExecutor: ActorRef[ExecuteJob[E]],
-     context: ActorContext[Either[JobCompleted[E], Cmd]])(using ec: Scheduler): (S, Either[JobCompleted[E], Cmd]) => Effect[E, S] = (state, msg) => {
+     context: ActorContext[Either[JobCompleted[E], Cmd[Resp]]])(using ec: Scheduler): (S, Either[JobCompleted[E], Cmd[Resp]]) => Effect[E, S] = (state, msg) => {
 
     given timeout: Timeout = Timeout(5.seconds)
 
@@ -65,7 +65,7 @@ object ProcessInstance {
         }
 
       case Right(cmd) =>
-        val job = runtime.receive(state, cmd)
+        val job = runtime.receive[Resp](state, cmd)
 
         logger.info(s"received command: $cmd")
 

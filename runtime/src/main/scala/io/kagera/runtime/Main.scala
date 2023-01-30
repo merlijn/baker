@@ -9,8 +9,11 @@ import scala.reflect.ClassTag
 
 object Main {
 
-  def processBehavior[S, E, Cmd : ClassTag](processId: String, initialState: S, runtime: ProcessRuntime[S, E, Cmd]): Behavior[Cmd] =
-    Behaviors.setup[Cmd] { context =>
+  type Id[X] = X
+
+  def processBehavior[S, E, Cmd[X]](processId: String, initialState: S, runtime: ProcessRuntime[S, E, Cmd]): Behavior[Cmd[_]] =
+
+    Behaviors.setup[Cmd[_]] { context =>
       implicit val mat = Materializer(context)
 
       ProcessInstance.behavior(processId, initialState, runtime)
@@ -19,8 +22,11 @@ object Main {
   def main(args: Array[String]) = {
 
 //    given timeout: Timeout = Timeout(5.seconds)
+    type Arg = [A] =>> A
 
-    val system = ActorSystem(processBehavior("test-process-2", 0, CounterProcess), "kagera")
+    val b = processBehavior("test-process-2", 0, CounterProcess)
+
+    val system = ActorSystem(b, "kagera")
 
     system.tell(Inc(5))
   }

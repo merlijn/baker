@@ -51,11 +51,11 @@ object DSL {
     }
   }
 
-  def createPetriNet(adjacencies: TransitionAdjacency*): PetriNet[Place, Transition] = {
-    val edges: Seq[PetriNet.InnerEdge[Place, Transition]] = adjacencies.toSeq.zipWithIndex.flatMap {
+  def createPetriNet(adjacencies: TransitionAdjacency*): PetriNet[Place, Transition, Nothing] = {
+    val edges: Seq[PetriNet.InnerEdge[Place, Transition, Nothing]] = adjacencies.toSeq.zipWithIndex.flatMap {
       case (a, t) =>
-        a.in.map  { case (p, weight) => PetriNet.Edge[Place, Transition](Left(p), Right(t + 1), weight, None) }.toSeq ++
-        a.out.map { case (p, weight) => PetriNet.Edge[Place, Transition](Right(t + 1), Left(p), weight, None) }.toSeq
+        a.in.map  { case (p, weight) => PetriNet.PTEdge[Place, Transition](Left(p), Right(t + 1), weight, null) }.toSeq ++
+        a.out.map { case (p, weight) => PetriNet.TPEdge[Place, Transition](Right(t + 1), Left(p), weight, null) }.toSeq
     }
 
     PetriNet(edges.toSet)

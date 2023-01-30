@@ -6,9 +6,9 @@ sealed trait CounterEvent
 case class Incremented(amount: Int) extends CounterEvent
 case class Decremented(amount: Int) extends CounterEvent
 
-sealed trait CounterCmd
-case class Inc(amount: Int) extends CounterCmd
-case class Dec(amount: Int) extends CounterCmd
+sealed trait CounterCmd[Resp]
+case class Inc(amount: Int) extends CounterCmd[Unit]
+case class Dec(amount: Int) extends CounterCmd[Unit]
 
 object CounterProcess extends ProcessRuntime[Int, CounterEvent, CounterCmd] {
 
@@ -19,7 +19,7 @@ object CounterProcess extends ProcessRuntime[Int, CounterEvent, CounterCmd] {
 
   override def step(state: Int): Seq[Job[CounterEvent]] = Seq.empty
 
-  override def receive(state: Int, msg: CounterCmd): Job[CounterEvent] = msg match {
+  override def receive[Resp](state: Int, msg: CounterCmd[Resp]): Job[CounterEvent] = msg match {
     case Inc(n) => Job(Some(Incremented(n)))
     case Dec(n) => Job(Some(Decremented(n)))
   }
